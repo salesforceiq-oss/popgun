@@ -1,1 +1,1 @@
-var popular = require('../src');
+var popgun = require('../src');

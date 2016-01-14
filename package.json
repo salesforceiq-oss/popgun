@@ -1,5 +1,5 @@
 {
-  "name": "popular",
+  "name": "popgun",
   "version": "0.0.0",
   "description": "A pure Javascript popover component for high performance and feature-rich web applications",
   "main": "src/index.js",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/relateiq/popular.git"
+    "url": "git+https://github.com/relateiq/popgun.git"
   },
   "keywords": [
     "pop",
@@ -18,14 +18,14 @@
     "tip",
     "tooltip",
     "popup",
-    "popular"
+    "popgun"
   ],
   "author": "Anthony Liatsis <anthony.liatsis@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/relateiq/popular/issues"
+    "url": "https://github.com/relateiq/popgun/issues"
   },
-  "homepage": "https://github.com/relateiq/popular#readme",
+  "homepage": "https://github.com/relateiq/popgun#readme",
   "iqproj": {
     "app": true,
     "scss": false,

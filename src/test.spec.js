@@ -1,5 +1,5 @@
-var popular = require('./');
+var popgun = require('./');
 
-describe('popular', function() {
+describe('popgun', function() {
 
 });
