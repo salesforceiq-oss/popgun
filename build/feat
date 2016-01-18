@@ -121,6 +121,13 @@ case $featname in
         esac
     ;;
 
+    'typescript')
+        case $featcmd in
+            'enable') npm install --save-dev tsify ;;
+            'disable') npm uninstall --save-dev tsify ;;
+        esac
+    ;;
+
     'headless')
         case $featcmd in
             'enable')
@@ -144,6 +151,8 @@ case $featname in
         esac
     ;;
 
+    # t/f flag only
+    'templates') ;;
 
     *)
         echo "Unknown feature $featname";
