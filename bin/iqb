@@ -36,23 +36,25 @@ export EXORCIST_CMD=node_modules/exorcist/bin/exorcist.js
 export WATCHIFY_CMD=node_modules/watchify/bin/cmd.js
 export WATCH_CMD=node_modules/chokidar-cli/index.js
 export SASS_CMD=node_modules/node-sass/bin/node-sass
+export TSC_CMD=node_modules/typescript/bin/tsc
 PARALLEL_CMD='parallel --line-buffer --halt 2'
 
 # read some names out of the package.json
 export ENTRY_POINT=$(jq -r .main package.json);
+export SRC_MAIN=$(jq -r .iqproj.main package.json);
 export DEFAULT_NAME=$(jq -r .name package.json);
 
 # configuration settings
-export FEAT_APP=$(jq -r .iqproj.app package.json)
-export FEAT_TEMPLATES=$(jq -r .iqproj.templates package.json)
-export FEAT_TS=$(jq -r .iqproj.typescript package.json)
+export FEAT_APP=$(jq -r '.iqproj.app //empty' package.json)
+export FEAT_TEMPLATES=$(jq -r '.iqproj.templates //empty' package.json)
+export FEAT_TS=$(jq -r '.iqproj.typescript //empty' package.json)
 
 #################################################################################
 # utilities
 function find-next-open-port() {
     for port in $(seq $1 $(($1 + 1000))); do
         echo "\035" | /usr/bin/nc 127.0.0.1 $port > /dev/null
-        if [ $? -gt 0 ]; then 
+        if [ $? -gt 0 ]; then
             echo $port
             return 0
         fi
@@ -77,6 +79,7 @@ if [ -f "build/$command" ]; then
 fi
 
 [ -n "$FEAT_TS" ] && BROWSERIFY_CMD="$BROWSERIFY_CMD -p [ tsify --noImplicitAny ] "
+[ -n "$FEAT_TS" ] && WATCHIFY_CMD="$WATCHIFY_CMD -p [ tsify --noImplicitAny ] "
 
 #################################################################################
 # Built-in [standard] commands
@@ -88,7 +91,7 @@ case $command in
     # npm lifecycle commands
     "test")
         if [ "$FEAT_APP" = "true" ]; then
-            $KARMA_CMD start --single-run --no-auto-watch karma.conf.js 
+            $KARMA_CMD start --single-run --no-auto-watch karma.conf.js
         else
             $TAPE_CMD ${1:-src/**/*.spec.js}
         fi
@@ -104,7 +107,7 @@ case $command in
         outfile=$(pwd)/tmp/templates.js
 
         echo 'module.exports = angular.module("templates", []).run(function($templateCache) {' > $outfile
-        find src \
+        find src app \
             | grep '.html' \
             | xargs -P 6 -n 1 -I{} bash -c 'echo "$(basename {}) {}"' \
             | xargs -P 6 -n 2 node -e "console.log( \
@@ -121,17 +124,20 @@ case $command in
         ;;
 
     # testing
-    "watch:test") 
+    "watch:test")
         if [ "$FEAT_APP" = "true" ]; then
-            $KARMA_CMD start karma.conf.js 
+            $KARMA_CMD start karma.conf.js
         else
-            $self test && $WATCH_CMD --silent ${1-src/**/*.spec.js} -c "$self test" 
+            $self test && $WATCH_CMD --silent ${1-src/**/*.spec.js} -c "$self test"
         fi
         ;;
 
     # browserify feature
     "watch:js")   $WATCHIFY_CMD $ENTRY_POINT -d -o "$EXORCIST_CMD release/${DEFAULT_NAME}.js.map > release/${DEFAULT_NAME}.js" ;;
     "build:js")   $BROWSERIFY_CMD $ENTRY_POINT -d | $EXORCIST_CMD release/${DEFAULT_NAME}.js.map > release/${DEFAULT_NAME}.js ;;
+
+    "build:ts")   $TSC_CMD --sourceMap --module commonjs $SRC_MAIN --out release/${DEFAULT_NAME}.js ;;
+    "watch:ts")   $TSC_CMD --sourceMap --module commonjs -w $SRC_MAIN --out release/${DEFAULT_NAME}.js ;;
 
     # scss feature
     "watch:scss") $self build:scss && $WATCH_CMD --silent 'src/**/*.scss' -c "$self build:scss" ;;
@@ -144,7 +150,7 @@ case $command in
     "watch:html") $self build:html && $WATCH_CMD --silent app/* -c "$self build:html" ;;
     "build:html") cp app/index.html release/ ;;
     "watch:app")  $self build:app && $WATCHIFY_CMD app/index.js -d -o "$EXORCIST_CMD release/app.js.map > release/app.js" ;;
-    "build:app")  $BROWSERIFY_CMD app/index.js -d | $EXORCIST_CMD release/app.js.map > release/app.js ;;
+    "build:app")  $BROWSERIFY_CMD app/index.ts -d | $EXORCIST_CMD release/app.js.map > release/app.js ;;
     "livereload") $WATCH_CMD --silent release/* -c "curl -s http://localhost:${1:-35729}/changed\?files\=index.html" ;;
     "serve")
         SRV_PORT=$(find-next-open-port 8080)
@@ -154,45 +160,12 @@ case $command in
 
     # entry points
     "start"|"watch")
-        features=("$self assets" "$self watch:test")
-
-        if [ "$FEAT_TEMPLATES" = "true" ]; then
-            $self "templates"
-            features+=("$self watch:templates")
-        fi
-
-        if [ "$FEAT_APP" = "true" ]; then
-            features+=(
-                "$self watch:app"
-                "$self watch:html"
-                "$self watch:scss"
-                "$self watch:js"
-                "$self serve"
-            );
-        fi
-
-        if [ "$FEAT_TEMPLATE" = "true" ]; then
-            features+=("$self watch:templates")
-        fi
-
+        features=("$self assets" "$self watch:test" "$self watch:ts")
         $PARALLEL_CMD ::: "${features[@]}"
         ;;
 
     "build")
-        if [ "$FEAT_TEMPLATES" = "true" ]; then
-            $self "templates"
-        fi
-
-        features=("$self assets" "$self test")
-
-        if [ "$FEAT_APP" = "true" ]; then
-            features+=(
-                "$self build:scss"
-                "$self build:js"
-                "$self build:app"
-                "$self build:html"
-            );
-        fi
+        features=("$self assets" "$self test" "$self build:ts")
 
         $self clean &&
         $PARALLEL_CMD ::: "${features[@]}"
@@ -208,4 +181,3 @@ ELAPSED=$(( $END_TIME - $START_TIME ))
 TIMESTR=$(node -e "console.log($ELAPSED < 1000 ? $ELAPSED + 'ms' : ($ELAPSED / 1000.0) + 's')");
 
 echo "---DONE [ $TIMESTR ] $command $*"
-

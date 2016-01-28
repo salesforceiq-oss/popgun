@@ -27,9 +27,11 @@
   },
   "homepage": "https://github.com/relateiq/popgun#readme",
   "iqproj": {
+    "main": "src/index.ts",
     "app": true,
     "scss": false,
-    "browserify": false
+    "browserify": true,
+    "typescript": true
   },
   "devDependencies": {
     "browserify": "~12.0.0",
@@ -47,6 +49,8 @@
     "node-sass": "~3.4.0",
     "phantomjs": "~1.9.18",
     "tiny-lr": "~0.2.1",
+    "tsify": "~0.13.2",
+    "typescript": "~1.7.5",
     "watchify": "~3.5.0",
     "yargs": "~3.26.0"
   },

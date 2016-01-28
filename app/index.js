@@ -1,1 +1,0 @@
-var popgun = require('../src');

@@ -1,2 +1,12 @@
+.idea
+.sass-cache
 node_modules
+tmp
+test-assets
+/coverage
 release
+
+typings
+
+*.js
+*.js.map
