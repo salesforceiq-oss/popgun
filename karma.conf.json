@@ -5,13 +5,20 @@
   ],
   "basePath": "",
   "files": [
-    "src/**/*.spec.js"
+    "src/**/*.spec.js",
+    "src/**/*.spec.ts"
   ],
   "browserify": {
-    "debug": true
+    "debug": true,
+    "plugin": [
+      "tsify", {
+        "target": "ES5"
+      }
+    ]
   },
   "preprocessors": {
-    "src/**/*.spec.js": "browserify"
+    "src/**/*.spec.js": "browserify",
+    "src/**/*.spec.ts": "browserify"
   },
   "autoWatch": true,
   "reporters": [
