@@ -1,31 +1,27 @@
 {
   "frameworks": [
-    "browserify",
-    "jasmine"
+    "jasmine",
+    "browserify"
   ],
   "basePath": "",
   "files": [
-    "src/**/*.spec.js",
     "src/**/*.spec.ts"
   ],
+  "preprocessors": {
+    "src/**/*.spec.ts": "browserify"
+  },
   "browserify": {
     "debug": true,
     "plugin": [
-      "tsify", {
-        "target": "ES5"
-      }
+      "tsify"
     ]
-  },
-  "preprocessors": {
-    "src/**/*.spec.js": "browserify",
-    "src/**/*.spec.ts": "browserify"
   },
   "autoWatch": true,
   "reporters": [
     "progress"
   ],
   "browsers": [
-    "PhantomJS"
+    "Chrome"
   ],
   "junitReporter": {
     "outputFile": "test_out/unit.xml",

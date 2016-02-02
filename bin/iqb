@@ -76,7 +76,8 @@ if [ -f "build/$command" ]; then
     exec build/$command "$@"
 fi
 
-[ -n "$FEAT_TS" ] && BROWSERIFY_CMD="$BROWSERIFY_CMD -p [ tsify --noImplicitAny ] "
+[ -n "$FEAT_TS" ] && BROWSERIFY_CMD="$BROWSERIFY_CMD -p [ tsify --noImplicitAny ]"
+[ -n "$FEAT_TS" ] && WATCHIFY_CMD="$WATCHIFY_CMD -p [ tsify --noImplicitAny ]"
 
 #################################################################################
 # Built-in [standard] commands

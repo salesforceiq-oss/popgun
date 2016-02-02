@@ -1,5 +1,9 @@
-declare var module;
+import eventDelegate from './event-delegate';
 
-let x = "hello world";
+let x = 'hello world ' + eventDelegate;
 
-module.exports = "hi!";
+export default 'hi!';
+
+export {
+x
+}
