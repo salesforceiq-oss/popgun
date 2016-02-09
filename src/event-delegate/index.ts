@@ -6,7 +6,10 @@ function init(): void {
   EnumUtil.getNames(TriggerName).map((n: string): Trigger => {
     return new Trigger(n);
   }).forEach((trigger: Trigger) => {
-    document.addEventListener(<string> trigger.eventType, listener, trigger.useCapture);
+    let eventType: string = <string> trigger.eventType;
+
+    document.removeEventListener(eventType, listener);
+    document.addEventListener(eventType, listener, trigger.useCapture);
   });
 }
 
