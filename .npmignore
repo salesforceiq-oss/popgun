@@ -16,3 +16,6 @@ typings
 # Karma configuration
 karma.conf.js
 karma.conf.json
+
+# Node modules (npm will install these for us properly)
+node_modules
