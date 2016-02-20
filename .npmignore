@@ -9,3 +9,6 @@ typings
 
 # ESLint config
 .eslintrc
+
+# .gitignore
+.gitignore
