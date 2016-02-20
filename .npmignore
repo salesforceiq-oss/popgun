@@ -6,3 +6,6 @@ src/**/*.spec.js
 
 # TSD typings
 typings
+
+# ESLint config
+.eslintrc
