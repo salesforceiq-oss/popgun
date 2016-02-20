@@ -1,5 +1,5 @@
 # TypeScript files
-src/**/*.ts
+*.ts
 
 # TypeScript - JavaScript mappings
 *.js.map
