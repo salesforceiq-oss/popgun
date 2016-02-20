@@ -28,3 +28,6 @@ tsd.json
 
 # TypeScript formatter
 tsfmt.json
+
+# TypeScript linter
+tslint.json
