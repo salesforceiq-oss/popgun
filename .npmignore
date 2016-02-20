@@ -1,5 +1,5 @@
-# TypeScript src folder
-src
+# TypeScript files
+src/**/*.ts
 
 # Tests
 src/**/*.spec.js
