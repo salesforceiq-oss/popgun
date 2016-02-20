@@ -12,3 +12,7 @@ typings
 
 # .gitignore
 .gitignore
+
+# Karma configuration
+karma.conf.js
+karma.conf.json
