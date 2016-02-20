@@ -22,3 +22,6 @@ node_modules
 
 # TypeScript config
 tsconfig.json
+
+# TSD configuration
+tsd.json
