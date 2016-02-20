@@ -3,3 +3,6 @@ src/**/*.ts
 
 # Tests
 src/**/*.spec.js
+
+# TSD typings
+typings
