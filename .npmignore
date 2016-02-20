@@ -2,4 +2,4 @@
 src
 
 # Tests
-build/**/*.spec.js
+src/**/*.spec.js
