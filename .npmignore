@@ -25,3 +25,6 @@ tsconfig.json
 
 # TSD configuration
 tsd.json
+
+# TypeScript formatter
+tsfmt.json
