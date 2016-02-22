@@ -3,7 +3,8 @@
 import {  } from './';
 
 import { Options, defaultOptions } from './';
-import Trigger from '../trigger';
+import Trigger, { TriggerName } from '../trigger';
+import EnumUtil from '../enum-util';
 import * as extend from 'extend';
 
 let deepEqual = require('deep-equal');
@@ -90,6 +91,89 @@ describe('Options - ', () => {
         content: expected.content,
         placement: expected.placement
       })), expected)).toBe(true);
+    });
+
+  });
+
+  fdescribe('fromElement - ', () => {
+
+    function getOptionsFromElement(attr: string, attrValue: string): Options {
+      let el = document.createElement('div');
+      el.setAttribute(attr, attrValue);
+      return (new Options()).fromElement(el);
+    }
+
+    EnumUtil.getNames(TriggerName).forEach((n: string): void => {
+      it('should set ' + n + ' trigger from element attribute', () => {
+        let opts = getOptionsFromElement('popgun-trigger', n);
+        expect(opts.trigger).toEqual(new Trigger('hover'));
+      });
+    });
+
+    it('should set content from element attribute', () => {
+      let value = 'hello world';
+      let opts = getOptionsFromElement('popgun-content', value);
+      expect(opts.content).toEqual(value);
+    });
+
+    it('should set placement from element attribute', () => {
+      let value = 'left top';
+      let opts = getOptionsFromElement('popgun-placement', value);
+      expect(opts.placement).toEqual(value);
+    });
+
+    it('should set placementOffset from element attribute', () => {
+      let value = '123';
+      let opts = getOptionsFromElement('popgun-placement-offset', value);
+      expect(opts.placementOffset).toEqual(value);
+    });
+
+    it('should set optimizePlacement from element attribute', () => {
+      let value = 'false';
+      let opts = getOptionsFromElement('popgun-optimize-placement', value);
+      expect(opts.optimizePlacement).toEqual(value);
+    });
+
+    it('should set transitionPlacement from element attribute', () => {
+      let value = 'false';
+      let opts = getOptionsFromElement('popgun-transition-placement', value);
+      expect(opts.transitionPlacement).toEqual(value);
+    });
+
+    it('should set alignment from element attribute', () => {
+      let value = 'top left';
+      let opts = getOptionsFromElement('popgun-alignment', value);
+      expect(opts.alignment).toEqual(value);
+    });
+
+    it('should set alignmentOffset from element attribute', () => {
+      let value = '123';
+      let opts = getOptionsFromElement('popgun-alignment-offset', value);
+      expect(opts.alignmentOffset).toEqual(value);
+    });
+
+    it('should set viewportPadding from element attribute', () => {
+      let value = '123';
+      let opts = getOptionsFromElement('popgun-viewport-padding', value);
+      expect(opts.viewportPadding).toEqual(value);
+    });
+
+    it('should set timeToHoverOnPop from element attribute', () => {
+      let value = '123';
+      let opts = getOptionsFromElement('popgun-time-to-hover-on-pop', value);
+      expect(opts.timeToHoverOnPop).toEqual(value);
+    });
+
+    it('should set showDelay from element attribute', () => {
+      let value = '123';
+      let opts = getOptionsFromElement('popgun-show-delay', value);
+      expect(opts.showDelay).toEqual(value);
+    });
+
+    it('should set fadeDuration from element attribute', () => {
+      let value = '123';
+      let opts = getOptionsFromElement('popgun-fade-duration', value);
+      expect(opts.fadeDuration).toEqual(value);
     });
 
   });

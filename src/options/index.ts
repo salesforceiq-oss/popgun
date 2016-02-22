@@ -1,6 +1,8 @@
 import Trigger from '../trigger';
 import * as extend from 'extend';
 
+let camelize = require('camelize');
+
 export interface IOptions {
   trigger?: Trigger;
   content?: string;
@@ -55,5 +57,20 @@ export class Options implements IOptions {
 
   extend(opts: IOptions): Options {
     return extend(this, opts);
+  }
+
+  fromElement(el: Element): Options {
+    if (!el) {
+      return this;
+    }
+
+    for (let i = 0; i < el.attributes.length; i++) {
+      let attr = el.attributes[i];
+      let opts = {};
+
+      if (attr.name.indexOf('data-popgun-') === 0) {
+        opts[camelize(attr.name)] = attr.value;
+      }
+    }
   }
 }
