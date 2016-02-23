@@ -69,7 +69,7 @@ export class Options implements IOptions {
       let opts = {};
 
       if (attr.name.indexOf('data-popgun-') === 0) {
-        opts[camelize(attr.name)] = attr.value;
+        // opts[camelize(attr.name)] = attr.value;
       }
     }
   }
