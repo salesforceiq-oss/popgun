@@ -1,8 +1,7 @@
 import IOptions from './IOptions';
-import Trigger from '../trigger';
 
 let defaultOptions: IOptions = {
-    trigger: new Trigger('hover'),
+    trigger: 'hover',
     content: '',
     placement: 'top',
     placementOffset: 8,

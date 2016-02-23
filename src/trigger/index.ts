@@ -1,4 +1,8 @@
+// parse function that takes a string and turns it into an Array of Enums
+// getEventType(string), returns the 
+
 require('focusin').polyfill();
+import EnumUtil, { IEnumValuesByName } from '../enum-util';
 
 enum TriggerName {
   CLICK,
@@ -14,64 +18,60 @@ class TriggerEventType {
   static MANUAL: string = 'popgun-manual';
 }
 
-class Trigger {
-  name: TriggerName;
-  eventType: TriggerEventType;
-  useCapture: boolean;
+function parse(rawTrigger: string): TriggerName[] {
+  let triggerStrings: string[] = rawTrigger.split(/[ ,]+/);
+  let triggerValuesByName: IEnumValuesByName = EnumUtil.getValuesByName(TriggerName);
+  let triggerNameList: TriggerName[] = [];
 
-  constructor(stringName: string) {
-    this._setName(stringName);
-    this._setEventType();
-    this._setUseCapture();
-  }
+  triggerStrings.forEach((trigger: string) => {
+      let triggerStringName = trigger.toUpperCase();
 
-  private _setName(stringName: string): void {
-    switch (stringName.toUpperCase()) {
-      case 'CLICK':
-        this.name = TriggerName.CLICK;
-        break;
-      case 'HOVER':
-        this.name = TriggerName.HOVER;
-        break;
-      case 'FOCUS':
-        this.name = TriggerName.FOCUS;
-        break;
-      case 'MANUAL':
-        this.name = TriggerName.MANUAL;
-        break;
-    }
-  }
+      if (triggerStringName in triggerValuesByName) {
+          triggerNameList.push(triggerValuesByName[triggerStringName]);
+      }
+  });
 
-  private _setEventType(): void {
-    switch (this.name) {
-      case TriggerName.CLICK:
-        this.eventType = TriggerEventType.CLICK;
-        break;
-      case TriggerName.HOVER:
-        this.eventType = TriggerEventType.HOVER;
-        break;
-      case TriggerName.FOCUS:
-        this.eventType = TriggerEventType.FOCUS;
-        break;
-      case TriggerName.MANUAL:
-        this.eventType = TriggerEventType.MANUAL;
-        break;
-    }
-  }
+  return triggerNameList;
+}
 
-  private _setUseCapture(): void {
-    switch (this.name) {
-      case TriggerName.FOCUS:
-        this.useCapture = true;
-        break;
-      default:
-        this.useCapture = false;
-    }
+function getEventTypes(rawTrigger: string): TriggerEventType[] {
+  let triggerNameList: TriggerName[] = parse(rawTrigger);
+  let triggerEventTypeList: TriggerEventType[] = [];
+
+  triggerNameList.forEach((trigger: TriggerName) => {
+      triggerEventTypeList.push(getEventType(trigger));
+  });
+
+  return triggerEventTypeList;
+}
+
+function getEventType(trigger: TriggerName): TriggerEventType {
+  switch (trigger) {
+    case TriggerName.CLICK:
+      return TriggerEventType.CLICK;
+    case TriggerName.HOVER:
+      return TriggerEventType.HOVER;
+    case TriggerName.FOCUS:
+      return TriggerEventType.FOCUS;
+    case TriggerName.MANUAL:
+      return TriggerEventType.MANUAL;
   }
 }
 
-export default Trigger;
+function isUseCapture(trigger: TriggerName): boolean {
+  switch (trigger) {
+    case TriggerName.FOCUS:
+      return true;
+    default:
+      return false;
+  }
+}
+
 export {
   TriggerName,
-  TriggerEventType
+  TriggerEventType,
+  parse,
+  getEventTypes,
+  getEventType,
+  isUseCapture
 }

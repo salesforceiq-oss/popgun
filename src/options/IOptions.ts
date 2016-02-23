@@ -1,7 +1,5 @@
-import Trigger from '../trigger';
-
 interface IOptions {
-    trigger?: Trigger;
+    trigger?: string;
     content?: string;
     placement?: string;
     placementOffset?: number;

@@ -2,7 +2,7 @@
 
 import Options from './';
 import defaultOptions from './default-options';
-import Trigger, { TriggerName } from '../trigger';
+import { TriggerName } from '../trigger';
 import EnumUtil from '../enum-util';
 import * as extend from 'extend';
 
@@ -13,7 +13,7 @@ describe('Options - ', () => {
   describe('default - ', () => {
 
     it('should default trigger to a hover trigger', () => {
-      expect((new Options()).trigger).toEqual(new Trigger('hover'));
+      expect((new Options()).trigger).toEqual('hover');
     });
 
     it('should default content to an empty string', () => {
@@ -66,7 +66,7 @@ describe('Options - ', () => {
 
     it('should extend defaults with custom options object passed to constructor', () => {
       let expected = extend({}, defaultOptions); // copy
-      expected.trigger = new Trigger('click');
+      expected.trigger = 'click';
       expected.content = 'hello world';
       expected.placement = 'bottom';
 
@@ -80,7 +80,7 @@ describe('Options - ', () => {
 
     it('should extend defaults with custom options object with extend fn', () => {
       let expected = extend({}, defaultOptions); // copy
-      expected.trigger = new Trigger('click');
+      expected.trigger = 'click';
       expected.content = 'hello world';
       expected.placement = 'bottom';
 
@@ -105,7 +105,7 @@ describe('Options - ', () => {
     EnumUtil.getNames(TriggerName).forEach((n: string): void => {
       it('should set ' + n + ' trigger from element attribute', () => {
         let opts = getOptionsFromElement('popgun-trigger', n);
-        expect(opts.trigger).toEqual(new Trigger('hover'));
+        expect(opts.trigger).toEqual('hover');
       });
     });
 

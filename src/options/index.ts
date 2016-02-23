@@ -1,12 +1,11 @@
 import IOptions from './IOptions';
 import defaultOptions from './default-options';
-import Trigger from '../trigger';
 import * as extend from 'extend';
 
 let camelize = require('camelize');
 
 class Options implements IOptions {
-  trigger: Trigger;
+  trigger: string;
   content: string;
   placement: string;
   placementOffset: number;
