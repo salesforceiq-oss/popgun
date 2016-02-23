@@ -4,7 +4,7 @@ import * as popTarget from './';
 import Trigger, { TriggerName } from '../trigger';
 import EnumUtil from '../enum-util';
 
-describe('pop-target - ', () => {
+xdescribe('pop-target - ', () => {
 
   describe('isPopTarget() - ', () => {
 

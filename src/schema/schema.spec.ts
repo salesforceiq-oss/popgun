@@ -1,7 +1,7 @@
 /// <reference path='../../typings/tsd.d.ts' />
 
 import * as schema from './';
-import { IOptions } from '../options';
+import IOptions from '../options/IOptions';
 
 describe('schema -', () => {
 
@@ -27,7 +27,7 @@ describe('schema -', () => {
         schema.add('test', {
             placement: 'top'
         });
-        
+
         let newOpts: IOptions = {
             placement: 'bottom'
         };

@@ -1,12 +1,12 @@
-import { IOptions } from '../options';
+import IOptions from '../options/IOptions';
 
 interface ISchemaCache {
-    [key: string]: IOptions
+    [key: string]: IOptions;
 };
 
 let _cache: ISchemaCache = {};
 
-function add(key: string, opts: IOptions) {
+function add(key: string, opts: IOptions): void {
     _cache[key] = opts;
 }
 
@@ -14,7 +14,7 @@ function get(key: string): IOptions {
     return _cache[key];
 }
 
-function clear() {
+function clear(): void {
     _cache = {};
 }
 

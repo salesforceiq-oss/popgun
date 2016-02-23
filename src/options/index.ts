@@ -1,22 +1,8 @@
+import IOptions from './IOptions';
 import Trigger from '../trigger';
 import * as extend from 'extend';
 
 let camelize = require('camelize');
-
-export interface IOptions {
-  trigger?: Trigger;
-  content?: string;
-  placement?: string;
-  placementOffset?: number;
-  optimizePlacement?: boolean;
-  transitionPlacement?: boolean;
-  alignment?: string;
-  alignmentOffset?: number;
-  viewportPadding?: number;
-  timeToHoverOnPop?: number;
-  showDelay?: number;
-  fadeDuration?: number;
-}
 
 export let defaultOptions: IOptions = {
   trigger: new Trigger('hover'),

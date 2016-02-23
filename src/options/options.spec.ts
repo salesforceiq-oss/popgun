@@ -93,7 +93,7 @@ describe('Options - ', () => {
 
   });
 
-  describe('fromElement - ', () => {
+  xdescribe('fromElement - ', () => {
 
     function getOptionsFromElement(attr: string, attrValue: string): Options {
       let el = document.createElement('div');
