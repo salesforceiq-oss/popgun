@@ -1,23 +1,9 @@
 import IOptions from './IOptions';
+import defaultOptions from './default-options';
 import Trigger from '../trigger';
 import * as extend from 'extend';
 
 let camelize = require('camelize');
-
-export let defaultOptions: IOptions = {
-  trigger: new Trigger('hover'),
-  content: '',
-  placement: 'top',
-  placementOffset: 8,
-  optimizePlacement: true,
-  transitionPlacement: true,
-  alignment: '',
-  alignmentOffset: 0,
-  viewportPadding: 10,
-  timeToHoverOnPop: 300,
-  showDelay: 0,
-  fadeDuration: 100
-};
 
 export class Options implements IOptions {
   trigger: Trigger;
@@ -52,10 +38,11 @@ export class Options implements IOptions {
 
     for (let i = 0; i < el.attributes.length; i++) {
       let attr = el.attributes[i];
-      let opts = {};
+      let opts: IOptions = {};
+      let key: string = camelize(attr.name);
 
       if (attr.name.indexOf('data-popgun-') === 0) {
-        // opts[camelize(attr.name)] = attr.value;
+        (<any>opts)[key] = attr.value;
       }
     }
   }
