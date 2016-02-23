@@ -1,6 +1,7 @@
 /// <reference path='../../typings/tsd.d.ts' />
 
-import { Options, defaultOptions } from './';
+import Options from './';
+import defaultOptions from './default-options';
 import Trigger, { TriggerName } from '../trigger';
 import EnumUtil from '../enum-util';
 import * as extend from 'extend';

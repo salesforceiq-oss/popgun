@@ -5,7 +5,7 @@ import * as extend from 'extend';
 
 let camelize = require('camelize');
 
-export class Options implements IOptions {
+class Options implements IOptions {
   trigger: Trigger;
   content: string;
   placement: string;
@@ -47,3 +47,5 @@ export class Options implements IOptions {
     }
   }
 }
+
+export default Options;
