@@ -39,13 +39,14 @@ class Options implements IOptions {
     for (let i = 0; i < el.attributes.length; i++) {
       let attr = el.attributes[i];
       let opts: IOptions = {};
-      let key: string = camelize(attr.name);
 
-      if (attr.name.indexOf('data-popgun-') === 0) {
-        (<any>opts)[key] = attr.value;
-      }
+      // if (this.isOptionAttr(attr.name)) {
+      //   let key: string = camelize(attr.name);
+      //   (<any>opts)[key] = attr.value;
+      // }
     }
   }
+
 }
 
 export default Options;
