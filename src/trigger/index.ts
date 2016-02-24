@@ -1,25 +1,9 @@
-// parse function that takes a string and turns it into an Array of Enums
-// getEventType(string), returns the 
-
-require('focusin').polyfill();
 import EnumUtil, { IEnumValuesByName } from '../enum-util';
+import TriggerEventType from '../TriggerEventType';
+import TriggerType from '../TriggerType';
 
-enum TriggerName {
-  CLICK,
-  HOVER,
-  FOCUS,
-  MANUAL
-}
-
-class TriggerEventType {
-  static CLICK: string = 'click';
-  static HOVER: string = 'mouseenter';
-  static FOCUS: string = 'focusin';
-  static MANUAL: string = 'popgun-manual';
-}
-
-class Trigger {
-  name: TriggerName;
+export default class Trigger {
+  name: TriggerType;
   eventType: TriggerEventType;
   useCapture: boolean;
 
@@ -30,7 +14,7 @@ class Trigger {
   }
 
   private _setName(stringName: string): void {
-    let triggerValuesByName: IEnumValuesByName = EnumUtil.getValuesByName(TriggerName);
+    let triggerValuesByName: IEnumValuesByName = EnumUtil.getValuesByName(TriggerType);
     let trigger = stringName.toUpperCase();
 
     if (trigger in triggerValuesByName) {
@@ -40,16 +24,16 @@ class Trigger {
 
   private _setEventType(): void {
     switch (this.name) {
-      case TriggerName.CLICK:
+      case TriggerType.CLICK:
         this.eventType = TriggerEventType.CLICK;
         break;
-      case TriggerName.HOVER:
+      case TriggerType.HOVER:
         this.eventType = TriggerEventType.HOVER;
         break;
-      case TriggerName.FOCUS:
+      case TriggerType.FOCUS:
         this.eventType = TriggerEventType.FOCUS;
         break;
-      case TriggerName.MANUAL:
+      case TriggerType.MANUAL:
         this.eventType = TriggerEventType.MANUAL;
         break;
     }
@@ -57,37 +41,11 @@ class Trigger {
 
   private _setUseCapture(): void {
     switch (this.name) {
-      case TriggerName.FOCUS:
+      case TriggerType.FOCUS:
         this.useCapture = true;
         break;
       default:
         this.useCapture = false;
     }
   }
-}
-
-function parse(rawTrigger: string): TriggerName[] {
-  let triggerStrings: string[] = rawTrigger.split(/[ ,]+/);
-  let triggerValuesByName: IEnumValuesByName = EnumUtil.getValuesByName(TriggerName);
-  let triggerNameList: TriggerName[] = [];
-
-  triggerStrings.forEach((trigger: string) => {
-    let triggerStringName = trigger.toUpperCase();
-
-    if (triggerStringName in triggerValuesByName) {
-      triggerNameList.push(triggerValuesByName[triggerStringName]);
-    }
-  });
-
-  return triggerNameList;
-}
-
-// TriggerName to TriggerType
-
-
-export {
-TriggerName,
-TriggerEventType,
-Trigger,
-parse
 }

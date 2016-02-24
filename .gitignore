@@ -5,6 +5,7 @@ tmp
 test-assets
 /coverage
 release
+.DS_Store
 
 typings
 
