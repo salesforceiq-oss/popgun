@@ -5,7 +5,7 @@ import * as extend from 'extend';
 let camelize = require('camelize');
 
 class Options implements IOptions {
-  trigger: string;
+  trigger: Trigger[];
   content: string;
   placement: string;
   placementOffset: number;
@@ -17,6 +17,10 @@ class Options implements IOptions {
   timeToHoverOnPop: number;
   showDelay: number;
   fadeDuration: number;
+
+  static fromLiteral(opts: { [key: string]: any }): Options {
+      return extend(this, opts);
+  }
 
   constructor(opts?: IOptions) {
     this.extendDefault(opts);

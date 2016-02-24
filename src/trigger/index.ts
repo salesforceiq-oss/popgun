@@ -18,60 +18,76 @@ class TriggerEventType {
   static MANUAL: string = 'popgun-manual';
 }
 
+class Trigger {
+  name: TriggerName;
+  eventType: TriggerEventType;
+  useCapture: boolean;
+
+  constructor(stringName: string) {
+    this._setName(stringName);
+    this._setEventType();
+    this._setUseCapture();
+  }
+
+  private _setName(stringName: string): void {
+    let triggerValuesByName: IEnumValuesByName = EnumUtil.getValuesByName(TriggerName);
+    let trigger = stringName.toUpperCase();
+
+    if (trigger in triggerValuesByName) {
+      this.name = triggerValuesByName[trigger];
+    }
+  }
+
+  private _setEventType(): void {
+    switch (this.name) {
+      case TriggerName.CLICK:
+        this.eventType = TriggerEventType.CLICK;
+        break;
+      case TriggerName.HOVER:
+        this.eventType = TriggerEventType.HOVER;
+        break;
+      case TriggerName.FOCUS:
+        this.eventType = TriggerEventType.FOCUS;
+        break;
+      case TriggerName.MANUAL:
+        this.eventType = TriggerEventType.MANUAL;
+        break;
+    }
+  }
+
+  private _setUseCapture(): void {
+    switch (this.name) {
+      case TriggerName.FOCUS:
+        this.useCapture = true;
+        break;
+      default:
+        this.useCapture = false;
+    }
+  }
+}
+
 function parse(rawTrigger: string): TriggerName[] {
   let triggerStrings: string[] = rawTrigger.split(/[ ,]+/);
   let triggerValuesByName: IEnumValuesByName = EnumUtil.getValuesByName(TriggerName);
   let triggerNameList: TriggerName[] = [];
 
   triggerStrings.forEach((trigger: string) => {
-      let triggerStringName = trigger.toUpperCase();
+    let triggerStringName = trigger.toUpperCase();
 
-      if (triggerStringName in triggerValuesByName) {
-          triggerNameList.push(triggerValuesByName[triggerStringName]);
-      }
+    if (triggerStringName in triggerValuesByName) {
+      triggerNameList.push(triggerValuesByName[triggerStringName]);
+    }
   });
 
   return triggerNameList;
 }
 
-function getEventTypes(rawTrigger: string): TriggerEventType[] {
-  let triggerNameList: TriggerName[] = parse(rawTrigger);
-  let triggerEventTypeList: TriggerEventType[] = [];
+// TriggerName to TriggerType
 
-  triggerNameList.forEach((trigger: TriggerName) => {
-      triggerEventTypeList.push(getEventType(trigger));
-  });
-
-  return triggerEventTypeList;
-}
-
-function getEventType(trigger: TriggerName): TriggerEventType {
-  switch (trigger) {
-    case TriggerName.CLICK:
-      return TriggerEventType.CLICK;
-    case TriggerName.HOVER:
-      return TriggerEventType.HOVER;
-    case TriggerName.FOCUS:
-      return TriggerEventType.FOCUS;
-    case TriggerName.MANUAL:
-      return TriggerEventType.MANUAL;
-  }
-}
-
-function isUseCapture(trigger: TriggerName): boolean {
-  switch (trigger) {
-    case TriggerName.FOCUS:
-      return true;
-    default:
-      return false;
-  }
-}
 
 export {
-  TriggerName,
-  TriggerEventType,
-  parse,
-  getEventTypes,
-  getEventType,
-  isUseCapture
+TriggerName,
+TriggerEventType,
+Trigger,
+parse
 }

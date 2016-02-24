@@ -1,5 +1,5 @@
 interface IOptions {
-    trigger?: string;
+    trigger?: Trigger[];
     content?: string;
     placement?: string;
     placementOffset?: number;
