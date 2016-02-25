@@ -2,7 +2,7 @@
 
 import * as eventDelegate from './';
 
-describe('event-delegate', () => {
+describe('EventDelegate', () => {
 
   describe('- init -', () => {
     it('should addEventListener for click on document', () => {

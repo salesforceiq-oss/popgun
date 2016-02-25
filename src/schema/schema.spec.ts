@@ -1,7 +1,7 @@
 /// <reference path='../../typings/tsd.d.ts' />
 
-import * as schema from './';
-import IOptions from '../options/IOptions';
+import schema from './';
+import IOptions from '../IOptions';
 
 describe('schema -', () => {
 

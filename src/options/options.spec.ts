@@ -1,9 +1,9 @@
 /// <reference path='../../typings/tsd.d.ts' />
 
 import Options from './';
-import defaultOptions from './default-options';
-import { TriggerName } from '../trigger';
-import EnumUtil from '../enum-util';
+import defaultOptions from '../DefaultOptions';
+import TriggerType from '../TriggerType';
+import EnumUtil from '../EnumUtil';
 import * as extend from 'extend';
 
 let deepEqual = require('deep-equal');
@@ -102,7 +102,7 @@ describe('Options - ', () => {
       return (new Options()).fromElement(el);
     }
 
-    EnumUtil.getNames(TriggerName).forEach((n: string): void => {
+    EnumUtil.getNames(TriggerType).forEach((n: string): void => {
       it('should set ' + n + ' trigger from element attribute', () => {
         let opts = getOptionsFromElement('popgun-trigger', n);
         expect(opts.trigger).toEqual('hover');

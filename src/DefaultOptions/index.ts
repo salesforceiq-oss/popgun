@@ -1,4 +1,4 @@
-import IOptions from './IOptions';
+import IOptions from '../IOptions';
 
 let defaultOptions: IOptions = {
     trigger: 'hover',

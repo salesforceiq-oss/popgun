@@ -1,6 +1,7 @@
-import IOptions from './IOptions';
-import defaultOptions from './default-options';
+import IOptions from '../IOptions';
+import defaultOptions from '../DefaultOptions';
 import * as extend from 'extend';
+import Trigger from '../Trigger';
 
 let camelize = require('camelize');
 

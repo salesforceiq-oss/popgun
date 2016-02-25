@@ -1,4 +1,4 @@
-import EnumUtil, { IEnumValuesByName } from '../enum-util';
+import EnumUtil, { IEnumValuesByName } from '../EnumUtil';
 import TriggerEventType from '../TriggerEventType';
 import TriggerType from '../TriggerType';
 

@@ -1,8 +1,8 @@
 /// <reference path='../../typings/tsd.d.ts' />
 
 import * as popTarget from './';
-import { TriggerName } from '../trigger';
-import EnumUtil from '../enum-util';
+import TriggerType from '../TriggerType';
+import EnumUtil from '../EnumUtil';
 
 xdescribe('pop-target - ', () => {
 
@@ -43,8 +43,8 @@ xdescribe('pop-target - ', () => {
       expect(popTarget.isForTrigger(el, 'click')).toBe(false);
     });
 
-    EnumUtil.getNames(TriggerName).forEach((n: string): void => {
-      EnumUtil.getNames(TriggerName).forEach((n2: string): void => {
+    EnumUtil.getNames(TriggerType).forEach((n: string): void => {
+      EnumUtil.getNames(TriggerType).forEach((n2: string): void => {
         if (n !== n2) {
           it('should return false when trigger does not match pop target trigger', () => {
             let el = document.createElement('div');
@@ -56,7 +56,7 @@ xdescribe('pop-target - ', () => {
       });
     });
 
-    EnumUtil.getNames(TriggerName).forEach((n: string): void => {
+    EnumUtil.getNames(TriggerType).forEach((n: string): void => {
       it('should return true when trigger matches pop target trigger', () => {
         let el = document.createElement('div');
         el.setAttribute('popgun', '');

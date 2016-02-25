@@ -1,3 +1,5 @@
+import Trigger from '../Trigger';
+
 interface IOptions {
     trigger?: Trigger[];
     content?: string;

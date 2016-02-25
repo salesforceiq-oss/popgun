@@ -4,7 +4,7 @@ import Trigger from './';
 import TriggerEventType from '../TriggerEventType';
 import TriggerType from '../TriggerType';
 
-fdescribe('Trigger - ', () => {
+describe('Trigger - ', () => {
 
   describe('TriggerType - ', () => {
 

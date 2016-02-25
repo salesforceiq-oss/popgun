@@ -1,25 +1,21 @@
-import IOptions from '../options/IOptions';
+import IOptions from '../IOptions';
 
-interface ISchemaCache {
-    [key: string]: IOptions;
-};
+export class Schema {
+  private _cache: {
+    [key: string]: IOptions
+  } = {};
 
-let _cache: ISchemaCache = {};
+  add(key: string, opts: IOptions): void {
+    this._cache[key] = opts;
+  }
 
-function add(key: string, opts: IOptions): void {
-    _cache[key] = opts;
+  get(key: string): IOptions {
+    return this._cache[key];
+  }
+
+  clear(): void {
+    this._cache = {};
+  }
 }
 
-function get(key: string): IOptions {
-    return _cache[key];
-}
-
-function clear(): void {
-    _cache = {};
-}
-
-export {
-    get,
-    add,
-    clear
-}
+export default new Schema();
