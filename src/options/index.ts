@@ -5,7 +5,7 @@ import Trigger from '../Trigger';
 
 let camelize = require('camelize');
 
-class Options implements IOptions {
+export default class Options implements IOptions {
   trigger: Trigger[];
   content: string;
   placement: string;
@@ -52,5 +52,3 @@ class Options implements IOptions {
   }
 
 }
-
-export default Options;
