@@ -1,6 +1,6 @@
 /// <reference path='../../typings/tsd.d.ts' />
 
-import * as eventDelegate from './';
+import eventDelegate from './';
 
 describe('EventDelegate', () => {
 
