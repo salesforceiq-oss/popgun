@@ -3,8 +3,6 @@
 import Options from './';
 import defaultOptions from '../DefaultOptions';
 import Trigger from '../Trigger';
-import TriggerType from '../TriggerType';
-import EnumUtil from '../EnumUtil';
 import * as extend from 'extend';
 
 let deepEqual = require('deep-equal');
@@ -17,8 +15,12 @@ describe('Options - ', () => {
       expect((new Options()).trigger).toEqual([new Trigger('hover')]);
     });
 
-    it('should default content to an empty string', () => {
-      expect((new Options()).content).toBe('');
+    it('should default html to an empty string', () => {
+      expect((new Options()).html).toBe('');
+    });
+
+    it('should default text to an empty string', () => {
+      expect((new Options()).text).toBe('');
     });
 
     it('should default placement to top', () => {
@@ -68,13 +70,13 @@ describe('Options - ', () => {
     it('should extend defaults with custom options object passed to constructor', () => {
       let expected = extend({}, defaultOptions, {
         trigger: [new Trigger('click')],
-        content: 'hello world',
+        text: 'hello world',
         placement: 'bottom'
       }); // copy
 
       expect(deepEqual((new Options({
         trigger: 'click',
-        content: expected.content,
+        text: expected.text,
         placement: expected.placement
       })), expected)).toBe(true);
     });
@@ -82,13 +84,13 @@ describe('Options - ', () => {
     it('should extend defaults with custom options object with extend fn', () => {
       let expected = extend({}, defaultOptions); // copy
       expected.trigger = 'click';
-      expected.content = 'hello world';
+      expected.text = 'hello world';
       expected.placement = 'bottom';
 
 
       expect(deepEqual((new Options().extend({
         trigger: expected.trigger,
-        content: expected.content,
+        text: expected.text,
         placement: expected.placement
       })), expected)).toBe(true);
     });

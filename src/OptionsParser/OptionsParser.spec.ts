@@ -85,11 +85,11 @@ describe('OptionsParser -', () => {
         let val = 'test';
 
         expect(OptionsParser.fromLiteral({
-          content: val,
+          text: val,
           placement: val,
           alignment: val
         })).toEqual({
-          content: val,
+          text: val,
           placement: val,
           alignment: val
         });
@@ -167,10 +167,16 @@ describe('OptionsParser -', () => {
       });
     });
 
-    it('should set content from element attribute', () => {
+    it('should set text from element attribute', () => {
       let value = 'hello world';
-      let opts = fromSingleAttribute('popgun-content', value);
-      expect(opts.content).toEqual(value);
+      let opts = fromSingleAttribute('popgun-text', value);
+      expect(opts.text).toEqual(value);
+    });
+
+    it('should set html from element attribute', () => {
+      let value = 'hello world';
+      let opts = fromSingleAttribute('popgun-html', value);
+      expect(opts.html).toEqual(value);
     });
 
     it('should set placement from element attribute', () => {

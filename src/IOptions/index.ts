@@ -2,7 +2,8 @@ import Trigger from '../Trigger';
 
 interface IOptions {
     trigger?: Trigger[];
-    content?: string;
+    html?: string;
+    text?: string;
     placement?: string;
     placementOffset?: number;
     optimizePlacement?: boolean;

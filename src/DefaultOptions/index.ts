@@ -3,7 +3,8 @@ import Trigger from '../Trigger';
 
 let defaultOptions: IOptions = {
     trigger: [new Trigger('hover')],
-    content: '',
+    html: '',
+    text: '',
     placement: 'top',
     placementOffset: 8,
     optimizePlacement: true,

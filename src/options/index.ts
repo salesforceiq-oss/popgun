@@ -6,7 +6,8 @@ import OptionsParser from '../OptionsParser';
 
 export default class Options implements IOptions {
   trigger: Trigger[];
-  content: string;
+  html: string;
+  text: string;
   placement: string;
   placementOffset: number;
   optimizePlacement: boolean;
