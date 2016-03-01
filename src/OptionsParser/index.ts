@@ -1,6 +1,8 @@
 import IOptions from '../IOptions';
 import Trigger from '../Trigger';
-import schema from '../Schema';
+import schemaStore from '../SchemaStore';
+import groupStore from '../GroupStore';
+import IGroup from '../IGroup';
 import * as extend from 'extend';
 
 let camelize = require('camelize');
@@ -41,9 +43,9 @@ export default class OptionsParser {
 
   static fromElement(el: Element): IOptions {
     return extend(
-      // OptionsParser.fromGroupAttribute(el),
-      // OptionsParser.fromSchemaAttribute(el),
-      // OptionsParser.fromJSONAttribute(el),
+      OptionsParser.fromGroupAttribute(el),
+      OptionsParser.fromSchemaAttribute(el),
+      OptionsParser.fromJSONAttribute(el),
       OptionsParser.fromSingleAttributes(el)
     );
   }
@@ -89,14 +91,24 @@ export default class OptionsParser {
   static fromSchemaAttribute(el: Element): IOptions {
     let schemaId: string = el.getAttribute('popgun-schema');
 
-    return OptionsParser.fromLiteral(schema.get(schemaId));
+    return OptionsParser.fromLiteral(schemaStore.get(schemaId));
   }
 
   static fromGroupAttribute(el: Element): IOptions {
-    // let groupId: string = el.getAttribute('popgun-group');
+    let groupId: string = el.getAttribute('popgun-group');
+    return OptionsParser.fromGroupId(groupId);
+  }
 
-    // return groupId && group.get(groupId) || {};
-    return {};
+  static fromGroupId(id: string): IOptions {
+    let group: IGroup = groupStore.get(id);
+
+    if (group) {
+      return OptionsParser.fromLiteral(
+        extend({}, schemaStore.get(group.schema), group.options)
+      );
+    } else {
+      return {};
+    }
   }
 
   static parseTriggers(rawTrigger: string): Trigger[] {

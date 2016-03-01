@@ -5,11 +5,52 @@ import Trigger from '../Trigger';
 import IOptions from '../IOptions';
 import TriggerType from '../TriggerType';
 import EnumUtil from '../EnumUtil';
-import schema from '../Schema';
+import schemaStore from '../SchemaStore';
+import groupStore from '../GroupStore';
 
 let deepEqual = require('deep-equal');
 
 describe('OptionsParser -', () => {
+
+  describe('fromElement - ', () => {
+
+    it('end to end test to check priority', () => {
+
+      let groupVal: Object = {
+        trigger: 'hover, click',
+        placement: 'top right',
+        showDelay: '123',
+        transitionPlacement: false
+      };
+
+      let schemaVal: Object = {
+        transitionPlacement: true
+      };
+
+      let jsonVal: Object = {
+        trigger: 'hover',
+        placement: 'top bottom',
+        showDelay: '123'
+      };
+
+      groupStore.add('group-test', { options: groupVal });
+      groupStore.add('schema-test', schemaVal);
+
+      let el = document.createElement('div');
+      el.setAttribute('popgun-group', 'group-test');
+      el.setAttribute('popgun-schema', 'schema-test');
+      el.setAttribute('popgun-json', JSON.stringify(jsonVal));
+      el.setAttribute('popgun-placement', 'top left');
+
+      expect(deepEqual(OptionsParser.fromElement(el), {
+        placement: 'top left',
+        showDelay: 123,
+        trigger: [new Trigger('hover')],
+        transitionPlacement: false
+      })).toBe(true);
+    });
+
+  });
 
   describe('fromLiteral -', () => {
 
@@ -261,7 +302,7 @@ describe('OptionsParser -', () => {
         transitionPlacement: false
       };
 
-      spyOn(schema, 'get').and.returnValue(val);
+      spyOn(schemaStore, 'get').and.returnValue(val);
 
       let opts = fromSchemaAttribute('popgun-schema', 'test');
 
@@ -276,9 +317,77 @@ describe('OptionsParser -', () => {
     });
 
     it('should return empty object if schema does not exist', () => {
-      spyOn(schema, 'get').and.returnValue(undefined);
+      spyOn(schemaStore, 'get').and.returnValue(undefined);
       let opts = fromSchemaAttribute('popgun-schema', 'test');
       expect(opts).toEqual({});
+    });
+
+  });
+
+  describe('fromGroupAttribute -', () => {
+
+    function fromGroupAttribute(attr: string, attrValue: string): IOptions {
+      let el = document.createElement('div');
+      el.setAttribute(attr, attrValue);
+      return OptionsParser.fromGroupAttribute(el);
+    }
+
+    it('should parse popgun-group attribute', () => {
+      let val: Object = {
+        trigger: 'hover, click',
+        placement: 'top left',
+        showDelay: '123',
+        fadeDuration: 321,
+        optimizePlacement: 'true',
+        transitionPlacement: false
+      };
+
+      spyOn(groupStore, 'get').and.returnValue({ options: val });
+
+      let opts = fromGroupAttribute('popgun-group', 'test');
+
+      expect(deepEqual(opts, {
+        trigger: [new Trigger('hover'), new Trigger('click')],
+        placement: 'top left',
+        showDelay: 123,
+        fadeDuration: 321,
+        optimizePlacement: true,
+        transitionPlacement: false
+      })).toBe(true);
+    });
+
+    it('should return empty object if group does not exist', () => {
+      spyOn(groupStore, 'get').and.returnValue(undefined);
+      let opts = fromGroupAttribute('popgun-group', 'test');
+      expect(opts).toEqual({});
+    });
+
+  });
+
+  describe('fromGroupId - ', () => {
+
+    it('should get priority group opts over schema', () => {
+      let s: Object = {
+        trigger: 'hover',
+        placement: 'top left',
+      };
+
+      let opts: Object = {
+        trigger: 'hover, click',
+        placement: 'top left',
+        showDelay: '123',
+      };
+
+      schemaStore.add('schemaTest', s);
+      groupStore.add('groupTest', { options: opts });
+
+      let result = OptionsParser.fromGroupId('groupTest');
+
+      expect(deepEqual(result, {
+        trigger: [new Trigger('hover'), new Trigger('click')],
+        placement: 'top left',
+        showDelay: 123
+      })).toBe(true);
     });
 
   });

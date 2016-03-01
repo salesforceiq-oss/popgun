@@ -1,16 +1,16 @@
 /// <reference path='../../typings/tsd.d.ts' />
 
-import schema from './';
+import schemaStore from './';
 import IOptions from '../IOptions';
 
-describe('schema -', () => {
+describe('schemaStore -', () => {
 
     beforeEach(() => {
-        schema.clear();
+        schemaStore.clear();
     });
 
     it('should return undefined if no schema was added by that name', () => {
-        expect(schema.get('test')).toBe(undefined);
+        expect(schemaStore.get('test')).toBe(undefined);
     });
 
     it('should add and get schema', () => {
@@ -18,13 +18,13 @@ describe('schema -', () => {
             placement: 'bottom'
         };
 
-        schema.add('test', opts);
+        schemaStore.add('test', opts);
 
-        expect(schema.get('test')).toBe(opts);
+        expect(schemaStore.get('test')).toBe(opts);
     });
 
     it('should overwrite schema by name', () => {
-        schema.add('test', {
+        schemaStore.add('test', {
             placement: 'top'
         });
 
@@ -32,9 +32,9 @@ describe('schema -', () => {
             placement: 'bottom'
         };
 
-        schema.add('test', newOpts);
+        schemaStore.add('test', newOpts);
 
-        expect(schema.get('test')).toBe(newOpts);
+        expect(schemaStore.get('test')).toBe(newOpts);
     });
 
 });
