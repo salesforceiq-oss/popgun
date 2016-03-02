@@ -1,6 +1,7 @@
 import Trigger from '../Trigger';
 import TriggerType from '../TriggerType';
 import EnumUtil from '../EnumUtil';
+import PopTarget from '../PopTarget';
 
 export class EventDelegate {
   init(): void {
@@ -13,8 +14,10 @@ export class EventDelegate {
     });
   }
 
-  listener(): void {
-    console.log('hello world');
+  listener(e: Event): void {
+    if (PopTarget.isPopForTrigger(<Element>e.target, e.type)) {
+      // new PopTarget(e.target, e.type, Options);
+    }
   }
 }
 

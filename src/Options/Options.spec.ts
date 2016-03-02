@@ -3,6 +3,8 @@
 import Options from './';
 import defaultOptions from '../DefaultOptions';
 import Trigger from '../Trigger';
+import groupStore from '../GroupStore';
+import OptionsParser from '../OptionsParser';
 import * as extend from 'extend';
 
 let deepEqual = require('deep-equal');
@@ -93,6 +95,86 @@ describe('Options - ', () => {
         text: expected.text,
         placement: expected.placement
       })), expected)).toBe(true);
+    });
+
+  });
+
+  describe('containsEventTrigger - ', () => {
+
+    it('should return true if triggers contain event trigger', () => {
+      let opts = new Options({
+        trigger: 'hover, click'
+      });
+
+      expect(opts.containsEventTrigger('click')).toBe(true);
+    });
+
+    it('should return false if triggers does not contain event trigger', () => {
+      let opts = new Options({
+        trigger: 'hover'
+      });
+
+      expect(opts.containsEventTrigger('click')).toBe(false);
+    });
+
+    it('should return false if triggers does not contain event trigger', () => {
+      let opts = new Options({
+        trigger: 'manual'
+      });
+
+      expect(opts.containsEventTrigger('popgun-manual')).toBe(true);
+    });
+
+    it('should return false if triggers does not contain event trigger', () => {
+      let opts = new Options({
+        trigger: 'hover'
+      });
+
+      expect(opts.containsEventTrigger('mouseenter')).toBe(true);
+    });
+
+  });
+
+  describe('fromElement - ', () => {
+
+    it('should test the contract', () => {
+
+      let groupVal: Object = {
+        trigger: 'hover, click',
+        placement: 'top right',
+        showDelay: '123',
+        transitionPlacement: false
+      };
+
+      let schemaVal: Object = {
+        transitionPlacement: true
+      };
+
+      let jsonVal: Object = {
+        trigger: 'hover',
+        placement: 'top bottom',
+        showDelay: '123'
+      };
+
+      groupStore.add('group-test', { options: groupVal });
+      groupStore.add('schema-test', schemaVal);
+
+      let el = document.createElement('div');
+      el.setAttribute('popgun-group', 'group-test');
+      el.setAttribute('popgun-schema', 'schema-test');
+      el.setAttribute('popgun-json', JSON.stringify(jsonVal));
+      el.setAttribute('popgun-placement', 'top left');
+
+      let result = Options.fromElement(el);
+      let expected = new Options({
+        trigger: 'hover',
+        placement: 'top left',
+        showDelay: '123',
+        transitionPlacement: false
+      });
+
+      expect(deepEqual(result, expected)).toBe(true);
+
     });
 
   });

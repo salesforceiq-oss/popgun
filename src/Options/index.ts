@@ -19,6 +19,10 @@ export default class Options implements IOptions {
   showDelay: number;
   fadeDuration: number;
 
+  static fromElement(el: Element): Options {
+    return (new Options()).extend(OptionsParser.fromElement(el));
+  }
+
   constructor(opts?: { [key: string]: any }) {
     this.extendDefault(OptionsParser.fromLiteral(opts));
   }
@@ -29,6 +33,11 @@ export default class Options implements IOptions {
 
   extend(opts: IOptions): Options {
     return extend(this, opts);
+  }
+
+  containsEventTrigger(eventType: string): boolean {
+    eventType = eventType.toLowerCase();
+    return this.trigger.some((t: Trigger) => t.eventType === eventType);
   }
 
 }
