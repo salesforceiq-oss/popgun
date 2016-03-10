@@ -4,7 +4,6 @@ import Options from './';
 import defaultOptions from '../DefaultOptions';
 import Trigger from '../Trigger';
 import groupStore from '../GroupStore';
-import OptionsParser from '../OptionsParser';
 import * as extend from 'extend';
 
 let deepEqual = require('deep-equal');

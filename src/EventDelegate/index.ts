@@ -1,5 +1,6 @@
 import Trigger from '../Trigger';
 import TriggerType from '../TriggerType';
+import TriggerEventType from '../TriggerEventType';
 import EnumUtil from '../EnumUtil';
 import PopTarget from '../PopTarget';
 
@@ -15,8 +16,12 @@ export class EventDelegate {
   }
 
   listener(e: Event): void {
-    if (PopTarget.isPopForTrigger(<Element>e.target, e.type)) {
-      // new PopTarget(e.target, e.type, Options);
+    let t = TriggerEventType.triggerEventTypeToTriggerType(e.type);
+    let trigger = new Trigger(t);
+
+    if (PopTarget.isPopForTrigger(<Element>e.target, trigger)) {
+      let popTarget = new PopTarget(<Element>e.target, trigger);
+      // add to cache map of pops to groups
     }
   }
 }

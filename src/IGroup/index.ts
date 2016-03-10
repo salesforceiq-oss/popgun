@@ -3,7 +3,7 @@ import IOptions from '../IOptions';
 interface IGroup {
   schema?: string;
   options?: IOptions;
-  getElement?: Function;
+  getContentElement?: Function;
 }
 
 export default IGroup;
