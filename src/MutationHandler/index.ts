@@ -33,12 +33,6 @@ export class MutationHandler {
           this.addGroupIdToCache(<Element>addedNode);
         }
       }.bind(this));
-    } else if (mutation.type === 'childList' && mutation.removedNodes.length > 0) {
-      Array.prototype.slice.call(mutation.removedNodes).forEach(function(removedNode: Node): void {
-        if (!!(removedNode instanceof Element) && popEngine.isPopTarget(<Element>removedNode)) {
-          this.addGroupIdToCache(<Element>removedNode);
-        }
-      }.bind(this));
     } else if (mutation.type === 'attributes' && mutation.attributeName === 'popgun') {
       this.addGroupIdToCache(<Element>mutation.target);
     }

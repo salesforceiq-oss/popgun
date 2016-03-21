@@ -57,25 +57,6 @@ describe('MutationHandler - ', () => {
 
     });
 
-    it('should call remove from PopCache if removal to DOM', (done) => {
-
-      let el = document.createElement('div');
-      el.setAttribute('popgun', '');
-      el.setAttribute('id', 'test');
-      document.body.appendChild(el);
-
-      spyOn(popEngine, 'addGroupToPopStore');
-      mutationHandler.registerObserver();
-
-      document.body.removeChild(document.getElementById('test'));
-
-      setTimeout(function(): void {
-        expect(popEngine.addGroupToPopStore).toHaveBeenCalled();
-        done();
-      }, 0);
-
-    });
-
     it('should call add to PopCache if popgun attr added to element', (done) => {
 
       let el = document.createElement('div');
@@ -107,24 +88,6 @@ describe('MutationHandler - ', () => {
       setTimeout(function(): void {
         expect(popEngine.addGroupToPopStore).not.toHaveBeenCalled();
         document.body.removeChild(document.getElementById('test'));
-        done();
-      }, 0);
-
-    });
-
-    it('should not remove from cache if element without popgun attr removed from DOM', (done) => {
-
-      let el = document.createElement('div');
-      el.setAttribute('id', 'test');
-      document.body.appendChild(el);
-
-      spyOn(popEngine, 'addGroupToPopStore');
-      mutationHandler.registerObserver();
-
-      document.body.removeChild(document.getElementById('test'));
-
-      setTimeout(function(): void {
-        expect(popEngine.addGroupToPopStore).not.toHaveBeenCalled();
         done();
       }, 0);
 
