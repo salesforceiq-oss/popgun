@@ -158,12 +158,36 @@ describe('PopEngine - ', () => {
 
   });
 
-  // describe('setState() - ', () => {
+  describe('setState() - ', () => {
 
-  //   it('should call fireEvent', () => {
-  //   });
+    let el = document.createElement('div');
+    el.setAttribute('popgun', '');
 
-  // });
+    let t = new Trigger('click');
+
+    it('should call fireEvent and set pop.state', () => {
+
+      spyOn(popEngine, 'fireEvent');
+
+      let p = new Pop(el, t);
+      popEngine.setState(p, PopStateType.SHOWING, p.opts, null, true);
+
+      expect(p.state).toBe(PopStateType.SHOWING);
+      expect(popEngine.fireEvent).toHaveBeenCalled();
+    });
+
+    it('should not call fireEvent if new state is the same and renotify is false', () => {
+
+      spyOn(popEngine, 'fireEvent');
+
+      let p = new Pop(el, t);
+      popEngine.setState(p, PopStateType.HIDDEN, p.opts, null, false);
+
+      expect(p.state).toBe(PopStateType.HIDDEN);
+      expect(popEngine.fireEvent).not.toHaveBeenCalled();
+    });
+
+  });
 
   describe('fireEvent() - ', () => {
 

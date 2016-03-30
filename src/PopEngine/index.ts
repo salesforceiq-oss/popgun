@@ -40,7 +40,7 @@ export class PopEngine {
     if (state !== pop.state || renotify) {
       pop.state = state;
 
-      // this.fireStateChangeListener(pop, state, targetOpts, result, renotify);
+      this.fireEvent('StateChange', pop);
       this.fireEvent(state, pop);
     }
   }
