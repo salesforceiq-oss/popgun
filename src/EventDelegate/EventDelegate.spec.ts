@@ -43,7 +43,7 @@ describe('EventDelegate - ', () => {
 
   describe('listener - ', () => {
 
-    it('should instantiate PopTarget with click when listener passes in click event', () => {
+    it('should instantiate Pop with click when listener passes in click event', () => {
       spyOn(popEngine, 'isPopForTrigger');
 
       let el = document.createElement('div');
@@ -60,7 +60,7 @@ describe('EventDelegate - ', () => {
       expect(popEngine.isPopForTrigger).toHaveBeenCalledWith(e.target, (new Trigger('click')));
     });
 
-    it('should instantiate PopTarget with hover when listener passes in mouseenter event', () => {
+    it('should instantiate Pop with hover when listener passes in mouseenter event', () => {
       spyOn(popEngine, 'isPopForTrigger');
 
       let el = document.createElement('div');
@@ -77,7 +77,7 @@ describe('EventDelegate - ', () => {
       expect(popEngine.isPopForTrigger).toHaveBeenCalledWith(e.target, (new Trigger('hover')));
     });
 
-    it('should instantiate PopTarget with focus when listener passes in focusin event', () => {
+    it('should instantiate Pop with focus when listener passes in focusin event', () => {
       spyOn(popEngine, 'isPopForTrigger');
 
       let el = document.createElement('div');
@@ -94,7 +94,7 @@ describe('EventDelegate - ', () => {
       expect(popEngine.isPopForTrigger).toHaveBeenCalledWith(e.target, (new Trigger('focus')));
     });
 
-    it('should instantiate PopTarget with manual when listener passes in mouseenter popgun-manual', () => {
+    it('should instantiate Pop with manual when listener passes in mouseenter popgun-manual', () => {
       spyOn(popEngine, 'isPopForTrigger');
 
       let el = document.createElement('div');

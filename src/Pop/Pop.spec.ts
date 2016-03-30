@@ -1,41 +1,41 @@
 /// <reference path='../../typings/tsd.d.ts' />
 
-import PopTarget from './';
+import Pop from './';
 import Trigger from '../Trigger';
 
-describe('PopTarget - ', () => {
+describe('Pop - ', () => {
 
-  describe('constructor() - ', () => {
+  describe('constructor', () => {
 
-    it('should create PopTarget with Trigger with EventType click', () => {
+    it('should create Pop with Trigger with EventType click', () => {
       let el = document.createElement('div');
       el.setAttribute('popgun', '');
       let t = new Trigger('click');
-      let p = new PopTarget(el, t);
+      let p = new Pop(el, t);
       expect(p.trigger.name).toBe(t.name);
     });
 
-    it('should create PopTarget with Trigger with EventType hover', () => {
+    it('should create Pop with Trigger with EventType hover', () => {
       let el = document.createElement('div');
       el.setAttribute('popgun', '');
       let t = new Trigger('hover');
-      let p = new PopTarget(el, t);
+      let p = new Pop(el, t);
       expect(p.trigger.name).toBe(t.name);
     });
 
-    it('should create PopTarget with Trigger with EventType focus', () => {
+    it('should create Pop with Trigger with EventType focus', () => {
       let el = document.createElement('div');
       el.setAttribute('popgun', '');
       let t = new Trigger('focus');
-      let p = new PopTarget(el, t);
+      let p = new Pop(el, t);
       expect(p.trigger.name).toBe(t.name);
     });
 
-    it('should create PopTarget with Trigger with EventType manual', () => {
+    it('should create Pop with Trigger with EventType manual', () => {
       let el = document.createElement('div');
       el.setAttribute('popgun', '');
       let t = new Trigger('manual');
-      let p = new PopTarget(el, t);
+      let p = new Pop(el, t);
       expect(p.trigger.name).toBe(t.name);
     });
 

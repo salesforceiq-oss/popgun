@@ -58,6 +58,7 @@ export default class OptionsParser {
         let attr = el.attributes[i];
 
         if (attr.name.indexOf('popgun-') === 0) {
+          // this is not picking up camel case..
           let key: string = camelize(attr.name.substring(7));
 
           if (key !== 'group' && key !== 'schema' && key !== 'json') {

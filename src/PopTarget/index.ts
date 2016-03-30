@@ -1,13 +1,11 @@
-import Options from '../Options';
 import Trigger from '../Trigger';
 
 export default class PopTarget {
-  opts: Options;
-  el: Element;
+  element: Element;
   trigger: Trigger;
 
   constructor(el: Element, trigger: Trigger) {
-    this.el = el;
+    this.element = el;
     this.trigger = trigger;
   }
 

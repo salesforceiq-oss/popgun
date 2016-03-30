@@ -4,6 +4,9 @@ import Trigger from '../Trigger';
 import Options from '../Options';
 import IGroup from '../IGroup';
 import PopTarget from '../PopTarget';
+import Pop from '../Pop';
+import PopStateType from '../PopStateType';
+let camelize = require('camelize');
 
 export class PopEngine {
 
@@ -32,6 +35,36 @@ export class PopEngine {
   getPopTargetFromGroupId(groupId: string): PopTarget {
     return popStore.get(groupId);
   }
+
+  setState(pop: Pop, state: string, targetOpts: Options, result: any, renotify: boolean): void {
+    if (state !== pop.state || renotify) {
+      pop.state = state;
+
+      // this.fireStateChangeListener(pop, state, targetOpts, result, renotify);
+      this.fireEvent(state, pop);
+    }
+  }
+
+  fireEvent(state: string, pop: Pop): void {
+    let event = document.createEvent('CustomEvent');
+    event.initCustomEvent(camelize('on_pop_' + state), true, true, pop);
+
+    pop.popTarget.element.dispatchEvent(event);
+  }
+
+  // showTip(pop: Pop): void {
+  //   // this.addGroupToPopStore();
+  //   let delay = pop.opts.showDelay;
+
+  //   // clear any timeouts
+  //   // do a timeout and show tip
+  //   setTimeout(function(): void {
+  //     // let transitionTipEl = pop.state === PopStateType.SHOWING;
+  //     // let animationEndStates = {};
+
+  //     console.log('showing tip');
+  //   }, delay);
+  // }
 
 }
 

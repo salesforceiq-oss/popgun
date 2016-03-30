@@ -5,6 +5,8 @@ import Trigger from '../Trigger';
 import IGroup from '../IGroup';
 import groupStore from '../GroupStore';
 import popStore from '../PopStore';
+import Pop from '../Pop';
+import PopStateType from '../PopStateType';
 
 describe('PopEngine - ', () => {
 
@@ -155,5 +157,145 @@ describe('PopEngine - ', () => {
     });
 
   });
+
+  // describe('setState() - ', () => {
+
+  //   it('should call fireEvent', () => {
+  //   });
+
+  // });
+
+  describe('fireEvent() - ', () => {
+
+    let a = {
+      eventHandler(e: Event): void {
+        console.log(e);
+        return;
+      }
+    };
+
+    let el = document.createElement('div');
+    el.setAttribute('popgun', '');
+
+    let t = new Trigger('click');
+
+    it('should fire event for onPopHidden', (done) => {
+
+      spyOn(a, 'eventHandler');
+      let p = new Pop(el, t);
+      p.popTarget.element.addEventListener('onPopHidden', a.eventHandler, false);
+      popEngine.fireEvent(PopStateType.HIDDEN, p);
+
+      setTimeout(function(): void {
+        expect(a.eventHandler).toHaveBeenCalled();
+        done();
+      }, 0);
+
+    });
+
+    it('should fire event for onPopContentSetup', (done) => {
+
+      spyOn(a, 'eventHandler');
+      let p = new Pop(el, t);
+      p.popTarget.element.addEventListener('onPopContentSetup', a.eventHandler, false);
+      popEngine.fireEvent(PopStateType.CONTENT_SETUP, p);
+
+      setTimeout(function(): void {
+        expect(a.eventHandler).toHaveBeenCalled();
+        done();
+      }, 0);
+    });
+
+    it('should fire event for onPopPrePosition', (done) => {
+
+      spyOn(a, 'eventHandler');
+      let p = new Pop(el, t);
+      p.popTarget.element.addEventListener('onPopPrePosition', a.eventHandler, false);
+      popEngine.fireEvent(PopStateType.PRE_POSITION, p);
+
+      setTimeout(function(): void {
+        expect(a.eventHandler).toHaveBeenCalled();
+        done();
+      }, 0);
+    });
+
+    it('should fire event for onPopPreShow', (done) => {
+
+      spyOn(a, 'eventHandler');
+      let p = new Pop(el, t);
+
+      p.popTarget.element.addEventListener('onPopPreShow', a.eventHandler, false);
+      popEngine.fireEvent(PopStateType.PRE_SHOW, p);
+
+      setTimeout(function(): void {
+        expect(a.eventHandler).toHaveBeenCalled();
+        done();
+      }, 0);
+    });
+
+    it('should fire event for onPopShowing', (done) => {
+
+      spyOn(a, 'eventHandler');
+      let p = new Pop(el, t);
+
+      p.popTarget.element.addEventListener('onPopShowing', a.eventHandler, false);
+      popEngine.fireEvent(PopStateType.SHOWING, p);
+
+      setTimeout(function(): void {
+        expect(a.eventHandler).toHaveBeenCalled();
+        done();
+      }, 0);
+    });
+
+    it('should fire event for onPopPreHide', (done) => {
+
+      spyOn(a, 'eventHandler');
+      let p = new Pop(el, t);
+
+      p.popTarget.element.addEventListener('onPopPreHide', a.eventHandler, false);
+      popEngine.fireEvent(PopStateType.PRE_HIDE, p);
+
+      setTimeout(function(): void {
+        expect(a.eventHandler).toHaveBeenCalled();
+        done();
+      }, 0);
+    });
+
+    it('should fire event for onPopStateChange', (done) => {
+
+      spyOn(a, 'eventHandler');
+      let p = new Pop(el, t);
+
+      p.popTarget.element.addEventListener('onPopStateChange', a.eventHandler, false);
+      popEngine.fireEvent('StateChange', p);
+
+      setTimeout(function(): void {
+        expect(a.eventHandler).toHaveBeenCalled();
+        done();
+      }, 0);
+    });
+
+    it('should not fire event if not registered', (done) => {
+
+      spyOn(a, 'eventHandler');
+      let p = new Pop(el, t);
+
+      p.popTarget.element.addEventListener('onPopPreHide', a.eventHandler, false);
+      popEngine.fireEvent(PopStateType.SHOWING, p);
+
+      setTimeout(function(): void {
+        expect(a.eventHandler).not.toHaveBeenCalled();
+        done();
+      }, 0);
+    });
+
+  });
+
+  // describe('showTip() - ', () => {
+
+  //   it('should call fireEvent', () => {
+  //   });
+
+  // });
 
 });
