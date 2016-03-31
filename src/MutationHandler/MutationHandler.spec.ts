@@ -7,34 +7,6 @@ describe('MutationHandler - ', () => {
 
   describe('MutationObserver - ', () => {
 
-    beforeEach(() => {
-      spyOn(mutationHandler, 'maybeAddOrRemovePopTarget').and.callThrough();
-      mutationHandler.registerObserver();
-    });
-
-    afterEach(() => {
-      document.body.removeChild(document.getElementById('test'));
-      mutationHandler.disconnectObserver();
-    });
-
-    it('should call maybeAddOrRemovePopTarget when DOM mutation occurs', (done) => {
-
-      let el = document.createElement('div');
-      el.setAttribute('popgun', '');
-      el.setAttribute('id', 'test');
-      document.body.appendChild(el);
-
-      setTimeout(function(): void {
-        expect(mutationHandler.maybeAddOrRemovePopTarget).toHaveBeenCalled();
-        done();
-      }, 0);
-
-    });
-
-  });
-
-  describe('maybeAddOrRemovePopTarget - ', () => {
-
     afterEach(() => {
       mutationHandler.disconnectObserver();
     });

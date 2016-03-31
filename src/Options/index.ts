@@ -27,15 +27,15 @@ export default class Options implements IOptions {
     this.extendDefault(OptionsParser.fromLiteral(opts));
   }
 
-  extendDefault(opts: IOptions): Options {
+  public extendDefault(opts: IOptions): Options {
     return extend(this, defaultOptions, opts);
   }
 
-  extend(opts: IOptions): Options {
+  public extend(opts: IOptions): Options {
     return extend(this, opts);
   }
 
-  containsEventTrigger(eventType: string): boolean {
+  public containsEventTrigger(eventType: string): boolean {
     eventType = eventType.toLowerCase();
     return this.trigger.some((t: Trigger) => t.eventType === eventType);
   }

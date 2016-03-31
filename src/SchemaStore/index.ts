@@ -5,9 +5,9 @@ import MixinUtil from '../MixinUtil';
 export class SchemaStore implements Cache<IOptions> {
   // Cache impl
   _cache: any = {};
-  add: (key: string, opts: IOptions) => void;
-  get: (key: string) => IOptions;
-  clear: () => void;
+  public add: (key: string, opts: IOptions) => void;
+  public get: (key: string) => IOptions;
+  public clear: () => void;
 }
 
 MixinUtil.applyMixins(SchemaStore, [Cache]);

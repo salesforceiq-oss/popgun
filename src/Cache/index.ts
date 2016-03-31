@@ -3,15 +3,15 @@ export default class Cache<T> {
     [key: string]: T
   } = {};
 
-  add(key: string, opts: T): void {
+  public add(key: string, opts: T): void {
     this._cache[key] = opts;
   }
 
-  get(key: string): T {
+  public get(key: string): T {
     return this._cache[key];
   }
 
-  clear(): void {
+  public clear(): void {
     this._cache = {};
   }
 }

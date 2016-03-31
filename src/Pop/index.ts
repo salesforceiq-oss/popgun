@@ -16,11 +16,11 @@ export default class Pop {
     this.opts = Options.fromElement(el);
     this.state = PopStateType.HIDDEN;
 
-    let target = this.buildTarget(this.opts.html || this.opts.text);
+    let target = this._buildTarget(this.opts.html || this.opts.text);
     this.popTarget = (new PopTarget(target, trigger));
   }
 
-  buildTarget(htmlOrText: string): Element {
+  private _buildTarget(htmlOrText: string): Element {
     let content = this.opts.html || this.opts.text;
     let el = document.createElement('div');
     el.innerHTML = content;

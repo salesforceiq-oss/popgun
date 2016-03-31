@@ -9,41 +9,41 @@ let camelize = require('camelize');
 
 export class PopEngine {
 
-  isPopTarget(el: Element): boolean {
+  public isPopTarget(el: Element): boolean {
     return !!(el && el.hasAttribute('popgun'));
   }
 
-  isPopForTrigger(el: Element, trigger: Trigger): boolean {
+  public isPopForTrigger(el: Element, trigger: Trigger): boolean {
     return this.isPopTarget(el) && Options.fromElement(el).containsEventTrigger(<string>trigger.eventType);
   }
 
   // Add group to groupStore when registering a group
-  addGroupToGroupStore(groupId: string, group: IGroup): void {
+  public addGroupToGroupStore(groupId: string, group: IGroup): void {
     groupStore.add(groupId, group);
   }
 
-  getGroupFromGroupId(groupId: string): IGroup {
+  public getGroupFromGroupId(groupId: string): IGroup {
     return groupStore.get(groupId);
   }
 
   // Add group to popStore when caching a group
-  addGroupToPopStore(groupId: string): void {
+  public addGroupToPopStore(groupId: string): void {
     popStore.add(groupId, null);
   }
 
-  getPopTargetFromGroupId(groupId: string): PopTarget {
+  public getPopTargetFromGroupId(groupId: string): PopTarget {
     return popStore.get(groupId);
   }
 
-  setState(pop: Pop, state: string, targetOpts: Options, result: any, renotify: boolean): void {
+  public setState(pop: Pop, state: string, targetOpts: Options, result: any, renotify: boolean): void {
     if (state !== pop.state || renotify) {
       pop.state = state;
 
-      this.fireEvent(state, pop);
+      this._fireEvent(state, pop);
     }
   }
 
-  fireEvent(state: string, pop: Pop): void {
+  private _fireEvent(state: string, pop: Pop): void {
     let event = document.createEvent('CustomEvent');
     event.initCustomEvent(camelize('PopGun_' + state), true, true, {'pop': pop});
 

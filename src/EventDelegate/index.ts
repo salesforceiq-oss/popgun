@@ -6,7 +6,7 @@ import Pop from '../Pop';
 import popEngine from '../PopEngine';
 
 export class EventDelegate {
-  init(): void {
+  public init(): void {
     EnumUtil.getNames(TriggerType).forEach((rawTriggerType: string) => {
       let trigger: Trigger = new Trigger(rawTriggerType);
       let eventType: string = <string>trigger.eventType;
@@ -16,7 +16,7 @@ export class EventDelegate {
     });
   }
 
-  listener(e: Event): void {
+  public listener(e: Event): void {
     let t = TriggerEventType.triggerEventTypeToTriggerType(e.type);
     let trigger = new Trigger(t);
 

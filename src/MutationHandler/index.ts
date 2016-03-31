@@ -3,7 +3,7 @@ import popEngine from '../PopEngine';
 export class MutationHandler {
   observer: MutationObserver;
 
-  registerObserver(): void {
+  public registerObserver(): void {
     let target: Node = document.body;
     let config: MutationObserverInit = {
       attributes: true,
@@ -15,30 +15,30 @@ export class MutationHandler {
 
     this.observer = new MutationObserver(function(mutations: MutationRecord[]): void {
       mutations.forEach(function(mutation: MutationRecord): void {
-        this.maybeAddOrRemovePopTarget(mutation);
+        this._maybeAddOrRemovePopTarget(mutation);
       }.bind(this));
     }.bind(this));
 
     this.observer.observe(target, config);
   }
 
-  disconnectObserver(): void {
+  public disconnectObserver(): void {
     this.observer.disconnect();
   }
 
-  maybeAddOrRemovePopTarget(mutation: MutationRecord): void {
+  private _maybeAddOrRemovePopTarget(mutation: MutationRecord): void {
     if (mutation.type === 'childList' && !!mutation.addedNodes.length) {
       Array.prototype.slice.call(mutation.addedNodes).forEach(function(addedNode: Node): void {
         if (!!(addedNode instanceof Element) && popEngine.isPopTarget(<Element>addedNode)) {
-          this.addGroupIdToCache(<Element>addedNode);
+          this._addGroupIdToCache(<Element>addedNode);
         }
       }.bind(this));
     } else if (mutation.type === 'attributes' && mutation.attributeName === 'popgun') {
-      this.addGroupIdToCache(<Element>mutation.target);
+      this._addGroupIdToCache(<Element>mutation.target);
     }
   }
 
-  addGroupIdToCache(el: Element): void {
+  private _addGroupIdToCache(el: Element): void {
     let groupId = '';
     if (el.hasAttribute('popgun-group')) {
       groupId = el.getAttribute('popgun-group');
