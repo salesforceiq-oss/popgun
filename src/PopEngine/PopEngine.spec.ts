@@ -203,11 +203,11 @@ describe('PopEngine - ', () => {
 
     let t = new Trigger('click');
 
-    it('should fire event for onPopHidden', (done) => {
+    it('should fire event for PopGunHidden', (done) => {
 
       spyOn(a, 'eventHandler');
       let p = new Pop(el, t);
-      p.popTarget.element.addEventListener('onPopHidden', a.eventHandler, false);
+      p.popTarget.element.addEventListener('PopGunHidden', a.eventHandler, false);
       popEngine.fireEvent(PopStateType.HIDDEN, p);
 
       setTimeout(function(): void {
@@ -217,11 +217,11 @@ describe('PopEngine - ', () => {
 
     });
 
-    it('should fire event for onPopContentSetup', (done) => {
+    it('should fire event for PopGunContentSetup', (done) => {
 
       spyOn(a, 'eventHandler');
       let p = new Pop(el, t);
-      p.popTarget.element.addEventListener('onPopContentSetup', a.eventHandler, false);
+      p.popTarget.element.addEventListener('PopGunContentSetup', a.eventHandler, false);
       popEngine.fireEvent(PopStateType.CONTENT_SETUP, p);
 
       setTimeout(function(): void {
@@ -230,11 +230,11 @@ describe('PopEngine - ', () => {
       }, 0);
     });
 
-    it('should fire event for onPopPrePosition', (done) => {
+    it('should fire event for PopGunPrePosition', (done) => {
 
       spyOn(a, 'eventHandler');
       let p = new Pop(el, t);
-      p.popTarget.element.addEventListener('onPopPrePosition', a.eventHandler, false);
+      p.popTarget.element.addEventListener('PopGunPrePosition', a.eventHandler, false);
       popEngine.fireEvent(PopStateType.PRE_POSITION, p);
 
       setTimeout(function(): void {
@@ -243,12 +243,12 @@ describe('PopEngine - ', () => {
       }, 0);
     });
 
-    it('should fire event for onPopPreShow', (done) => {
+    it('should fire event for PopGunPreShow', (done) => {
 
       spyOn(a, 'eventHandler');
       let p = new Pop(el, t);
 
-      p.popTarget.element.addEventListener('onPopPreShow', a.eventHandler, false);
+      p.popTarget.element.addEventListener('PopGunPreShow', a.eventHandler, false);
       popEngine.fireEvent(PopStateType.PRE_SHOW, p);
 
       setTimeout(function(): void {
@@ -257,12 +257,12 @@ describe('PopEngine - ', () => {
       }, 0);
     });
 
-    it('should fire event for onPopShowing', (done) => {
+    it('should fire event for PopGunShowing', (done) => {
 
       spyOn(a, 'eventHandler');
       let p = new Pop(el, t);
 
-      p.popTarget.element.addEventListener('onPopShowing', a.eventHandler, false);
+      p.popTarget.element.addEventListener('PopGunShowing', a.eventHandler, false);
       popEngine.fireEvent(PopStateType.SHOWING, p);
 
       setTimeout(function(): void {
@@ -271,27 +271,13 @@ describe('PopEngine - ', () => {
       }, 0);
     });
 
-    it('should fire event for onPopPreHide', (done) => {
+    it('should fire event for PopGunPreHide', (done) => {
 
       spyOn(a, 'eventHandler');
       let p = new Pop(el, t);
 
-      p.popTarget.element.addEventListener('onPopPreHide', a.eventHandler, false);
+      p.popTarget.element.addEventListener('PopGunPreHide', a.eventHandler, false);
       popEngine.fireEvent(PopStateType.PRE_HIDE, p);
-
-      setTimeout(function(): void {
-        expect(a.eventHandler).toHaveBeenCalled();
-        done();
-      }, 0);
-    });
-
-    it('should fire event for onPopStateChange', (done) => {
-
-      spyOn(a, 'eventHandler');
-      let p = new Pop(el, t);
-
-      p.popTarget.element.addEventListener('onPopStateChange', a.eventHandler, false);
-      popEngine.fireEvent('StateChange', p);
 
       setTimeout(function(): void {
         expect(a.eventHandler).toHaveBeenCalled();
@@ -304,7 +290,7 @@ describe('PopEngine - ', () => {
       spyOn(a, 'eventHandler');
       let p = new Pop(el, t);
 
-      p.popTarget.element.addEventListener('onPopPreHide', a.eventHandler, false);
+      p.popTarget.element.addEventListener('PopGunPreHide', a.eventHandler, false);
       popEngine.fireEvent(PopStateType.SHOWING, p);
 
       setTimeout(function(): void {

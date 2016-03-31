@@ -5,7 +5,6 @@ import Options from '../Options';
 import IGroup from '../IGroup';
 import PopTarget from '../PopTarget';
 import Pop from '../Pop';
-import PopStateType from '../PopStateType';
 let camelize = require('camelize');
 
 export class PopEngine {
@@ -40,14 +39,13 @@ export class PopEngine {
     if (state !== pop.state || renotify) {
       pop.state = state;
 
-      this.fireEvent('StateChange', pop);
       this.fireEvent(state, pop);
     }
   }
 
   fireEvent(state: string, pop: Pop): void {
     let event = document.createEvent('CustomEvent');
-    event.initCustomEvent(camelize('on_pop_' + state), true, true, pop);
+    event.initCustomEvent(camelize('PopGun_' + state), true, true, pop);
 
     pop.popTarget.element.dispatchEvent(event);
   }
