@@ -45,7 +45,7 @@ export class PopEngine {
 
   private _fireEvent(state: string, pop: Pop): void {
     let event = document.createEvent('CustomEvent');
-    event.initCustomEvent(camelize('PopGun_' + state), true, true, {'pop': pop});
+    event.initCustomEvent(camelize('Popgun_' + state), true, true, {'pop': pop});
 
     pop.popTarget.element.dispatchEvent(event);
   }

@@ -18,6 +18,7 @@ export default class Pop {
 
     let target = this._buildTarget(this.opts.html || this.opts.text);
     this.popTarget = (new PopTarget(target, trigger));
+    this.parentElement.appendChild(this.popTarget.element);
   }
 
   private _buildTarget(htmlOrText: string): Element {

@@ -162,7 +162,6 @@ describe('PopEngine - ', () => {
 
     let a = {
       eventHandler(e: Event): void {
-        console.log(e);
         return;
       }
     };
@@ -172,146 +171,106 @@ describe('PopEngine - ', () => {
 
     let t = new Trigger('click');
 
-    it('should call _fireEvent and set state to PopGunContentSetup', (done) => {
+    it('should call _fireEvent and set state to PopgunContentSetup', () => {
 
-      spyOn(a, 'eventHandler');
+      spyOn(a, 'eventHandler').and.callThrough();
 
       let p = new Pop(el, t);
-      p.popTarget.element.addEventListener('PopGunContentSetup', a.eventHandler, false);
+      el.addEventListener('PopgunContentSetup', a.eventHandler, false);
       popEngine.setState(p, PopStateType.CONTENT_SETUP, p.opts, null, true);
 
       expect(p.state).toBe(PopStateType.CONTENT_SETUP);
-      setTimeout(function(): void {
-        expect(a.eventHandler).toHaveBeenCalled();
-        done();
-      }, 0);
+      expect(a.eventHandler).toHaveBeenCalled();
 
     });
 
-    it('should call _fireEvent and set state to PopGunPrePosition', (done) => {
+    it('should call _fireEvent and set state to PopgunPrePosition', () => {
 
       spyOn(a, 'eventHandler');
 
       let p = new Pop(el, t);
-      p.popTarget.element.addEventListener('PopGunPrePosition', a.eventHandler, false);
+      el.addEventListener('PopgunPrePosition', a.eventHandler, false);
       popEngine.setState(p, PopStateType.PRE_POSITION, p.opts, null, true);
 
       expect(p.state).toBe(PopStateType.PRE_POSITION);
-      setTimeout(function(): void {
-        expect(a.eventHandler).toHaveBeenCalled();
-        done();
-      }, 0);
+      expect(a.eventHandler).toHaveBeenCalled();
 
     });
 
-    it('should call _fireEvent and set state to PopGunPreShow', (done) => {
+    it('should call _fireEvent and set state to PopgunPreShow', () => {
 
       spyOn(a, 'eventHandler');
 
       let p = new Pop(el, t);
-      p.popTarget.element.addEventListener('PopGunPreShow', a.eventHandler, false);
+      el.addEventListener('PopgunPreShow', a.eventHandler, false);
       popEngine.setState(p, PopStateType.PRE_SHOW, p.opts, null, true);
 
       expect(p.state).toBe(PopStateType.PRE_SHOW);
-      setTimeout(function(): void {
-        expect(a.eventHandler).toHaveBeenCalled();
-        done();
-      }, 0);
+      expect(a.eventHandler).toHaveBeenCalled();
 
     });
 
-    it('should call _fireEvent and set state to PopGunPreShow', (done) => {
+    it('should call _fireEvent and set state to PopgunShowing', () => {
 
       spyOn(a, 'eventHandler');
 
       let p = new Pop(el, t);
-      p.popTarget.element.addEventListener('PopGunPreShow', a.eventHandler, false);
-      popEngine.setState(p, PopStateType.PRE_SHOW, p.opts, null, true);
-
-      expect(p.state).toBe(PopStateType.PRE_SHOW);
-      setTimeout(function(): void {
-        expect(a.eventHandler).toHaveBeenCalled();
-        done();
-      }, 0);
-
-    });
-
-    it('should call _fireEvent and set state to PopGunShowing', (done) => {
-
-      spyOn(a, 'eventHandler');
-
-      let p = new Pop(el, t);
-      p.popTarget.element.addEventListener('PopGunShowing', a.eventHandler, false);
+      el.addEventListener('PopgunShowing', a.eventHandler, false);
       popEngine.setState(p, PopStateType.SHOWING, p.opts, null, true);
 
       expect(p.state).toBe(PopStateType.SHOWING);
-      setTimeout(function(): void {
-        expect(a.eventHandler).toHaveBeenCalled();
-        done();
-      }, 0);
+      expect(a.eventHandler).toHaveBeenCalled();
 
     });
 
-    it('should call _fireEvent and set state to PopGunPreHide', (done) => {
+    it('should call _fireEvent and set state to PopgunPreHide', () => {
 
       spyOn(a, 'eventHandler');
 
       let p = new Pop(el, t);
-      p.popTarget.element.addEventListener('PopGunPreHide', a.eventHandler, false);
+      el.addEventListener('PopgunPreHide', a.eventHandler, false);
       popEngine.setState(p, PopStateType.PRE_HIDE, p.opts, null, true);
 
       expect(p.state).toBe(PopStateType.PRE_HIDE);
-      setTimeout(function(): void {
-        expect(a.eventHandler).toHaveBeenCalled();
-        done();
-      }, 0);
+      expect(a.eventHandler).toHaveBeenCalled();
 
     });
 
-    it('should call _fireEvent and set state to PopGunPreHide', (done) => {
+    it('should not call _fireEvent if new state is the same and renotify is true', () => {
 
       spyOn(a, 'eventHandler');
 
       let p = new Pop(el, t);
-      p.popTarget.element.addEventListener('PopGunPreHide', a.eventHandler, false);
-      popEngine.setState(p, PopStateType.PRE_HIDE, p.opts, null, true);
+      el.addEventListener('PopgunHidden', a.eventHandler, false);
+      popEngine.setState(p, PopStateType.HIDDEN, p.opts, null, true);
 
-      expect(p.state).toBe(PopStateType.PRE_HIDE);
-      setTimeout(function(): void {
-        expect(a.eventHandler).toHaveBeenCalled();
-        done();
-      }, 0);
+      expect(p.state).toBe(PopStateType.HIDDEN);
+      expect(a.eventHandler).toHaveBeenCalled();
 
     });
 
-    it('should not call _fireEvent if new state is the same and renotify is false', (done) => {
+    it('should not call _fireEvent if new state is the same and renotify is false', () => {
 
       spyOn(a, 'eventHandler');
 
       let p = new Pop(el, t);
-      p.popTarget.element.addEventListener('PopGunHidden', a.eventHandler, false);
+      el.addEventListener('PopgunHidden', a.eventHandler, false);
       popEngine.setState(p, PopStateType.HIDDEN, p.opts, null, false);
 
       expect(p.state).toBe(PopStateType.HIDDEN);
-      setTimeout(function(): void {
-        expect(a.eventHandler).not.toHaveBeenCalled();
-        done();
-      }, 0);
+      expect(a.eventHandler).not.toHaveBeenCalled();
 
     });
 
-    it('should not call _fireEvent if not registered', (done) => {
+    it('should not call _fireEvent if not registered', () => {
 
       spyOn(a, 'eventHandler');
 
       let p = new Pop(el, t);
-      p.popTarget.element.addEventListener('PopGunPreHide', a.eventHandler, false);
+      el.addEventListener('PopgunPreHide', a.eventHandler, false);
       popEngine.setState(p, PopStateType.SHOWING, p.opts, null, true);
 
-      setTimeout(function(): void {
-        expect(a.eventHandler).not.toHaveBeenCalled();
-        done();
-      }, 0);
+      expect(a.eventHandler).not.toHaveBeenCalled();
 
     });
 
