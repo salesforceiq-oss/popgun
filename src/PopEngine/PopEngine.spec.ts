@@ -173,7 +173,7 @@ describe('PopEngine - ', () => {
 
     it('should call _fireEvent and set state to PopgunContentSetup', () => {
 
-      spyOn(a, 'eventHandler').and.callThrough();
+      spyOn(a, 'eventHandler');
 
       let p = new Pop(el, t);
       el.addEventListener('PopgunContentSetup', a.eventHandler, false);
