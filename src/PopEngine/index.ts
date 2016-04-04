@@ -3,11 +3,24 @@ import groupStore from '../GroupStore';
 import Trigger from '../Trigger';
 import Options from '../Options';
 import IGroup from '../IGroup';
+import PopStateType from '../PopStateType';
 import PopTarget from '../PopTarget';
 import Pop from '../Pop';
 let camelize = require('camelize');
 
 export class PopEngine {
+
+  _timeouts: {
+    hoverdelay: any
+    popHover: any
+  } = {
+    hoverdelay: null,
+    popHover: null
+  };
+
+  _handlers: {
+    [key: string]: string
+  } = {};
 
   public isPopTarget(el: Element): boolean {
     return !!(el && el.hasAttribute('popgun'));
@@ -26,9 +39,9 @@ export class PopEngine {
     return groupStore.get(groupId);
   }
 
-  // Add group to popStore when caching a group
-  public addGroupToPopStore(groupId: string): void {
-    popStore.add(groupId, null);
+  // Add pop to popStore when caching a pop
+  public addPopToPopStore(groupId: string, pop: any): void {
+    popStore.add(groupId, pop);
   }
 
   public getPopTargetFromGroupId(groupId: string): PopTarget {
@@ -50,19 +63,44 @@ export class PopEngine {
     pop.popTarget.element.dispatchEvent(event);
   }
 
-  // showTip(pop: Pop): void {
-  //   // this.addGroupToPopStore();
-  //   let delay = pop.opts.showDelay;
+  private _maybeClear(timeoutOrHandler: any, isTimeout: boolean): void {
+    if (timeoutOrHandler) {
+      let obj = isTimeout ? this._timeouts : this._handlers;
+      let key = null;
+      for (let k in obj) {
+        if (obj.hasOwnProperty(k) && (obj[k] === timeoutOrHandler)) {
+          key = k;
+        }
+      }
+      if (isTimeout) {
+        clearTimeout(obj[key]);
+      } else {
+        timeoutOrHandler();
+      }
+      obj[key] = undefined;
+    }
+  }
 
-  //   // clear any timeouts
-  //   // do a timeout and show tip
-  //   setTimeout(function(): void {
-  //     // let transitionTipEl = pop.state === PopStateType.SHOWING;
-  //     // let animationEndStates = {};
+  private _maybeClearTimeout(timeout: any): void {
+    return this._maybeClear(timeout, true);
+  }
 
-  //     console.log('showing tip');
-  //   }, delay);
-  // }
+  private _maybeClearHandler(watch: any): void {
+    return this._maybeClear(watch, false);
+  }
+
+  showTip(groupId: string, pop: Pop): void {
+    // add pop to cache
+    this.addPopToPopStore(groupId, pop);
+    let delay = pop.opts.showDelay;
+
+    // clear any timeouts and do a timeout and show tip
+    this._maybeClearTimeout(this._timeouts.hoverdelay);
+    this._timeouts.hoverdelay = setTimeout(function(): void {
+
+      console.log('showing tip');
+    }, delay);
+  }
 
 }
 

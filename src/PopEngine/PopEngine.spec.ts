@@ -132,14 +132,14 @@ describe('PopEngine - ', () => {
 
   });
 
-  describe('addGroupToPopStore() - ', () => {
+  describe('addPopToPopStore() - ', () => {
 
     beforeEach(() => {
       popStore.clear();
     });
 
     it('should add groupId as a key to popStore', () => {
-      popEngine.addGroupToPopStore('test');
+      popEngine.addPopToPopStore('test', null);
       expect(popStore.get('test')).toBe(null);
     });
 
@@ -152,7 +152,7 @@ describe('PopEngine - ', () => {
     });
 
     it('should get pop from groupId', () => {
-      popEngine.addGroupToPopStore('test');
+      popEngine.addPopToPopStore('test', null);
       expect(popEngine.getPopTargetFromGroupId('test')).toBe(null);
     });
 
@@ -271,6 +271,24 @@ describe('PopEngine - ', () => {
       popEngine.setState(p, PopStateType.SHOWING, p.opts, null, true);
 
       expect(a.eventHandler).not.toHaveBeenCalled();
+
+    });
+
+  });
+
+  describe('_maybeClearTimeout()', () => {
+
+    it('should clear timeout', (done) => {
+
+      spyOn(popEngine, '_maybeClear');
+
+      popEngine._timeouts.hoverdelay = setTimeout(function(): void {
+        expect(popEngine._maybeClear).toHaveBeenCalled();
+        done();
+      }, 3000);
+
+      // can't call private method in tests..
+      popEngine._maybeClearTimeout(popEngine._timeouts.hoverdelay);
 
     });
 

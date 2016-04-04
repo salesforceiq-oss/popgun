@@ -13,7 +13,7 @@ describe('MutationHandler - ', () => {
 
     it('should call add to PopCache if addition to DOM', (done) => {
 
-      spyOn(popEngine, 'addGroupToPopStore');
+      spyOn(popEngine, 'addPopToPopStore');
       mutationHandler.registerObserver();
 
       let el = document.createElement('div');
@@ -22,7 +22,7 @@ describe('MutationHandler - ', () => {
       document.body.appendChild(el);
 
       setTimeout(function(): void {
-        expect(popEngine.addGroupToPopStore).toHaveBeenCalled();
+        expect(popEngine.addPopToPopStore).toHaveBeenCalled();
         document.body.removeChild(document.getElementById('test'));
         done();
       }, 0);
@@ -35,13 +35,13 @@ describe('MutationHandler - ', () => {
       el.setAttribute('id', 'test');
       document.body.appendChild(el);
 
-      spyOn(popEngine, 'addGroupToPopStore');
+      spyOn(popEngine, 'addPopToPopStore');
       mutationHandler.registerObserver();
 
       document.getElementById('test').setAttribute('popgun', 'glomp');
 
       setTimeout(function(): void {
-        expect(popEngine.addGroupToPopStore).toHaveBeenCalled();
+        expect(popEngine.addPopToPopStore).toHaveBeenCalled();
         document.body.removeChild(document.getElementById('test'));
         done();
       }, 0);
@@ -50,7 +50,7 @@ describe('MutationHandler - ', () => {
 
     it('should not add to cache if element without popgun attr added to DOM', (done) => {
 
-      spyOn(popEngine, 'addGroupToPopStore');
+      spyOn(popEngine, 'addPopToPopStore');
       mutationHandler.registerObserver();
 
       let el = document.createElement('div');
@@ -58,7 +58,7 @@ describe('MutationHandler - ', () => {
       document.body.appendChild(el);
 
       setTimeout(function(): void {
-        expect(popEngine.addGroupToPopStore).not.toHaveBeenCalled();
+        expect(popEngine.addPopToPopStore).not.toHaveBeenCalled();
         document.body.removeChild(document.getElementById('test'));
         done();
       }, 0);
