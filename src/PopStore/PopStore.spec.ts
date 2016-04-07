@@ -1,7 +1,7 @@
 /// <reference path='../../typings/tsd.d.ts' />
 
 import popStore from './';
-import PopTarget from '../PopTarget';
+import Pop from '../Pop';
 import Trigger from '../Trigger';
 
 describe('popStore -', () => {
@@ -18,7 +18,7 @@ describe('popStore -', () => {
     let el = document.createElement('div');
     el.setAttribute('popgun', '');
     let t = new Trigger('click');
-    let pop = new PopTarget(el, t);
+    let pop = new Pop(el, t);
 
     popStore.add('test', pop);
 
@@ -29,14 +29,14 @@ describe('popStore -', () => {
     let el = document.createElement('div');
     el.setAttribute('popgun', '');
     let t = new Trigger('click');
-    let pop = new PopTarget(el, t);
+    let pop = new Pop(el, t);
 
     popStore.add('test', pop);
 
     el = document.createElement('div');
     el.setAttribute('popgun', '');
     t = new Trigger('focus');
-    let newPop = new PopTarget(el, t);
+    let newPop = new Pop(el, t);
 
     popStore.add('test', newPop);
 

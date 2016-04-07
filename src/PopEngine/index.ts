@@ -1,6 +1,7 @@
 import popStore from '../PopStore';
 import groupStore from '../GroupStore';
 import Trigger from '../Trigger';
+import TriggerType from '../TriggerType';
 import Options from '../Options';
 import IGroup from '../IGroup';
 import PopStateType from '../PopStateType';
@@ -44,7 +45,7 @@ export class PopEngine {
     popStore.add(groupId, pop);
   }
 
-  public getPopTargetFromGroupId(groupId: string): PopTarget {
+  public getPopFromGroupId(groupId: string): Pop {
     return popStore.get(groupId);
   }
 
@@ -89,14 +90,30 @@ export class PopEngine {
     return this._maybeClear(watch, false);
   }
 
-  showTip(groupId: string, pop: Pop): void {
+  private _isPopAlreadyShowingForTarget(targetElement: Element): boolean {
+    let groupId = targetElement.getAttribute('popgun-group');
+    if (this.getPopFromGroupId(groupId) && this.getPopFromGroupId(groupId).parentElement === targetElement) {
+      return true;
+    }
+    return false;
+  }
+
+  public showPop(targetElement: Element, isPinned: boolean, pop: Pop): void {
     // add pop to cache
-    this.addPopToPopStore(groupId, pop);
-    let delay = pop.opts.showDelay;
+    // this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
+    let delay = isPinned ? 0 : pop.opts.showDelay;
+
+    // if (pop.opts.disabled) {
+    //   return;
+    // }
 
     // clear any timeouts and do a timeout and show tip
     this._maybeClearTimeout(this._timeouts.hoverdelay);
     this._timeouts.hoverdelay = setTimeout(function(): void {
+      let lastState = pop.state;
+      let transitionTipEl = (lastState === PopStateType.SHOWING) && !pop.opts.disableTransition;
+      let animationEndStates = {};
+      let isAlreadyShowing = this._isPopAlreadyShowingForTarget(targetElement);
 
       console.log('showing tip');
     }, delay);

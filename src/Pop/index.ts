@@ -7,6 +7,7 @@ export default class Pop {
   opts: Options;
   parentElement: Element;
   state: string;
+  isPinned: boolean;
   popTarget: PopTarget;
   trigger: Trigger;
 
@@ -15,6 +16,7 @@ export default class Pop {
     this.trigger = trigger;
     this.opts = Options.fromElement(el);
     this.state = PopStateType.HIDDEN;
+    this.isPinned = false;
 
     let target = this._buildTarget(this.opts.html || this.opts.text);
     this.popTarget = (new PopTarget(target, trigger));

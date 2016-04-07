@@ -145,7 +145,7 @@ describe('PopEngine - ', () => {
 
   });
 
-  describe('getPopTargetFromGroupId() - ', () => {
+  describe('getPopFromGroupId() - ', () => {
 
     beforeEach(() => {
       popStore.clear();
@@ -153,7 +153,7 @@ describe('PopEngine - ', () => {
 
     it('should get pop from groupId', () => {
       popEngine.addPopToPopStore('test', null);
-      expect(popEngine.getPopTargetFromGroupId('test')).toBe(null);
+      expect(popEngine.getPopFromGroupId('test')).toBe(null);
     });
 
   });
@@ -290,6 +290,46 @@ describe('PopEngine - ', () => {
       // can't call private method in tests..
       popEngine._maybeClearTimeout(popEngine._timeouts.hoverdelay);
 
+    });
+
+  });
+
+  describe('_isPopAlreadyShowingForTarget()', () => {
+
+    it('should return true if it does exist for target', () => {
+
+      let el = document.createElement('div');
+      el.setAttribute('popgun', '');
+      el.setAttribute('popgun-group', 'test');
+
+      let pop = new Pop(el, new Trigger('click'));
+      popEngine.addPopToPopStore('test', pop);
+
+      expect(popEngine._isPopAlreadyShowingForTarget(el)).toBe(true);
+    });
+
+    it('should return false if it does not exist for target', () => {
+
+      let el = document.createElement('div');
+      el.setAttribute('popgun', '');
+      el.setAttribute('popgun-group', 'test');
+
+      expect(popEngine._isPopAlreadyShowingForTarget(el)).toBe(false);
+    });
+
+    it('should return false if it does not match target', () => {
+
+      let el = document.createElement('div');
+      el.setAttribute('popgun', '');
+      el.setAttribute('popgun-group', 'test');
+
+      let pop = new Pop(el, new Trigger('click'));
+      popEngine.addPopToPopStore('test', pop);
+
+      let anotherEl = document.createElement('span');
+      anotherEl.setAttribute('popgun', '');
+
+      expect(popEngine._isPopAlreadyShowingForTarget(anotherEl)).toBe(false);
     });
 
   });

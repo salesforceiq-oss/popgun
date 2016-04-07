@@ -22,6 +22,8 @@ export class EventDelegate {
 
     if (popEngine.isPopForTrigger(<Element>e.target, trigger)) {
       let pop = new Pop(<Element>e.target, trigger);
+      let isPinned = trigger.name === TriggerType.CLICK;
+      popEngine.showPop(<Element>e.target, isPinned, pop);
     }
   }
 }

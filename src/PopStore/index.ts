@@ -1,12 +1,12 @@
 import Cache from '../Cache';
-import PopTarget from '../PopTarget';
+import Pop from '../Pop';
 import MixinUtil from '../MixinUtil';
 
-export class PopStore implements Cache<PopTarget> {
+export class PopStore implements Cache<Pop> {
   // Cache impl
   _cache: any = {};
-  public add: (key: string, pop: PopTarget) => void;
-  public get: (key: string) => PopTarget;
+  public add: (key: string, pop: Pop) => void;
+  public get: (key: string) => Pop;
   public clear: () => void;
 }
 
