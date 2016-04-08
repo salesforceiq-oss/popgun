@@ -5,22 +5,22 @@ import PopTarget from '../PopTarget';
 
 export default class Pop {
   opts: Options;
-  parentElement: Element;
+  targetEl: Element;
   state: string;
   isPinned: boolean;
-  popTarget: PopTarget;
+  popEl: PopTarget;
   trigger: Trigger;
 
   constructor(el: Element, trigger: Trigger) {
-    this.parentElement = el;
+    this.targetEl = el;
     this.trigger = trigger;
     this.opts = Options.fromElement(el);
     this.state = PopStateType.HIDDEN;
     this.isPinned = false;
 
     let target = this._buildTarget(this.opts.html || this.opts.text);
-    this.popTarget = (new PopTarget(target, trigger));
-    this.parentElement.appendChild(this.popTarget.element);
+    this.popEl = (new PopTarget(target, trigger));
+    this.targetEl.appendChild(this.popEl.element);
   }
 
   private _buildTarget(htmlOrText: string): Element {

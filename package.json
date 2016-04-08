@@ -37,6 +37,7 @@
     "browserify": "~13.0.0",
     "browserify-istanbul": "~0.2.1",
     "chokidar-cli": "~1.0.1",
+    "closest": "~0.0.1",
     "connect-livereload": "~0.5.4",
     "deep-equal": "~1.0.1",
     "exorcist": "~0.4.0",

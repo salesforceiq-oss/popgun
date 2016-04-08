@@ -8,6 +8,7 @@ import PopStateType from '../PopStateType';
 import PopTarget from '../PopTarget';
 import Pop from '../Pop';
 let camelize = require('camelize');
+let closest = require('closest');
 
 export class PopEngine {
 
@@ -61,7 +62,7 @@ export class PopEngine {
     let event = document.createEvent('CustomEvent');
     event.initCustomEvent(camelize('Popgun_' + state), true, true, {'pop': pop});
 
-    pop.popTarget.element.dispatchEvent(event);
+    pop.popEl.element.dispatchEvent(event);
   }
 
   private _maybeClear(timeoutOrHandler: any, isTimeout: boolean): void {
@@ -92,10 +93,27 @@ export class PopEngine {
 
   private _isPopAlreadyShowingForTarget(targetElement: Element): boolean {
     let groupId = targetElement.getAttribute('popgun-group');
-    if (this.getPopFromGroupId(groupId) && this.getPopFromGroupId(groupId).parentElement === targetElement) {
-      return true;
+    if (this.getPopFromGroupId(groupId)) {
+      return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING) &&
+        (this.getPopFromGroupId(groupId).targetEl === targetElement));
     }
     return false;
+  }
+
+  private _getParentPop(pop: Pop): Pop {
+    let parentEl = closest(pop.popEl.element, 'div[pop=""]');
+    if (parentEl) {
+      return this.getPopFromGroupId(parentEl.getAttribute('pop-id'));
+    }
+    return null;
+  }
+
+  private _maybePinOrUnpinPopAndParentPops(pop: Pop, pin: boolean): void {
+    pop.isPinned = pin;
+    let parentPop = this._getParentPop(pop);
+    if (parentPop) {
+      this._maybePinOrUnpinPopAndParentPops(parentPop, pin);
+    }
   }
 
   public showPop(targetElement: Element, isPinned: boolean, pop: Pop): void {
@@ -103,9 +121,9 @@ export class PopEngine {
     // this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
     let delay = isPinned ? 0 : pop.opts.showDelay;
 
-    // if (pop.opts.disabled) {
-    //   return;
-    // }
+    if (pop.opts.disabled) {
+      return;
+    }
 
     // clear any timeouts and do a timeout and show tip
     this._maybeClearTimeout(this._timeouts.hoverdelay);
@@ -114,6 +132,16 @@ export class PopEngine {
       let transitionTipEl = (lastState === PopStateType.SHOWING) && !pop.opts.disableTransition;
       let animationEndStates = {};
       let isAlreadyShowing = this._isPopAlreadyShowingForTarget(targetElement);
+
+      if (isPinned) {
+        this._maybePinOrUnpinPopAndParentPops(pop, true);
+      }
+
+      // maybe unpin tip before the state changes for a new target
+      this._maybePinOrUnpinPopAndParentPops(pop, false);
+
+      // needs to happen before the isAlreadyShowing check to allow the short circuit to keep the tip open
+      this._maybeClearTimeout(this._timeouts.tipHover);
 
       console.log('showing tip');
     }, delay);

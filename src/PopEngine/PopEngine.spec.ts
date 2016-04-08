@@ -303,9 +303,22 @@ describe('PopEngine - ', () => {
       el.setAttribute('popgun-group', 'test');
 
       let pop = new Pop(el, new Trigger('click'));
+      pop.state = PopStateType.SHOWING;
       popEngine.addPopToPopStore('test', pop);
 
       expect(popEngine._isPopAlreadyShowingForTarget(el)).toBe(true);
+    });
+
+    it('should return false if it is not showing', () => {
+
+      let el = document.createElement('div');
+      el.setAttribute('popgun', '');
+      el.setAttribute('popgun-group', 'test');
+
+      let pop = new Pop(el, new Trigger('click'));
+      popEngine.addPopToPopStore('test', pop);
+
+      expect(popEngine._isPopAlreadyShowingForTarget(el)).toBe(false);
     });
 
     it('should return false if it does not exist for target', () => {
@@ -330,6 +343,56 @@ describe('PopEngine - ', () => {
       anotherEl.setAttribute('popgun', '');
 
       expect(popEngine._isPopAlreadyShowingForTarget(anotherEl)).toBe(false);
+    });
+
+  });
+
+  describe('_getParentPop()', () => {
+
+    it('should find parent pop', () => {
+
+      let targetEl = document.createElement('div');
+      targetEl.setAttribute('popgun', '');
+
+      let outerEl = document.createElement('div');
+      outerEl.setAttribute('pop', '');
+      outerEl.setAttribute('pop-id', 'test');
+
+      let outerPop = new Pop(targetEl, new Trigger('click'));
+      outerPop.popEl.element = outerEl;
+      popEngine.addPopToPopStore('test', outerPop);
+
+      let innerEl = document.createElement('div');
+      innerEl.setAttribute('pop', '');
+      innerEl.setAttribute('pop-id', 'test2');
+
+      let innerPop = new Pop(targetEl, new Trigger('click'));
+      innerPop.popEl.element = innerEl;
+      popEngine.addPopToPopStore('test2', innerPop);
+
+      outerEl.appendChild(innerEl);
+
+      expect(popEngine._getParentPop(innerPop)).toBe(outerPop);
+
+    });
+
+    it('should return null if no parent pop', () => {
+
+      let targetEl = document.createElement('div');
+      targetEl.setAttribute('popgun', '');
+
+      let popEl = document.createElement('div');
+      popEl.setAttribute('pop', '');
+      popEl.setAttribute('pop-id', 'test2');
+
+      let innerPop = new Pop(targetEl, new Trigger('click'));
+      innerPop.popEl.element = popEl;
+      popEngine.addPopToPopStore('test2', innerPop);
+
+      document.body.appendChild(popEl);
+
+      expect(popEngine._getParentPop(innerPop)).toBe(null);
+
     });
 
   });
