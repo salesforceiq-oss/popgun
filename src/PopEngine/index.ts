@@ -68,18 +68,18 @@ export class PopEngine {
   private _maybeClear(timeoutOrHandler: any, isTimeout: boolean): void {
     if (timeoutOrHandler) {
       let obj = isTimeout ? this._timeouts : this._handlers;
-      let key = null;
+      let key: string = null;
       for (let k in obj) {
-        if (obj.hasOwnProperty(k) && (obj[k] === timeoutOrHandler)) {
+        if (obj.hasOwnProperty(k) && ((<any>obj)[k] === timeoutOrHandler)) {
           key = k;
         }
       }
       if (isTimeout) {
-        clearTimeout(obj[key]);
+        clearTimeout((<any>obj)[key]);
       } else {
         timeoutOrHandler();
       }
-      obj[key] = undefined;
+      (<any>obj)[key] = undefined;
     }
   }
 
@@ -116,20 +116,33 @@ export class PopEngine {
     }
   }
 
+  // listenForHideAllTips(listen) {
+  //   if (!listen) {
+  //     $document.off('riq-hide-all-tips.' + tipId);
+  //   } else {
+  //     $document.on('riq-hide-all-tips.' + tipId, function() {
+  //       if (RiqTipSrvc.isInShowProcess(riqTipInstance.state)) {
+  //         hideTip(undefined, true);
+  //         UtilSrvc.safeApply($scope);
+  //       }
+  //     });
+  //   }
+  // }
+
   public showPop(targetElement: Element, isPinned: boolean, pop: Pop): void {
     // add pop to cache
     // this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
     let delay = isPinned ? 0 : pop.opts.showDelay;
 
-    if (pop.opts.disabled) {
-      return;
-    }
+    // if (pop.opts.disabled) {
+    //   return;
+    // }
 
     // clear any timeouts and do a timeout and show tip
     this._maybeClearTimeout(this._timeouts.hoverdelay);
     this._timeouts.hoverdelay = setTimeout(function(): void {
       let lastState = pop.state;
-      let transitionTipEl = (lastState === PopStateType.SHOWING) && !pop.opts.disableTransition;
+      // let transitionTipEl = (lastState === PopStateType.SHOWING) && !pop.opts.disableTransition;
       let animationEndStates = {};
       let isAlreadyShowing = this._isPopAlreadyShowingForTarget(targetElement);
 
@@ -142,6 +155,9 @@ export class PopEngine {
 
       // needs to happen before the isAlreadyShowing check to allow the short circuit to keep the tip open
       this._maybeClearTimeout(this._timeouts.tipHover);
+
+      // listenForHideAllTips(true);
+      // listenForScroll(true, targetElement);
 
       console.log('showing tip');
     }, delay);

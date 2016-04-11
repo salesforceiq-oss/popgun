@@ -276,126 +276,126 @@ describe('PopEngine - ', () => {
 
   });
 
-  describe('_maybeClearTimeout()', () => {
+  // describe('_maybeClearTimeout()', () => {
 
-    it('should clear timeout', (done) => {
+  //   it('should clear timeout', (done) => {
 
-      spyOn(popEngine, '_maybeClear');
+  //     spyOn(popEngine, '_maybeClear');
 
-      popEngine._timeouts.hoverdelay = setTimeout(function(): void {
-        expect(popEngine._maybeClear).toHaveBeenCalled();
-        done();
-      }, 3000);
+  //     popEngine._timeouts.hoverdelay = setTimeout(function(): void {
+  //       expect(popEngine._maybeClear).toHaveBeenCalled();
+  //       done();
+  //     }, 3000);
 
-      // can't call private method in tests..
-      popEngine._maybeClearTimeout(popEngine._timeouts.hoverdelay);
+  //     // can't call private method in tests..
+  //     popEngine._maybeClearTimeout(popEngine._timeouts.hoverdelay);
 
-    });
+  //   });
 
-  });
+  // });
 
-  describe('_isPopAlreadyShowingForTarget()', () => {
+  // describe('_isPopAlreadyShowingForTarget()', () => {
 
-    it('should return true if it does exist for target', () => {
+  //   it('should return true if it does exist for target', () => {
 
-      let el = document.createElement('div');
-      el.setAttribute('popgun', '');
-      el.setAttribute('popgun-group', 'test');
+  //     let el = document.createElement('div');
+  //     el.setAttribute('popgun', '');
+  //     el.setAttribute('popgun-group', 'test');
 
-      let pop = new Pop(el, new Trigger('click'));
-      pop.state = PopStateType.SHOWING;
-      popEngine.addPopToPopStore('test', pop);
+  //     let pop = new Pop(el, new Trigger('click'));
+  //     pop.state = PopStateType.SHOWING;
+  //     popEngine.addPopToPopStore('test', pop);
 
-      expect(popEngine._isPopAlreadyShowingForTarget(el)).toBe(true);
-    });
+  //     expect(popEngine._isPopAlreadyShowingForTarget(el)).toBe(true);
+  //   });
 
-    it('should return false if it is not showing', () => {
+  //   it('should return false if it is not showing', () => {
 
-      let el = document.createElement('div');
-      el.setAttribute('popgun', '');
-      el.setAttribute('popgun-group', 'test');
+  //     let el = document.createElement('div');
+  //     el.setAttribute('popgun', '');
+  //     el.setAttribute('popgun-group', 'test');
 
-      let pop = new Pop(el, new Trigger('click'));
-      popEngine.addPopToPopStore('test', pop);
+  //     let pop = new Pop(el, new Trigger('click'));
+  //     popEngine.addPopToPopStore('test', pop);
 
-      expect(popEngine._isPopAlreadyShowingForTarget(el)).toBe(false);
-    });
+  //     expect(popEngine._isPopAlreadyShowingForTarget(el)).toBe(false);
+  //   });
 
-    it('should return false if it does not exist for target', () => {
+  //   it('should return false if it does not exist for target', () => {
 
-      let el = document.createElement('div');
-      el.setAttribute('popgun', '');
-      el.setAttribute('popgun-group', 'test');
+  //     let el = document.createElement('div');
+  //     el.setAttribute('popgun', '');
+  //     el.setAttribute('popgun-group', 'test');
 
-      expect(popEngine._isPopAlreadyShowingForTarget(el)).toBe(false);
-    });
+  //     expect(popEngine._isPopAlreadyShowingForTarget(el)).toBe(false);
+  //   });
 
-    it('should return false if it does not match target', () => {
+  //   it('should return false if it does not match target', () => {
 
-      let el = document.createElement('div');
-      el.setAttribute('popgun', '');
-      el.setAttribute('popgun-group', 'test');
+  //     let el = document.createElement('div');
+  //     el.setAttribute('popgun', '');
+  //     el.setAttribute('popgun-group', 'test');
 
-      let pop = new Pop(el, new Trigger('click'));
-      popEngine.addPopToPopStore('test', pop);
+  //     let pop = new Pop(el, new Trigger('click'));
+  //     popEngine.addPopToPopStore('test', pop);
 
-      let anotherEl = document.createElement('span');
-      anotherEl.setAttribute('popgun', '');
+  //     let anotherEl = document.createElement('span');
+  //     anotherEl.setAttribute('popgun', '');
 
-      expect(popEngine._isPopAlreadyShowingForTarget(anotherEl)).toBe(false);
-    });
+  //     expect(popEngine._isPopAlreadyShowingForTarget(anotherEl)).toBe(false);
+  //   });
 
-  });
+  // });
 
-  describe('_getParentPop()', () => {
+  // describe('_getParentPop()', () => {
 
-    it('should find parent pop', () => {
+  //   it('should find parent pop', () => {
 
-      let targetEl = document.createElement('div');
-      targetEl.setAttribute('popgun', '');
+  //     let targetEl = document.createElement('div');
+  //     targetEl.setAttribute('popgun', '');
 
-      let outerEl = document.createElement('div');
-      outerEl.setAttribute('pop', '');
-      outerEl.setAttribute('pop-id', 'test');
+  //     let outerEl = document.createElement('div');
+  //     outerEl.setAttribute('pop', '');
+  //     outerEl.setAttribute('pop-id', 'test');
 
-      let outerPop = new Pop(targetEl, new Trigger('click'));
-      outerPop.popEl.element = outerEl;
-      popEngine.addPopToPopStore('test', outerPop);
+  //     let outerPop = new Pop(targetEl, new Trigger('click'));
+  //     outerPop.popEl.element = outerEl;
+  //     popEngine.addPopToPopStore('test', outerPop);
 
-      let innerEl = document.createElement('div');
-      innerEl.setAttribute('pop', '');
-      innerEl.setAttribute('pop-id', 'test2');
+  //     let innerEl = document.createElement('div');
+  //     innerEl.setAttribute('pop', '');
+  //     innerEl.setAttribute('pop-id', 'test2');
 
-      let innerPop = new Pop(targetEl, new Trigger('click'));
-      innerPop.popEl.element = innerEl;
-      popEngine.addPopToPopStore('test2', innerPop);
+  //     let innerPop = new Pop(targetEl, new Trigger('click'));
+  //     innerPop.popEl.element = innerEl;
+  //     popEngine.addPopToPopStore('test2', innerPop);
 
-      outerEl.appendChild(innerEl);
+  //     outerEl.appendChild(innerEl);
 
-      expect(popEngine._getParentPop(innerPop)).toBe(outerPop);
+  //     expect(popEngine._getParentPop(innerPop)).toBe(outerPop);
 
-    });
+  //   });
 
-    it('should return null if no parent pop', () => {
+  //   it('should return null if no parent pop', () => {
 
-      let targetEl = document.createElement('div');
-      targetEl.setAttribute('popgun', '');
+  //     let targetEl = document.createElement('div');
+  //     targetEl.setAttribute('popgun', '');
 
-      let popEl = document.createElement('div');
-      popEl.setAttribute('pop', '');
-      popEl.setAttribute('pop-id', 'test2');
+  //     let popEl = document.createElement('div');
+  //     popEl.setAttribute('pop', '');
+  //     popEl.setAttribute('pop-id', 'test2');
 
-      let innerPop = new Pop(targetEl, new Trigger('click'));
-      innerPop.popEl.element = popEl;
-      popEngine.addPopToPopStore('test2', innerPop);
+  //     let innerPop = new Pop(targetEl, new Trigger('click'));
+  //     innerPop.popEl.element = popEl;
+  //     popEngine.addPopToPopStore('test2', innerPop);
 
-      document.body.appendChild(popEl);
+  //     document.body.appendChild(popEl);
 
-      expect(popEngine._getParentPop(innerPop)).toBe(null);
+  //     expect(popEngine._getParentPop(innerPop)).toBe(null);
 
-    });
+  //   });
 
-  });
+  // });
 
   // describe('showTip() - ', () => {
 

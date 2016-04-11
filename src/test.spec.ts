@@ -1,1 +1,1 @@
-import popgun from "./";
+import Popgun from './';

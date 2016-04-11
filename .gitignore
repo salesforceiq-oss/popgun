@@ -1,5 +1,7 @@
 .idea
 .sass-cache
+.app-src
+.src
 node_modules
 tmp
 test-assets

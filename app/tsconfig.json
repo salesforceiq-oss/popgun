@@ -3,7 +3,7 @@
     "module": "commonjs",
     "noImplicitAny": true,
     "target": "es5",
-    "outDir": "../.src"
+    "outDir": "../.app-src"
   },
   "exclude": [
     "node_modules",
