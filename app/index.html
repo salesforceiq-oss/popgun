@@ -5,7 +5,66 @@
     <meta charset="UTF-8">
     <title>popgun demo</title>
     <link rel="stylesheet" type="text/css" href="app.css">
+
+    <!-- merchants -->
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,400italic,700,700italic,900,900italic,300italic,300,100italic,100' rel='stylesheet' type='text/css'>
     <style>
+      body {
+        background: #1c4657;
+        color: #fff;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        font-family: 'Lato', sans-serif;
+        font-weight: 400;
+      }
+      h3 {
+        font-weight: 200;
+      }
+      img {
+        width: 200px;
+        height: 200px;
+        display: block;
+        margin: 0 auto;
+
+        -webkit-transition: -webkit-transform 1.5s ease-in-out;
+        transition: transform 1.5s ease-in-out;
+      }
+      img:hover {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+      }
+      #npm {
+        margin: 0 auto;
+        margin-top: 15px;
+        width: 200px;
+        height: 25px;
+        background: #000;
+        font: monospace;
+        color: #fff;
+        text-align: center;
+      }
+      button {
+        box-sizing: border-box;
+        outline: 0 none;
+        vertical-align: middle;
+        height: 44px;
+        font-size: 1.8rem;
+        border-top-width: 1px;
+        border-right-width: 1px;
+        border-bottom-width: 2px;
+        border-left-width: 1px;
+        border-color: #469594;
+        background: #67bbaa;
+        color: #FFFFFF;
+        display: block;
+        margin: 0 auto;
+        margin-top: 15px;
+        border-style: solid;
+        border-radius: 3px;
+        cursor: pointer;
+        font-weight: 300;
+        padding: 0px 40px;
+      }
       #popgun {
         width: 50px;
         height: 50px;
@@ -21,11 +80,17 @@
   </head>
 
   <body>
-  <h1>The Pop Don't Stop</h1>
+  <a href="#"><img src="http://i.imgur.com/AqLJt3J.png"></a>
+  <div id="npm">
+    $ npm install popgun
+  </div>
+  <a href="https://github.com/relateiq/popgun" style="text-decoration: none;"><button>View Source</button></a>
+  <!-- <h1>Popgun</h1>
+  <h3>A pure Javascript popover component for high performance and feature-rich web applications</h3>
   <div id="popgun"
         popgun-group="test"
         popgun>
-  </div>
+  </div> -->
 
     <script src="app.js"></script>
   </body>
