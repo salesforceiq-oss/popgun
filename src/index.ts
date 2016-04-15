@@ -23,10 +23,7 @@ export class Popgun {
 
   constructor() {
     mutationHandler.registerObserver();
-  }
-
-  public hello(): void {
-    console.log('hi');
+    eventDelegate.init();
   }
 
 }
