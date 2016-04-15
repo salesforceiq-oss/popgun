@@ -13,10 +13,10 @@ describe('EventDelegate - ', () => {
       expect(document.addEventListener).toHaveBeenCalledWith('click', jasmine.any(Function), false);
     });
 
-    it('should addEventListener for mouseenter on document', () => {
+    it('should addEventListener for mouseover on document', () => {
       spyOn(document, 'addEventListener');
       eventDelegate.init();
-      expect(document.addEventListener).toHaveBeenCalledWith('mouseenter', jasmine.any(Function), false);
+      expect(document.addEventListener).toHaveBeenCalledWith('mouseover', jasmine.any(Function), false);
     });
 
     it('should addEventListener for focusin on document', () => {
@@ -35,7 +35,7 @@ describe('EventDelegate - ', () => {
       spyOn(document, 'removeEventListener');
       eventDelegate.init();
       expect(document.removeEventListener).toHaveBeenCalledWith('click', jasmine.any(Function));
-      expect(document.removeEventListener).toHaveBeenCalledWith('mouseenter', jasmine.any(Function));
+      expect(document.removeEventListener).toHaveBeenCalledWith('mouseover', jasmine.any(Function));
       expect(document.removeEventListener).toHaveBeenCalledWith('focusin', jasmine.any(Function));
       expect(document.removeEventListener).toHaveBeenCalledWith('popgun-manual', jasmine.any(Function));
     });
@@ -60,7 +60,7 @@ describe('EventDelegate - ', () => {
       expect(popEngine.isPopForTrigger).toHaveBeenCalledWith(e.target, (new Trigger('click')));
     });
 
-    it('should instantiate Pop with hover when listener passes in mouseenter event', () => {
+    it('should instantiate Pop with hover when listener passes in mouseover event', () => {
       spyOn(popEngine, 'isPopForTrigger');
 
       let el = document.createElement('div');
@@ -68,7 +68,7 @@ describe('EventDelegate - ', () => {
       el.setAttribute('popgun-trigger', 'hover');
 
       let e = {
-        type: 'mouseenter',
+        type: 'mouseover',
         target: el
       };
 
@@ -94,7 +94,7 @@ describe('EventDelegate - ', () => {
       expect(popEngine.isPopForTrigger).toHaveBeenCalledWith(e.target, (new Trigger('focus')));
     });
 
-    it('should instantiate Pop with manual when listener passes in mouseenter popgun-manual', () => {
+    it('should instantiate Pop with manual when listener passes in mouseover popgun-manual', () => {
       spyOn(popEngine, 'isPopForTrigger');
 
       let el = document.createElement('div');

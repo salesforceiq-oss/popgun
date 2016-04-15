@@ -10,8 +10,8 @@ describe('TriggerEventType - ', () => {
       expect(TriggerEventType.CLICK).toBe('click');
     });
 
-    it('should set hover event type to `mouseenter`', () => {
-      expect(TriggerEventType.HOVER).toBe('mouseenter');
+    it('should set hover event type to `mouseover`', () => {
+      expect(TriggerEventType.HOVER).toBe('mouseover');
     });
 
     it('should set focus event type to `focusin`', () => {
@@ -30,8 +30,8 @@ describe('TriggerEventType - ', () => {
       expect(TriggerEventType.triggerEventTypeToTriggerType('click')).toBe('click');
     });
 
-    it('should return `hover` for `mouseenter`', () => {
-      expect(TriggerEventType.triggerEventTypeToTriggerType('mouseenter')).toBe('hover');
+    it('should return `hover` for `mouseover`', () => {
+      expect(TriggerEventType.triggerEventTypeToTriggerType('mouseover')).toBe('hover');
     });
 
     it('should return `focus` for `focusin`', () => {

@@ -129,7 +129,7 @@ describe('Options - ', () => {
         trigger: 'hover'
       });
 
-      expect(opts.containsEventTrigger('mouseenter')).toBe(true);
+      expect(opts.containsEventTrigger('mouseover')).toBe(true);
     });
 
   });

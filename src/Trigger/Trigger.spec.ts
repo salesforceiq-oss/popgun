@@ -32,7 +32,7 @@ describe('Trigger - ', () => {
           expect((new Trigger('click')).eventType).toBe(TriggerEventType.CLICK);
       });
 
-      it('should set hover event type to `mouseenter`', () => {
+      it('should set hover event type to `mouseover`', () => {
           expect((new Trigger('hover')).eventType).toBe(TriggerEventType.HOVER);
       });
 

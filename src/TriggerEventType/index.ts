@@ -2,7 +2,7 @@ require('focusin').polyfill();
 
 export default class TriggerEventType {
   static CLICK: string = 'click';
-  static HOVER: string = 'mouseenter';
+  static HOVER: string = 'mouseover';
   static FOCUS: string = 'focusin';
   static MANUAL: string = 'popgun-manual';
 
@@ -10,7 +10,7 @@ export default class TriggerEventType {
     switch (eventType) {
       case 'click':
         return 'click';
-      case 'mouseenter':
+      case 'mouseover':
         return 'hover';
       case 'focusin':
         return 'focus';
