@@ -116,20 +116,23 @@ export class PopEngine {
     }
   }
 
-  // listenForHideAllTips(listen) {
-  //   if (!listen) {
-  //     $document.off('riq-hide-all-tips.' + tipId);
-  //   } else {
-  //     $document.on('riq-hide-all-tips.' + tipId, function() {
-  //       if (RiqTipSrvc.isInShowProcess(riqTipInstance.state)) {
-  //         hideTip(undefined, true);
-  //         UtilSrvc.safeApply($scope);
-  //       }
-  //     });
-  //   }
-  // }
+  private _listenForScroll(listen: boolean, targetElem: Element): void {
+    document.addEventListener('scroll', () => {
+      console.log('scroll');
+    }, true);
+  }
 
   public showPop(targetElement: Element, isPinned: boolean, pop: Pop): void {
+
+    let container = document.createElement('div');
+    let nose = document.createElement('span');
+    let content = document.createElement('div');
+    container.setAttribute('class', 'pop');
+    nose.setAttribute('class', 'nose-triangle');
+    content.setAttribute('class', 'pop-content');
+    container.appendChild(content);
+    container.appendChild(nose);
+
     // add pop to cache
     // this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
     let delay = isPinned ? 0 : pop.opts.showDelay;
@@ -156,10 +159,39 @@ export class PopEngine {
       // needs to happen before the isAlreadyShowing check to allow the short circuit to keep the tip open
       this._maybeClearTimeout(this._timeouts.tipHover);
 
-      // listenForHideAllTips(true);
-      // listenForScroll(true, targetElement);
+      this._listenForScroll(true, targetElement);
 
-      console.log('showing tip');
+      // CONTENT SETUP
+      this.setState(pop, PopStateType.CONTENT_SETUP, pop.opts, null, false);
+      // already set up on pop initialization, but i should probably look into refactoring that
+
+      // PRE POSITION
+      this.setState(pop, PopStateType.PRE_POSITION, pop.opts, null, false);
+
+      // positioning stuff
+
+      this._maybeClearTimeout(this._timeouts.position);
+      this._timeouts.hoverdelay = setTimeout(function(): void {
+
+        // PRE SHOW
+        this.setState(pop, PopStateType.PRE_SHOW, pop.opts, null, false);
+
+        this._maybeClearTimeout(this._timeouts.hoverdelay);
+        this._maybeClearHandler(this._handlers.escapeHandler);
+        // handlers.escapeHandler = EscapeStackSrvc.addEscapeHandler(function() {
+        //   hideTip(undefined);
+        //   if (angular.isFunction(hybridOpts.onEscape)) {
+        //     hybridOpts.onEscape();
+        //   }
+        //   return true;
+        // });
+
+        // SHOWING
+        this.setState(pop, PopStateType.SHOWING, pop.opts, null, false);
+
+      });
+
+      // console.log('showing tip');
     }, delay);
   }
 
