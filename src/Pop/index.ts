@@ -20,12 +20,12 @@ export default class Pop {
 
     let target = this._buildTarget(this.opts.html || this.opts.text);
     this.popEl = (new PopTarget(target, trigger));
-    this.targetEl.appendChild(this.popEl.element);
   }
 
   private _buildTarget(htmlOrText: string): Element {
     let content = this.opts.html || this.opts.text;
     let el = document.createElement('div');
+    el.setAttribute('class', 'pop-content');
     el.innerHTML = content;
     return el;
   }
