@@ -36,6 +36,9 @@ export default class Trigger {
       case TriggerType.MANUAL:
         this.eventType = TriggerEventType.MANUAL;
         break;
+      case TriggerType.MOUSEOUT:
+        this.eventType = TriggerEventType.MOUSEOUT;
+        break;
     }
   }
 

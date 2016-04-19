@@ -2,7 +2,8 @@ enum TriggerType {
   CLICK,
   HOVER,
   FOCUS,
-  MANUAL
+  MANUAL,
+  MOUSEOUT
 }
 
 export default TriggerType;

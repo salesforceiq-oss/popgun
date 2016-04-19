@@ -20,7 +20,11 @@ export class EventDelegate {
     let t = TriggerEventType.triggerEventTypeToTriggerType(e.type);
     let trigger = new Trigger(t);
 
-    if (popEngine.isPopForTrigger(<Element>e.target, trigger)) {
+    // if hover is a trigger and event type is mouseout, hidePop()
+    // unless i figure out how to add mouseout to the el..
+    if (e.type === 'mouseout' && popEngine.isPopForTrigger(<Element>e.target, (new Trigger('hover')))) {
+      popEngine.hidePop(<Element>e.target);
+    } else if (popEngine.isPopForTrigger(<Element>e.target, trigger)) {
       let pop = new Pop(<Element>e.target, trigger);
       let isPinned = trigger.name === TriggerType.CLICK;
       popEngine.showPop(<Element>e.target, isPinned, pop);

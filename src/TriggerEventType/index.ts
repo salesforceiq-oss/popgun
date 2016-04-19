@@ -5,6 +5,7 @@ export default class TriggerEventType {
   static HOVER: string = 'mouseover';
   static FOCUS: string = 'focusin';
   static MANUAL: string = 'popgun-manual';
+  static MOUSEOUT: string = 'mouseout';
 
   static triggerEventTypeToTriggerType(eventType: string): string {
     switch (eventType) {
@@ -16,6 +17,8 @@ export default class TriggerEventType {
         return 'focus';
       case 'popgun-manual':
         return 'manual';
+      case 'mouseout':
+        return 'mouseout';
     }
   }
 }
