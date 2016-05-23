@@ -28,4 +28,19 @@ export class Popgun {
 
 }
 
+// angular adapter
+// have a service that exposes the popgun api
+// have something on the srvc that sees a template url and can convert it on the attribute
+// someway in the adapter to have $compile on a particular scope
+// have an angular popgun directive that can listen for content_setup event
+// and $compile on the target scope
+// create isolate scope 
+
+// think about
+// how to get data
+// how to compile the scope
+
+
+// probably want to publish as another repo
+
 export default new Popgun();

@@ -8,14 +8,10 @@
 
     <!-- merchants -->
     <link href='https://fonts.googleapis.com/css?family=Lato:400,400italic,700,700italic,900,900italic,300italic,300,100italic,100' rel='stylesheet' type='text/css'>
+    <style type='text/css' href='app.css'></style>
     <style>
       body {
         background: #1c4657;
-        color: #fff;
-      }
-      h1, h2, h3, h4, h5, h6 {
-        font-family: 'Lato', sans-serif;
-        font-weight: 400;
       }
       h3 {
         font-weight: 200;
@@ -75,34 +71,24 @@
         display: block;
         width: 100px;
         height: 100px;
+        /*margin: auto;
+        margin-right: 0;*/
       }
 
       #inserted {
         background: red;
+        position: absolute;
+        top: 0;
       }
 
       #inserted2 {
         background: purple;
       }
 
-      .pop-content {
-        height: 50px;
-        width: 300px;
-        font-size: 2em;
-        display: inline-block;
-        margin: -19px 45px 0;
-        background: green;
-        border-radius: 2px;
+      #inserted3 {
+        background: blue;
       }
-      .nose-triangle {
-        width: 0; 
-        height: 0; 
-        border-left: 20px solid transparent;
-        border-right: 20px solid transparent;
-        margin-left: 55px;
-        
-        border-top: 20px solid green;
-      }
+
     </style>
   </head>
 
@@ -112,13 +98,6 @@
     $ npm install popgun
   </div>
   <a href="https://github.com/relateiq/popgun" style="text-decoration: none;"><button>View Source</button></a>
-  <!-- <h1>Popgun</h1>
-  <h3>A pure Javascript popover component for high performance and feature-rich web applications</h3>
-  <div id="popgun"
-        popgun-group="test"
-        popgun>
-  </div> -->
-
     <script src="app.js"></script>
   </body>
 
