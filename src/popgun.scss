@@ -22,18 +22,18 @@ $basePx: 10;
   height: 0;
   width: 0;
 
-  @if ($direction == up) or ($direction == down) or ($direction == right) or ($direction == left) {
+  @if ($direction == top) or ($direction == bottom) or ($direction == right) or ($direction == left) {
     border-color: transparent;
     border-style: solid;
     border-width: $size / 2;
 
-    @if $direction == up {
+    @if $direction == top {
       border-bottom-color: $color;
 
     } @else if $direction == right {
       border-left-color:   $color;
 
-    } @else if $direction == down {
+    } @else if $direction == bottom {
       border-top-color:    $color;
 
     } @else if $direction == left {
@@ -41,24 +41,24 @@ $basePx: 10;
     }
   }
 
-  @else if ($direction == up-right) or ($direction == up-left) {
+  @else if ($direction == top-right) or ($direction == top-left) {
     border-top: $size solid $color;
 
-    @if $direction == up-right {
+    @if $direction == top-right {
       border-left:  $size solid transparent;
 
-    } @else if $direction == up-left {
+    } @else if $direction == top-left {
       border-right: $size solid transparent;
     }
   }
 
-  @else if ($direction == down-right) or ($direction == down-left) {
+  @else if ($direction == bottom-right) or ($direction == bottom-left) {
     border-bottom: $size solid $color;
 
-    @if $direction == down-right {
+    @if $direction == bottom-right {
       border-left:  $size solid transparent;
 
-    } @else if $direction == down-left {
+    } @else if $direction == bottom-left {
       border-right: $size solid transparent;
     }
   }
@@ -199,10 +199,7 @@ $boxShadowPop: 1px 2px 2px rgba(#1a333d, 0.15);
   }
 
   .nose-triangle {
-    @include inlineNoseTriangle(7px, rgba(#133340, 0.88), 0px, transparent, 50%, 50%, 50%, 50%, absolute, false);
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    border-top: 7px solid #fff;
+    @include inlineNoseTriangle(7px, #fff, 0px, transparent, 50%, 50%, 50%, 50%, absolute, false);
 
     &.top {
       margin-top: 1px;

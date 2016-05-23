@@ -238,8 +238,6 @@ export class PopEngine {
     };
     positioner(container, pop.targetEl, positionOpts)
               .at(pop.opts.placement, pop.opts.optimizePlacement, pop.opts.alignment);
-    positioner(container, pop.targetEl, positionOpts)
-              .arrow();
   }
 
 }
