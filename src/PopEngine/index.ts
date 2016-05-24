@@ -1,11 +1,9 @@
 import popStore from '../PopStore';
 import groupStore from '../GroupStore';
 import Trigger from '../Trigger';
-import TriggerType from '../TriggerType';
 import Options from '../Options';
 import IGroup from '../IGroup';
 import PopStateType from '../PopStateType';
-import PopTarget from '../PopTarget';
 import Pop from '../Pop';
 let camelize = require('camelize');
 let closest = require('closest');
@@ -66,34 +64,26 @@ export class PopEngine {
     }
   }
 
-  // TODO:
-  // 1. test positioning, animate
-  // 2. angular adapter
-  // 3. idk what else
-
   public showPop(targetElement: Element, isPinned: boolean, pop: Pop): void {
-    console.log('showing pop');
     let delay = isPinned ? 0 : pop.opts.showDelay;
     let isAlreadyShowing = this._isPopAlreadyShowingForGroup(targetElement);
     let groupId = targetElement.getAttribute('popgun-group');
 
     // clear any timeouts and do a timeout and show pop
-    this._maybeClearTimeout(this._timeouts.timeToHoverOnPop[groupId]);
-    this._maybeClearTimeout(this._timeouts.hoverdelay);
+    this._maybeClearTimeout(this._timeouts.timeToHoverOnPop, groupId);
+    this._maybeClearTimeout(this._timeouts.hoverdelay, null);
     this._timeouts.hoverdelay = setTimeout(function(): void {
       let animationEndStates = {};
       let container = <Element>null;
       let nose = <Element>null;
 
       if (isAlreadyShowing) {
-        console.log('pop is already open, reusing');
         // if pop is already showing for group, reuse
         container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
         nose = <Element>container.getElementsByClassName('nose-triangle')[0];
         container.removeChild(container.getElementsByClassName('pop-content')[0]);
         this._maybeClearHandler(this._handlers[groupId]);
       } else {
-        console.log('creating pop');
         container = document.createElement('div');
         nose = document.createElement('div');
         container.setAttribute('class', 'pop');
@@ -111,7 +101,7 @@ export class PopEngine {
       }
 
       // needs to happen before the isAlreadyShowing check to allow the short circuit to keep the pop open
-      this._maybeClearTimeout(this._timeouts.popHover);
+      this._maybeClearTimeout(this._timeouts.popHover, null);
       this._listenForScroll(true, targetElement);
 
       // CONTENT SETUP
@@ -121,16 +111,15 @@ export class PopEngine {
       // PRE POSITION
       this.setState(pop, PopStateType.PRE_POSITION, pop.opts, null, false);
 
-      this._maybeClearTimeout(this._timeouts.position);
+      this._maybeClearTimeout(this._timeouts.position, null);
       this._timeouts.position = setTimeout(function(): void {
 
-        console.log('positioning');
         this._setPosition(pop, container, nose);
 
         // PRE SHOW
         this.setState(pop, PopStateType.PRE_SHOW, pop.opts, null, false);
 
-        this._maybeClearTimeout(this._timeouts.hoverdelay);
+        this._maybeClearTimeout(this._timeouts.hoverdelay, null);
         this._handlers[groupId] = escapeStack.add(function(): boolean {
           this.hidePop(pop.targetEl);
           return true;
@@ -148,7 +137,6 @@ export class PopEngine {
     let pop = this.getPopFromGroupId(groupId);
     let popEl = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
     this._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
-      console.log('removing');
       targetElement.removeAttribute('pinned-pop');
       this._maybeClearHandler(this._handlers[groupId]);
       document.body.removeChild(popEl);
@@ -167,7 +155,7 @@ export class PopEngine {
     pop.targetEl.dispatchEvent(event);
   }
 
-  private _maybeClear(timeoutOrHandler: any, isTimeout: boolean): void {
+  private _maybeClear(timeoutOrHandler: any, isTimeout: boolean, groupId: string): void {
     if (timeoutOrHandler) {
       let obj = isTimeout ? this._timeouts : this._handlers;
       let key: string = null;
@@ -177,20 +165,28 @@ export class PopEngine {
         }
       }
       if (isTimeout) {
-        clearTimeout((<any>obj)[key]);
+        if (key === 'timeToHoverOnPop') {
+          clearTimeout((<any>obj)[key][groupId]);
+        } else {
+          clearTimeout((<any>obj)[key]);
+        }
       } else {
         timeoutOrHandler();
       }
-      (<any>obj)[key] = undefined;
+      if (key === 'timeToHoverOnPop') {
+        (<any>obj)[key][groupId] = undefined;
+      } else {
+        (<any>obj)[key] = undefined;
+      }
     }
   }
 
-  private _maybeClearTimeout(timeout: any): void {
-    return this._maybeClear(timeout, true);
+  private _maybeClearTimeout(timeout: any, groupId: string): void {
+    return this._maybeClear(timeout, true, groupId);
   }
 
   private _maybeClearHandler(watch: any): void {
-    return this._maybeClear(watch, false);
+    return this._maybeClear(watch, false, null);
   }
 
   private _isPopAlreadyShowingForGroup(targetElement: Element): boolean {
@@ -200,6 +196,15 @@ export class PopEngine {
     }
     return false;
   }
+
+  // private _isPopAlreadyOpen(targetElement: Element): boolean {
+  //   let groupId = targetElement.getAttribute('popgun-group');
+  //   if (this.getPopFromGroupId(groupId)) {
+  //     return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING) &&
+  //       (this.getPopFromGroupId(groupId).targetEl === targetElement));
+  //   }
+  //   return false;
+  // }
 
   private _getParentPop(pop: Pop): Pop {
     let parentEl = closest(pop.targetEl, 'div[pop=""]');
