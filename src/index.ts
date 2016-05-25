@@ -26,6 +26,10 @@ export class Popgun {
     eventDelegate.init();
   }
 
+  pop(): string {
+    return 'pop!';
+  }
+
 }
 
 export default new Popgun();
