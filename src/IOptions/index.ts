@@ -14,6 +14,8 @@ interface IOptions {
     timeToHoverOnPop?: number;
     showDelay?: number;
     fadeDuration?: number;
+    cushion?: number;
+    containerCushion?: number;
 }
 
 export default IOptions;

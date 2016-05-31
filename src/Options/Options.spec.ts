@@ -64,6 +64,14 @@ describe('Options - ', () => {
       expect((new Options()).fadeDuration).toBe(100);
     });
 
+    it('should default cushion to 8', () => {
+      expect((new Options()).cushion).toBe(8);
+    });
+
+    it('should default containerCushion to 10', () => {
+      expect((new Options()).containerCushion).toBe(10);
+    });
+
   });
 
   describe('extend - ', () => {

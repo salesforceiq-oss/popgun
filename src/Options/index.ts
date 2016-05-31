@@ -18,6 +18,8 @@ export default class Options implements IOptions {
   timeToHoverOnPop: number;
   showDelay: number;
   fadeDuration: number;
+  cushion: number;
+  containerCushion: number;
 
   static fromElement(el: Element): Options {
     return (new Options()).extend(OptionsParser.fromElement(el));

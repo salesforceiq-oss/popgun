@@ -26,6 +26,8 @@ export default class OptionsParser {
           case 'timeToHoverOnPop':
           case 'showDelay':
           case 'fadeDuration':
+          case 'cushion':
+          case 'containerCushion':
             value = parseFloat(value);
             break;
           case 'optimizePlacement':

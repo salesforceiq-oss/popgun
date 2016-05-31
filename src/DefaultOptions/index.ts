@@ -14,7 +14,9 @@ let defaultOptions: IOptions = {
     viewportPadding: 10,
     timeToHoverOnPop: 300,
     showDelay: 0,
-    fadeDuration: 100
+    fadeDuration: 100,
+    cushion: 8,
+    containerCushion: 10
 };
 
 export default defaultOptions;
