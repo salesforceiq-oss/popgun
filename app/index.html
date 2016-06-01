@@ -10,94 +10,35 @@
     <link href='https://fonts.googleapis.com/css?family=Lato:400,400italic,700,700italic,900,900italic,300italic,300,100italic,100' rel='stylesheet' type='text/css'>
     <style type='text/css' href='app.css'></style>
     <style>
-      body {
-        background: #1c4657;
-      }
-      h3 {
-        font-weight: 200;
-      }
-      img {
-        width: 200px;
-        height: 200px;
-        display: block;
-        margin: 0 auto;
+    .target {
+        width: 75px;
+        height: 75px;
+        padding: 10px;
+        background: #cacac9;
+        margin-bottom: 25px;
+    }
 
-        -webkit-transition: -webkit-transform 1.5s ease-in-out;
-        transition: transform 1.5s ease-in-out;
-      }
-      img:hover {
-        -webkit-transform: rotate(360deg);
-        transform: rotate(360deg);
-      }
-      #npm {
-        margin: 0 auto;
-        margin-top: 15px;
-        width: 200px;
-        height: 25px;
-        background: #000;
-        font: monospace;
-        color: #fff;
-        text-align: center;
-      }
-      button {
-        box-sizing: border-box;
-        outline: 0 none;
-        vertical-align: middle;
-        height: 44px;
-        font-size: 1.8rem;
-        border-top-width: 1px;
-        border-right-width: 1px;
-        border-bottom-width: 2px;
-        border-left-width: 1px;
-        border-color: #469594;
+    .different-class {
         background: #67bbaa;
-        color: #FFFFFF;
-        display: block;
-        margin: 0 auto;
-        margin-top: 15px;
-        border-style: solid;
-        border-radius: 3px;
-        cursor: pointer;
-        font-weight: 300;
-        padding: 0px 40px;
-      }
-      #popgun {
-        width: 50px;
-        height: 50px;
-        background: red;
-      }
+    }
 
-      .insert {
-        display: block;
-        width: 100px;
-        height: 100px;
-        /*margin: auto;
-        margin-right: 0;*/
-      }
+    .very-different-class {
+        background: #f16b50;
+    }
 
-      #inserted {
-        background: red;
-        position: absolute;
-        top: 0;
-      }
-
-      #inserted2 {
-        background: purple;
-      }
-
-      #inserted3 {
-        background: blue;
-      }
-
+    .one-final-different-class {
+        background: #1c4657;
+    }
     </style>
   </head>
 
   <body>
-  <a href="#"><img src="http://i.imgur.com/AqLJt3J.png"></a>
-  <div id="npm">
-    $ npm install popgun
-  </div>
-  <a href="https://github.com/relateiq/popgun" style="text-decoration: none;"><button>View Source</button></a>
+    <div>
+        <h2>Popgun</h2>
+        <h4>The highly customizable and efficient UI tip.</h4>
+
+        <div class="target very-different-class" popgun popgun-group="test">Hover Me!</div>
+    </div>
     <script src="app.js"></script>
   </body>
 
