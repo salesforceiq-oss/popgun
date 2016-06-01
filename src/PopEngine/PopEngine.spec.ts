@@ -98,7 +98,7 @@ describe('PopEngine - ', () => {
 
   });
 
-  describe('addGroupToGroupStore() - ', () => {
+  describe('addGroupOptionsToGroupStore() - ', () => {
 
     beforeEach(() => {
       groupStore.clear();
@@ -109,13 +109,13 @@ describe('PopEngine - ', () => {
         schema: 'schemaId'
       };
 
-      popEngine.addGroupToGroupStore('test', opts);
+      popEngine.addGroupOptionsToGroupStore('test', opts);
       expect(groupStore.get('test')).toBe(opts);
     });
 
   });
 
-  describe('getGroupFromGroupId() - ', () => {
+  describe('getGroupOptionsFromGroupId() - ', () => {
 
     beforeEach(() => {
       groupStore.clear();
@@ -126,8 +126,8 @@ describe('PopEngine - ', () => {
         schema: 'schemaId'
       };
 
-      popEngine.addGroupToGroupStore('test', opts);
-      expect(popEngine.getGroupFromGroupId('test')).toBe(opts);
+      popEngine.addGroupOptionsToGroupStore('test', opts);
+      expect(popEngine.getGroupOptionsFromGroupId('test')).toBe(opts);
     });
 
   });

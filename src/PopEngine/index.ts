@@ -39,11 +39,12 @@ export class PopEngine {
   }
 
   // Add group to groupStore when registering a group
-  public addGroupToGroupStore(groupId: string, group: IGroup): void {
+  public addGroupOptionsToGroupStore(groupId: string, group: IGroup): void {
     groupStore.add(groupId, group);
   }
 
-  public getGroupFromGroupId(groupId: string): IGroup {
+  // Get group 
+  public getGroupOptionsFromGroupId(groupId: string): IGroup {
     return groupStore.get(groupId);
   }
 
@@ -100,7 +101,6 @@ export class PopEngine {
         this._maybePinOrUnpinPopAndParentPops(targetElement, true);
       }
 
-      // needs to happen before the isAlreadyShowing check to allow the short circuit to keep the pop open
       this._maybeClearTimeout(this._timeouts.popHover, null);
       this._listenForScroll(true, targetElement);
 
