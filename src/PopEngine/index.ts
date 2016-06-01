@@ -64,14 +64,23 @@ export class PopEngine {
     }
   }
 
+  public clearTimeoutByGroupId(groupId: string) {
+    this._maybeClearTimeout(this._timeouts.timeToHoverOnPop, groupId);
+    this._maybeClearTimeout(this._timeouts.hoverdelay, null);
+  }
+
+  public clearTimeout(targetElement: Element) {
+    let groupId = targetElement.getAttribute('popgun-group');
+    this.clearTimeoutByGroupId(groupId);
+  }
+
   public showPop(targetElement: Element, isPinned: boolean, pop: Pop): void {
     let delay = isPinned ? 0 : pop.opts.showDelay;
     let isAlreadyShowing = this._isPopAlreadyShowingForGroup(targetElement);
     let groupId = targetElement.getAttribute('popgun-group');
 
     // clear any timeouts and do a timeout and show pop
-    this._maybeClearTimeout(this._timeouts.timeToHoverOnPop, groupId);
-    this._maybeClearTimeout(this._timeouts.hoverdelay, null);
+    this.clearTimeout(targetElement);
     this._timeouts.hoverdelay = setTimeout(function(): void {
       let animationEndStates = {};
       let container = <Element>null;
@@ -133,7 +142,7 @@ export class PopEngine {
   }
 
   public hidePop(targetElement: Element): void {
-    let groupId = targetElement.getAttribute('popgun-group');
+    let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
     let pop = this.getPopFromGroupId(groupId);
     let popEl = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
     this._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
@@ -197,14 +206,14 @@ export class PopEngine {
     return false;
   }
 
-  // private _isPopAlreadyOpen(targetElement: Element): boolean {
-  //   let groupId = targetElement.getAttribute('popgun-group');
-  //   if (this.getPopFromGroupId(groupId)) {
-  //     return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING) &&
-  //       (this.getPopFromGroupId(groupId).targetEl === targetElement));
-  //   }
-  //   return false;
-  // }
+  public isPopAlreadyOpen(targetElement: Element): boolean {
+    let groupId = targetElement.getAttribute('popgun-group');
+    if (this.getPopFromGroupId(groupId)) {
+      return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING) &&
+        (this.getPopFromGroupId(groupId).targetEl === targetElement));
+    }
+    return false;
+  }
 
   private _getParentPop(pop: Pop): Pop {
     let parentEl = closest(pop.targetEl, 'div[pop=""]');
