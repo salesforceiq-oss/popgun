@@ -13,3 +13,6 @@ typings
 
 *.js
 *.js.map
+
+# Don't ignore karma.conf.js, even though it is a JS file
+!karma.conf.js
