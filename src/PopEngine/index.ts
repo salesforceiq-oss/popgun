@@ -64,14 +64,25 @@ export class PopEngine {
     }
   }
 
-  public clearTimeoutByGroupId(groupId: string) {
+  private _clearTimeoutByGroupId(groupId: string): void {
     this._maybeClearTimeout(this._timeouts.timeToHoverOnPop, groupId);
     this._maybeClearTimeout(this._timeouts.hoverdelay, null);
   }
 
-  public clearTimeout(targetElement: Element) {
-    let groupId = targetElement.getAttribute('popgun-group');
-    this.clearTimeoutByGroupId(groupId);
+  public clearTimeout(targetElement: Element): void {
+    let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
+    this._clearTimeoutByGroupId(groupId);
+  }
+
+  public createPopElement(targetElement: Element): Element {
+    let container = document.createElement('div');
+    let nose = document.createElement('div');
+    container.setAttribute('class', 'pop');
+    container.setAttribute('pop-id', targetElement.getAttribute('popgun-group'));
+    container.setAttribute('pop', '');
+    nose.setAttribute('class', 'nose-triangle');
+    container.appendChild(nose);
+    return container;
   }
 
   public showPop(targetElement: Element, isPinned: boolean, pop: Pop): void {
@@ -93,20 +104,14 @@ export class PopEngine {
         container.removeChild(container.getElementsByClassName('pop-content')[0]);
         this._maybeClearHandler(this._handlers[groupId]);
       } else {
-        container = document.createElement('div');
-        nose = document.createElement('div');
-        container.setAttribute('class', 'pop');
-        container.setAttribute('pop-id', targetElement.getAttribute('popgun-group'));
-        container.setAttribute('pop', '');
-        nose.setAttribute('class', 'nose-triangle');
-        container.appendChild(nose);
+        container = this.createPopElement(targetElement);
         document.body.appendChild(container);
       }
 
       this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
 
       if (isPinned) {
-        this._maybePinOrUnpinPopAndParentPops(targetElement, true);
+        this.maybePinOrUnpinPopAndParentPops(targetElement, true);
       }
 
       // needs to happen before the isAlreadyShowing check to allow the short circuit to keep the pop open
@@ -223,14 +228,15 @@ export class PopEngine {
     return null;
   }
 
-  private _maybePinOrUnpinPopAndParentPops(target: Element, pin: boolean): void {
+  /* make public */
+  public maybePinOrUnpinPopAndParentPops(target: Element, pin: boolean): void {
     let groupId = target.getAttribute('popgun-group');
     let pop = this.getPopFromGroupId(groupId);
     pop.isPinned = pin;
     target.setAttribute('pinned-pop', '');
     let parentPop = this._getParentPop(pop);
     if (parentPop) {
-      this._maybePinOrUnpinPopAndParentPops(parentPop.targetEl, pin);
+      this.maybePinOrUnpinPopAndParentPops(parentPop.targetEl, pin);
     }
   }
 

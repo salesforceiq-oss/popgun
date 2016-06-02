@@ -7,34 +7,33 @@ import popEngine from '../PopEngine';
 let closest = require('closest');
 
 export class EventDelegate {
+
+  private _setEventListener(trigger: Trigger, listener: (e: Event) => void): void {
+    document.removeEventListener(<string>trigger.eventType, listener);
+    document.addEventListener(<string>trigger.eventType, listener, trigger.useCapture);
+  } 
   public init(): void {
 
-    let trigger:Trigger = new Trigger(TriggerType[TriggerType["CLICK"]]);
-    document.removeEventListener(TriggerEventType.CLICK, this.onClick);
-    document.addEventListener(TriggerEventType.CLICK, this.onClick, trigger.useCapture);
-
-    trigger = new Trigger(TriggerType[TriggerType["HOVER"]]);
-    document.removeEventListener(TriggerEventType.HOVER, this.onHover);
-    document.addEventListener(TriggerEventType.HOVER, this.onHover, trigger.useCapture);
-
-    trigger = new Trigger(TriggerType[TriggerType["FOCUS"]]);
-    document.removeEventListener(TriggerEventType.FOCUS, this.onFocus);
-    document.addEventListener(TriggerEventType.FOCUS, this.onFocus, trigger.useCapture);
-
-    trigger = new Trigger(TriggerType[TriggerType["MANUAL"]]);
-    document.removeEventListener(TriggerEventType.MANUAL, this.onManual);
-    document.addEventListener(TriggerEventType.MANUAL, this.onManual, trigger.useCapture);
-
-    trigger = new Trigger(TriggerType[TriggerType["MOUSEOUT"]]);
-    document.removeEventListener(TriggerEventType.MOUSEOUT, this.onMouseOut);
-    document.addEventListener(TriggerEventType.MOUSEOUT, this.onMouseOut, trigger.useCapture);
-
+    this._setEventListener(new Trigger(TriggerType[TriggerType["CLICK"]]), this.onClick);
+    this._setEventListener(new Trigger(TriggerType[TriggerType["HOVER"]]), this.onHover);
+    this._setEventListener(new Trigger(TriggerType[TriggerType["FOCUS"]]), this.onFocus);
+    this._setEventListener(new Trigger(TriggerType[TriggerType["MANUAL"]]), this.onManual);
+    this._setEventListener(new Trigger(TriggerType[TriggerType["MOUSEOUT"]]), this.onMouseOut);
   }
 
   public onClick(e: MouseEvent): void {
     let t:string = TriggerEventType.triggerEventTypeToTriggerType(e.type);
     let trigger:Trigger = new Trigger(t);
     let target:Element = <Element>e.target;
+    let isPinned = trigger.name === TriggerType.CLICK;
+    if (popEngine.isPopForTrigger(target, trigger)) {
+      if (popEngine.isPopAlreadyOpen(target)) {
+        popEngine.maybePinOrUnpinPopAndParentPops(target, isPinned);
+      } else {
+        let pop = new Pop(target, trigger);
+        popEngine.showPop(target, isPinned, pop);
+      }
+    }
     if (popEngine.isPopForTrigger(target, trigger) && !popEngine.isPopAlreadyOpen(target)) {
       let pop = new Pop(target, trigger);
       let isPinned = trigger.name === TriggerType.CLICK;
@@ -59,7 +58,7 @@ export class EventDelegate {
     } else {
       if (popEngine.isPop(target)) {
         let popId = target.getAttribute('pop-id');
-        popEngine.clearTimeoutByGroupId(target.getAttribute('pop-id'));
+        popEngine.clearTimeout(target);
       }
     }
   }
