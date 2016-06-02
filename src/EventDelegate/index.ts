@@ -65,7 +65,15 @@ export class EventDelegate {
   }
 
   public onFocus(e: Event): void {
+    let t:string = TriggerEventType.triggerEventTypeToTriggerType(e.type);
+    let trigger:Trigger = new Trigger(t);
+    let target:Element = <Element>e.target;
 
+    if (popEngine.isPopForTrigger(target, trigger)) {
+      let pop = new Pop(target, trigger);
+      let isPinned = false; // not pinned because the the trigger was not a click
+      popEngine.showPop(target, isPinned, pop);
+    }
   }
 
   public onManual(e: Event): void {
@@ -92,17 +100,6 @@ export class EventDelegate {
       if (!(popEngine.isPopTarget(relatedTarget)) && !(popEngine.isPop(relatedTarget))) {
         popEngine.hidePop(target);
       }
-    }
-  }
-
-  public listener(e: Event): void {
-    let t:string = TriggerEventType.triggerEventTypeToTriggerType(e.type);
-    let trigger:Trigger = new Trigger(t);
-    let target:Element = <Element>e.target;
-    if (popEngine.isPopForTrigger(target, trigger)) {
-      let pop = new Pop(target, trigger);
-      let isPinned = trigger.name === TriggerType.CLICK;
-      popEngine.showPop(target, isPinned, pop);
     }
   }
 }

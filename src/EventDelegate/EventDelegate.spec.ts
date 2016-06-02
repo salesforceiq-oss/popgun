@@ -55,7 +55,7 @@ describe('EventDelegate - ', () => {
         target: el
       };
 
-      eventDelegate.listener(<any>e);
+      eventDelegate.onClick(<any>e);
 
       expect(popEngine.isPopForTrigger).toHaveBeenCalledWith(e.target, (new Trigger('click')));
     });
@@ -72,7 +72,7 @@ describe('EventDelegate - ', () => {
         target: el
       };
 
-      eventDelegate.listener(<any>e);
+      eventDelegate.onHover(<any>e);
 
       expect(popEngine.isPopForTrigger).toHaveBeenCalledWith(e.target, (new Trigger('hover')));
     });
@@ -89,7 +89,7 @@ describe('EventDelegate - ', () => {
         target: el
       };
 
-      eventDelegate.listener(<any>e);
+      eventDelegate.onFocus(<any>e);
 
       expect(popEngine.isPopForTrigger).toHaveBeenCalledWith(e.target, (new Trigger('focus')));
     });
@@ -106,7 +106,7 @@ describe('EventDelegate - ', () => {
         target: el
       };
 
-      eventDelegate.listener(<any>e);
+      eventDelegate.onManual(<any>e);
 
       expect(popEngine.isPopForTrigger).toHaveBeenCalledWith(e.target, (new Trigger('manual')));
     });
