@@ -7,8 +7,8 @@ let groupOpts = {
   schema: 'testSchema',
   options: { showDelay: 250, text: 'Wow! I cannot believe Popgun actually works!' }
 };
-popgun.addSchemaToSchemaStore('testSchema', testSchema);
-popgun.addGroupOptionsToGroupStore('test', groupOpts);
+popgun.registerSchema('testSchema', testSchema);
+popgun.registerGroup('test', groupOpts);
 
 let el = document.createElement('div');
 el.setAttribute('popgun', '');

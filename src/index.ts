@@ -27,22 +27,23 @@ export class Popgun {
   }
 
   // Store a group w/ options to reuse 
-  // schema is a base schema of options, options are specific options that take precedence over schema options
-  public addGroupOptionsToGroupStore(groupId: string, opts: any): void {
-    let groupOpts: IGroup = {
-      schema: opts.schemaId,
-      options: opts.options
-    };
+  // schema is a base set of options, options attr will precedence over schema
+  public registerGroup(groupId: string, groupOpts: IGroup): void {
     popEngine.addGroupOptionsToGroupStore(groupId, groupOpts);
   }
 
   // Store a schema of options
-  public addSchemaToSchemaStore(schemaId: string, opts: IOptions): void {
+  public registerSchema(schemaId: string, opts: IOptions): void {
     schemaStore.add(schemaId, opts);
   }
 
   public getPopFromGroupId(groupId: string): Pop {
     return popEngine.getPopFromGroupId(groupId);
+  }
+
+  // hidden, content_setup, pre_position, pre_show, showing, pre_hide
+  public getPopState(pop: Pop): string {
+    return pop.state;
   }
 
 }
