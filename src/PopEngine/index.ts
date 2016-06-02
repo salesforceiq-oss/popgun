@@ -228,7 +228,6 @@ export class PopEngine {
     return null;
   }
 
-  /* make public */
   public maybePinOrUnpinPopAndParentPops(target: Element, pin: boolean): void {
     let groupId = target.getAttribute('popgun-group');
     let pop = this.getPopFromGroupId(groupId);
