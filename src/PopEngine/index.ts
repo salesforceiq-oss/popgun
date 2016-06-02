@@ -75,8 +75,8 @@ export class PopEngine {
   }
 
   public createPopElement(targetElement: Element): Element {
-    let container = document.createElement('div');
-    let nose = document.createElement('div');
+    let container:Element = document.createElement('div');
+    let nose:Element = document.createElement('div');
     container.setAttribute('class', 'pop');
     container.setAttribute('pop-id', targetElement.getAttribute('popgun-group'));
     container.setAttribute('pop', '');
@@ -95,12 +95,10 @@ export class PopEngine {
     this._timeouts.hoverdelay = setTimeout(function(): void {
       let animationEndStates = {};
       let container = <Element>null;
-      let nose = <Element>null;
 
       if (isAlreadyShowing) {
         // if pop is already showing for group, reuse
         container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
-        nose = <Element>container.getElementsByClassName('nose-triangle')[0];
         container.removeChild(container.getElementsByClassName('pop-content')[0]);
         this._maybeClearHandler(this._handlers[groupId]);
       } else {
@@ -128,7 +126,7 @@ export class PopEngine {
       this._maybeClearTimeout(this._timeouts.position, null);
       this._timeouts.position = setTimeout(function(): void {
 
-        this._setPosition(pop, container, nose);
+        this._setPosition(pop, container);
 
         // PRE SHOW
         this.setState(pop, PopStateType.PRE_SHOW, pop.opts, null, false);
@@ -160,6 +158,17 @@ export class PopEngine {
 
   public popTopPop(): void {
     escapeStack.pop();
+  }
+
+  public maybePinOrUnpinPopAndParentPops(target: Element, pin: boolean): void {
+    let groupId = target.getAttribute('popgun-group');
+    let pop = this.getPopFromGroupId(groupId);
+    pop.isPinned = pin;
+    target.setAttribute('pinned-pop', '');
+    let parentPop = this._getParentPop(pop);
+    if (parentPop) {
+      this.maybePinOrUnpinPopAndParentPops(parentPop.targetEl, pin);
+    }
   }
 
   private _fireEvent(state: string, pop: Pop): void {
@@ -228,17 +237,6 @@ export class PopEngine {
     return null;
   }
 
-  public maybePinOrUnpinPopAndParentPops(target: Element, pin: boolean): void {
-    let groupId = target.getAttribute('popgun-group');
-    let pop = this.getPopFromGroupId(groupId);
-    pop.isPinned = pin;
-    target.setAttribute('pinned-pop', '');
-    let parentPop = this._getParentPop(pop);
-    if (parentPop) {
-      this.maybePinOrUnpinPopAndParentPops(parentPop.targetEl, pin);
-    }
-  }
-
   private _listenForScroll(listen: boolean, targetElem: Element): void {
     if (!listen) {
       console.log(targetElem);
@@ -248,7 +246,8 @@ export class PopEngine {
     }, true);
   }
 
-  private _setPosition(pop: Pop, container: Element, nose: Element): void {
+  private _setPosition(pop: Pop, container: Element): void {
+    let nose = <Element>container.getElementsByClassName('nose-triangle')[0];
     let positionOpts = {
       cushion: 8,
       containerCushion: 10,

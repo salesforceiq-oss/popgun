@@ -8,10 +8,6 @@ let closest = require('closest');
 
 export class EventDelegate {
 
-  private _setEventListener(trigger: Trigger, listener: (e: Event) => void): void {
-    document.removeEventListener(<string>trigger.eventType, listener);
-    document.addEventListener(<string>trigger.eventType, listener, trigger.useCapture);
-  } 
   public init(): void {
 
     this._setEventListener(new Trigger(TriggerType[TriggerType["CLICK"]]), this.onClick);
@@ -100,6 +96,11 @@ export class EventDelegate {
         popEngine.hidePop(target);
       }
     }
+  }
+
+  private _setEventListener(trigger: Trigger, listener: (e: Event) => void): void {
+    document.removeEventListener(<string>trigger.eventType, listener);
+    document.addEventListener(<string>trigger.eventType, listener, trigger.useCapture);
   }
 }
 
