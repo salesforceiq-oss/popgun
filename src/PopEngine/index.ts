@@ -236,8 +236,8 @@ export class PopEngine {
 
   private _setPosition(pop: Pop, container: Element, nose: Element): void {
     let positionOpts = {
-      cushion: 8,
-      containerCushion: 10,
+      cushion: pop.opts.cushion,
+      containerCushion: pop.opts.containerCushion,
       alignmentOffset: pop.opts.alignmentOffset,
       arrowElement: nose
     };
