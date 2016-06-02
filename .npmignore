@@ -1,9 +1,6 @@
 # TypeScript files
 *.ts
 
-# TypeScript - JavaScript mappings
-*.js.map
-
 # Tests
 src/**/*.spec.js
 
