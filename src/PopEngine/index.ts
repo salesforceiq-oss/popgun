@@ -65,40 +65,52 @@ export class PopEngine {
     }
   }
 
+  private _clearTimeoutByGroupId(groupId: string): void {
+    this._maybeClearTimeout(this._timeouts.timeToHoverOnPop, groupId);
+    this._maybeClearTimeout(this._timeouts.hoverdelay, null);
+  }
+
+  public clearTimeout(targetElement: Element): void {
+    let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
+    this._clearTimeoutByGroupId(groupId);
+  }
+
+  public createPopElement(targetElement: Element): Element {
+    let container:Element = document.createElement('div');
+    let nose:Element = document.createElement('div');
+    container.setAttribute('class', 'pop');
+    container.setAttribute('pop-id', targetElement.getAttribute('popgun-group'));
+    container.setAttribute('pop', '');
+    nose.setAttribute('class', 'nose-triangle');
+    container.appendChild(nose);
+    return container;
+  }
+
   public showPop(targetElement: Element, isPinned: boolean, pop: Pop): void {
     let delay = isPinned ? 0 : pop.opts.showDelay;
     let isAlreadyShowing = this._isPopAlreadyShowingForGroup(targetElement);
     let groupId = targetElement.getAttribute('popgun-group');
 
     // clear any timeouts and do a timeout and show pop
-    this._maybeClearTimeout(this._timeouts.timeToHoverOnPop, groupId);
-    this._maybeClearTimeout(this._timeouts.hoverdelay, null);
+    this.clearTimeout(targetElement);
     this._timeouts.hoverdelay = setTimeout(function(): void {
       let animationEndStates = {};
       let container = <Element>null;
-      let nose = <Element>null;
 
       if (isAlreadyShowing) {
         // if pop is already showing for group, reuse
         container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
-        nose = <Element>container.getElementsByClassName('nose-triangle')[0];
         container.removeChild(container.getElementsByClassName('pop-content')[0]);
         this._maybeClearHandler(this._handlers[groupId]);
       } else {
-        container = document.createElement('div');
-        nose = document.createElement('div');
-        container.setAttribute('class', 'pop');
-        container.setAttribute('pop-id', targetElement.getAttribute('popgun-group'));
-        container.setAttribute('pop', '');
-        nose.setAttribute('class', 'nose-triangle');
-        container.appendChild(nose);
+        container = this.createPopElement(targetElement);
         document.body.appendChild(container);
       }
 
       this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
 
       if (isPinned) {
-        this._maybePinOrUnpinPopAndParentPops(targetElement, true);
+        this.maybePinOrUnpinPopAndParentPops(targetElement, true);
       }
 
       this._maybeClearTimeout(this._timeouts.popHover, null);
@@ -114,7 +126,7 @@ export class PopEngine {
       this._maybeClearTimeout(this._timeouts.position, null);
       this._timeouts.position = setTimeout(function(): void {
 
-        this._setPosition(pop, container, nose);
+        this._setPosition(pop, container);
 
         // PRE SHOW
         this.setState(pop, PopStateType.PRE_SHOW, pop.opts, null, false);
@@ -133,7 +145,7 @@ export class PopEngine {
   }
 
   public hidePop(targetElement: Element): void {
-    let groupId = targetElement.getAttribute('popgun-group');
+    let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
     let pop = this.getPopFromGroupId(groupId);
     let popEl = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
     this._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
@@ -146,6 +158,17 @@ export class PopEngine {
 
   public popTopPop(): void {
     escapeStack.pop();
+  }
+
+  public maybePinOrUnpinPopAndParentPops(target: Element, pin: boolean): void {
+    let groupId = target.getAttribute('popgun-group');
+    let pop = this.getPopFromGroupId(groupId);
+    pop.isPinned = pin;
+    target.setAttribute('pinned-pop', '');
+    let parentPop = this._getParentPop(pop);
+    if (parentPop) {
+      this.maybePinOrUnpinPopAndParentPops(parentPop.targetEl, pin);
+    }
   }
 
   private _fireEvent(state: string, pop: Pop): void {
@@ -197,14 +220,14 @@ export class PopEngine {
     return false;
   }
 
-  // private _isPopAlreadyOpen(targetElement: Element): boolean {
-  //   let groupId = targetElement.getAttribute('popgun-group');
-  //   if (this.getPopFromGroupId(groupId)) {
-  //     return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING) &&
-  //       (this.getPopFromGroupId(groupId).targetEl === targetElement));
-  //   }
-  //   return false;
-  // }
+  public isPopAlreadyOpen(targetElement: Element): boolean {
+    let groupId = targetElement.getAttribute('popgun-group');
+    if (this.getPopFromGroupId(groupId)) {
+      return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING) &&
+        (this.getPopFromGroupId(groupId).targetEl === targetElement));
+    }
+    return false;
+  }
 
   private _getParentPop(pop: Pop): Pop {
     let parentEl = closest(pop.targetEl, 'div[pop=""]');
@@ -212,17 +235,6 @@ export class PopEngine {
       return this.getPopFromGroupId(parentEl.getAttribute('pop-id'));
     }
     return null;
-  }
-
-  private _maybePinOrUnpinPopAndParentPops(target: Element, pin: boolean): void {
-    let groupId = target.getAttribute('popgun-group');
-    let pop = this.getPopFromGroupId(groupId);
-    pop.isPinned = pin;
-    target.setAttribute('pinned-pop', '');
-    let parentPop = this._getParentPop(pop);
-    if (parentPop) {
-      this._maybePinOrUnpinPopAndParentPops(parentPop.targetEl, pin);
-    }
   }
 
   private _listenForScroll(listen: boolean, targetElem: Element): void {
@@ -234,7 +246,8 @@ export class PopEngine {
     }, true);
   }
 
-  private _setPosition(pop: Pop, container: Element, nose: Element): void {
+  private _setPosition(pop: Pop, container: Element): void {
+    let nose = <Element>container.getElementsByClassName('nose-triangle')[0];
     let positionOpts = {
       cushion: pop.opts.cushion,
       containerCushion: pop.opts.containerCushion,
