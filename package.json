@@ -37,7 +37,6 @@
     "browserify": "~13.0.0",
     "browserify-istanbul": "~2.0.0",
     "chokidar-cli": "~1.0.1",
-    "closest": "~0.0.1",
     "connect-livereload": "~0.5.4",
     "deep-equal": "~1.0.1",
     "exorcist": "~0.4.0",
@@ -65,6 +64,7 @@
   },
   "dependencies": {
     "camelize": "~1.0.0",
+    "closest": "~0.0.1",
     "escape-stack": "~0.2.0",
     "extend": "~3.0.0",
     "focusin": "~2.0.0",
