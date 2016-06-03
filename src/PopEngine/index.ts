@@ -65,19 +65,14 @@ export class PopEngine {
     }
   }
 
-  private _clearTimeoutByGroupId(groupId: string): void {
-    this._maybeClearTimeout(this._timeouts.timeToHoverOnPop, groupId);
-    this._maybeClearTimeout(this._timeouts.hoverdelay, null);
-  }
-
   public clearTimeout(targetElement: Element): void {
     let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
     this._clearTimeoutByGroupId(groupId);
   }
 
   public createPopElement(targetElement: Element): Element {
-    let container:Element = document.createElement('div');
-    let nose:Element = document.createElement('div');
+    let container: Element = document.createElement('div');
+    let nose: Element = document.createElement('div');
     container.setAttribute('class', 'pop');
     container.setAttribute('pop-id', targetElement.getAttribute('popgun-group'));
     container.setAttribute('pop', '');
@@ -171,6 +166,15 @@ export class PopEngine {
     }
   }
 
+  public isPopAlreadyOpen(targetElement: Element): boolean {
+    let groupId = targetElement.getAttribute('popgun-group');
+    if (this.getPopFromGroupId(groupId)) {
+      return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING) &&
+        (this.getPopFromGroupId(groupId).targetEl === targetElement));
+    }
+    return false;
+  }
+
   private _fireEvent(state: string, pop: Pop): void {
     let event = document.createEvent('CustomEvent');
     event.initCustomEvent(camelize('Popgun_' + state), true, true, {'pop': pop});
@@ -204,6 +208,11 @@ export class PopEngine {
     }
   }
 
+  private _clearTimeoutByGroupId(groupId: string): void {
+    this._maybeClearTimeout(this._timeouts.timeToHoverOnPop, groupId);
+    this._maybeClearTimeout(this._timeouts.hoverdelay, null);
+  }
+
   private _maybeClearTimeout(timeout: any, groupId: string): void {
     return this._maybeClear(timeout, true, groupId);
   }
@@ -216,15 +225,6 @@ export class PopEngine {
     let groupId = targetElement.getAttribute('popgun-group');
     if (this.getPopFromGroupId(groupId)) {
       return (this.getPopFromGroupId(groupId).state === PopStateType.SHOWING);
-    }
-    return false;
-  }
-
-  public isPopAlreadyOpen(targetElement: Element): boolean {
-    let groupId = targetElement.getAttribute('popgun-group');
-    if (this.getPopFromGroupId(groupId)) {
-      return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING) &&
-        (this.getPopFromGroupId(groupId).targetEl === targetElement));
     }
     return false;
   }
