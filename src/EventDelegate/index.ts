@@ -19,7 +19,7 @@ export class EventDelegate {
   public onClick(e: MouseEvent): void {
     let t: string = TriggerEventType.triggerEventTypeToTriggerType(e.type);
     let trigger: Trigger = new Trigger(t);
-    let target: Element = <Element>e.target;
+    let target: Element = <Element>closest(e.target, '[popgun=""]', true);
     let isPinned = trigger.name === TriggerType.CLICK;
     if (popEngine.isPopForTrigger(target, trigger)) {
       if (popEngine.isPopAlreadyOpen(target)) {
@@ -40,7 +40,7 @@ export class EventDelegate {
   public onHover(e: MouseEvent): void {
     let t: string = TriggerEventType.triggerEventTypeToTriggerType(e.type);
     let trigger: Trigger = new Trigger(t);
-    let target: Element = <Element>e.target;
+    let target: Element = <Element>closest(e.target, '[popgun=""]', true);
     if (popEngine.isPopForTrigger(target, trigger)) {
       if (popEngine.isPopAlreadyOpen(target)) {
         popEngine.clearTimeout(target);
@@ -59,7 +59,7 @@ export class EventDelegate {
   public onFocus(e: Event): void {
     let t: string = TriggerEventType.triggerEventTypeToTriggerType(e.type);
     let trigger: Trigger = new Trigger(t);
-    let target: Element = <Element>e.target;
+    let target: Element = <Element>closest(e.target, '[popgun=""]', true);
 
     if (popEngine.isPopForTrigger(target, trigger)) {
       let pop = new Pop(target, trigger);
@@ -71,7 +71,7 @@ export class EventDelegate {
   public onManual(e: Event): void {
     let t: string = TriggerEventType.triggerEventTypeToTriggerType(e.type);
     let trigger: Trigger = new Trigger(t);
-    let target: Element = <Element>e.target;
+    let target: Element = <Element>closest(e.target, '[popgun=""]', true);
 
     if (popEngine.isPopForTrigger(target, trigger)) {
       let pop = new Pop(target, trigger);
@@ -81,14 +81,15 @@ export class EventDelegate {
   }
 
   public onMouseOut(e: MouseEvent): void {
-    let target: Element = <Element>e.target;
+    let target: Element = <Element>closest(e.target, '[popgun=""]', true);
     let relatedTarget: Element = <Element>e.relatedTarget;
     if ((popEngine.isPopForTrigger(target, (new Trigger('hover')))) &&
       !(target).hasAttribute('pinned-pop')) {
       popEngine.hidePop(target);
     }
 
-    if (target.hasAttribute('pop') && !popEngine.getPopFromGroupId(target.getAttribute('pop-id')).isPinned) {
+    if (target && target.hasAttribute('pop') &&
+        !popEngine.getPopFromGroupId(target.getAttribute('pop-id')).isPinned) {
       if (!(popEngine.isPopTarget(relatedTarget)) && !(popEngine.isPop(relatedTarget))) {
         popEngine.hidePop(target);
       }
