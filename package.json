@@ -25,7 +25,7 @@
   "bugs": {
     "url": "https://github.com/relateiq/popgun/issues"
   },
-  "homepage": "https://github.com/relateiq/popgun#readme",
+  "homepage": "https://github.com/relateiq/popgun",
   "iqproj": {
     "main": "src/index.ts",
     "app": true,
