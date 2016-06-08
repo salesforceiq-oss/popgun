@@ -77,6 +77,7 @@ export class PopEngine {
     container.setAttribute('pop-id', targetElement.getAttribute('popgun-group'));
     container.setAttribute('pop', '');
     nose.setAttribute('class', 'nose-triangle');
+    container.setAttribute('style', 'z-index: 10000');
     container.appendChild(nose);
     return container;
   }
