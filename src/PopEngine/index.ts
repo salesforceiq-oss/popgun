@@ -74,7 +74,8 @@ export class PopEngine {
   public createPopElement(targetElement: Element): Element {
     let container: Element = document.createElement('div');
     let nose: Element = document.createElement('div');
-    container.setAttribute('class', 'pop');
+    container.classList.add('pop');
+    container.classList.add('hidden');
     container.setAttribute('pop-id', targetElement.getAttribute('popgun-group'));
     container.setAttribute('pop', '');
     nose.setAttribute('class', 'nose-triangle');
@@ -136,6 +137,7 @@ export class PopEngine {
 
         // SHOWING
         this.setState(pop, PopStateType.SHOWING, pop.opts, null, false);
+        container.classList.remove('hidden');
 
       }.bind(this));
     }.bind(this), delay);
