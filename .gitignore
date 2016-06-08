@@ -9,6 +9,9 @@ test-assets
 release
 .DS_Store
 
+npm-debug.log
+tsd-debug.log
+
 typings
 
 *.js
