@@ -86,6 +86,8 @@ export class PopEngine {
     let isAlreadyShowing = this._isPopAlreadyShowingForGroup(targetElement);
     let groupId = targetElement.getAttribute('popgun-group');
 
+    this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
+
     // clear any timeouts and do a timeout and show pop
     this.clearTimeout(targetElement);
     this._timeouts.hoverdelay = setTimeout(function(): void {
@@ -101,8 +103,6 @@ export class PopEngine {
         container = this.createPopElement(targetElement);
         document.body.appendChild(container);
       }
-
-      this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
 
       if (isPinned) {
         this.maybePinOrUnpinPopAndParentPops(targetElement, true);
