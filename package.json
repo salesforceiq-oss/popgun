@@ -68,6 +68,7 @@
     "escape-stack": "~0.2.0",
     "extend": "~3.0.0",
     "focusin": "~2.0.0",
-    "positioner": "~0.2.0"
+    "positioner": "~0.2.0",
+    "z-index-manager": "~0.0.2"
   }
 }
