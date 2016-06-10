@@ -74,6 +74,22 @@ Some Popgun attributes that you can define are:
 * **timeToHoverOnPop**: *(int - default 300)* the time a user has to hover back over the popover when they hover off the target.
 * **trigger**: *(string - default 'hover')* triggers for the target to show pop - 'hover', 'click', 'focus'.
 
+### DOM Events
+Throughout the life cycle of the popover, Popgun will fire the following events onto the target:
+* PopgunHidden
+* PopgunContentSetup
+* PopgunPrePosition
+* PopgunPreShow
+* PopgunShowing
+* PopgunPreHide
+
+**js**
+```javascript
+el.addEventListener('PopgunContentSetup', function(e) {
+  console.log('PopgunContentSetup');
+}, false);
+```
+
 
 ## Run Demo Popgun Application
 Run `iqb start` in the root directory to run a demo application with Popgun.
