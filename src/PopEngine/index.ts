@@ -16,10 +16,12 @@ export class PopEngine {
   _timeouts: {
     hoverdelay: any
     popHover: any
+    scrollTimer: { [key: string]: number }
     timeToHoverOnPop: { [key: string]: number }
   } = {
     hoverdelay: null,
     popHover: null,
+    scrollTimer: {},
     timeToHoverOnPop: {}
   };
 
@@ -112,7 +114,7 @@ export class PopEngine {
       }
 
       this._maybeClearTimeout(this._timeouts.popHover, null);
-      this._listenForScroll(true, targetElement);
+      this._listenForScroll(true, groupId, container);
 
       // CONTENT SETUP
       this.setState(pop, PopStateType.CONTENT_SETUP, pop.opts, null, false);
@@ -146,12 +148,18 @@ export class PopEngine {
   public hidePop(targetElement: Element): void {
     let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
     let pop = this.getPopFromGroupId(groupId);
+
     this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
-    let popEl = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
+
     this._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
+      let popEl = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
       targetElement.removeAttribute('pinned-pop');
+
       this._maybeClearHandler(this._handlers[groupId]);
+      this._listenForScroll(false, groupId, popEl);
+
       this.setState(pop, PopStateType.HIDDEN, pop.opts, null, false);
+
       document.body.removeChild(popEl);
       this.addPopToPopStore(groupId, null);
     }.bind(this), pop.opts.timeToHoverOnPop);
@@ -198,7 +206,7 @@ export class PopEngine {
         }
       }
       if (isTimeout) {
-        if (key === 'timeToHoverOnPop') {
+        if (key === 'timeToHoverOnPop' || key === 'scrollTimer') {
           clearTimeout((<any>obj)[key][groupId]);
         } else {
           clearTimeout((<any>obj)[key]);
@@ -206,7 +214,7 @@ export class PopEngine {
       } else {
         timeoutOrHandler();
       }
-      if (key === 'timeToHoverOnPop') {
+      if (key === 'timeToHoverOnPop' || key === 'scrollTimer') {
         (<any>obj)[key][groupId] = undefined;
       } else {
         (<any>obj)[key] = undefined;
@@ -243,13 +251,23 @@ export class PopEngine {
     return null;
   }
 
-  private _listenForScroll(listen: boolean, targetElem: Element): void {
+  private _listenForScroll(listen: boolean, groupId: string, container: Element): void {
     if (!listen) {
-      console.log(targetElem);
+      document.removeEventListener('scroll', this._positionOpenPops.bind(this), true);
+    } else {
+      document.addEventListener('scroll', this._positionOpenPops.bind(this), true);
     }
-    document.addEventListener('scroll', () => {
-      console.log('scroll');
-    }, true);
+  }
+
+  private _positionOpenPops(): void {
+    let popElementsList = Array.prototype.slice.call(document.body.getElementsByClassName('pop'));
+    popElementsList.forEach(function(popEl: Element): void {
+      let groupId = popEl.getAttribute('pop-id');
+      this._maybeClearTimeout(this._timeouts.scrollTimer, groupId);
+      this._timeouts.scrollTimer[groupId] = setTimeout(function(): void {
+        this._setPosition(this.getPopFromGroupId(groupId), popEl);
+      }.bind(this), 100);
+    }, this);
   }
 
   private _setPosition(pop: Pop, container: Element): void {
