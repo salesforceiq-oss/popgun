@@ -230,7 +230,8 @@ export class PopEngine {
   private _isPopAlreadyShowingForGroup(targetElement: Element): boolean {
     let groupId = targetElement.getAttribute('popgun-group');
     if (this.getPopFromGroupId(groupId)) {
-      return (this.getPopFromGroupId(groupId).state === PopStateType.SHOWING);
+      return (this.getPopFromGroupId(groupId).state === PopStateType.SHOWING ||
+              this.getPopFromGroupId(groupId).state === PopStateType.PRE_HIDE);
     }
     return false;
   }
