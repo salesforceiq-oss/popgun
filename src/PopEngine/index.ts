@@ -146,10 +146,12 @@ export class PopEngine {
   public hidePop(targetElement: Element): void {
     let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
     let pop = this.getPopFromGroupId(groupId);
+    this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
     let popEl = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
     this._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
       targetElement.removeAttribute('pinned-pop');
       this._maybeClearHandler(this._handlers[groupId]);
+      this.setState(pop, PopStateType.HIDDEN, pop.opts, null, false);
       document.body.removeChild(popEl);
       this.addPopToPopStore(groupId, null);
     }.bind(this), pop.opts.timeToHoverOnPop);
