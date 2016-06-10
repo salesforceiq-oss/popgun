@@ -86,8 +86,8 @@ export class PopEngine {
 
   public showPop(targetElement: Element, isPinned: boolean, pop: Pop): void {
     let delay = isPinned ? 0 : pop.opts.showDelay;
-    let isAlreadyShowing = this._isPopAlreadyShowingForGroup(targetElement);
     let groupId = targetElement.getAttribute('popgun-group');
+    let isAlreadyShowing = this._isPopAlreadyShowingForGroup(groupId);
 
     this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
 
@@ -227,8 +227,7 @@ export class PopEngine {
     return this._maybeClear(watch, false, null);
   }
 
-  private _isPopAlreadyShowingForGroup(targetElement: Element): boolean {
-    let groupId = targetElement.getAttribute('popgun-group');
+  private _isPopAlreadyShowingForGroup(groupId: string): boolean {
     if (this.getPopFromGroupId(groupId)) {
       return (this.getPopFromGroupId(groupId).state === PopStateType.SHOWING ||
               this.getPopFromGroupId(groupId).state === PopStateType.PRE_HIDE);
