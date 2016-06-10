@@ -76,17 +76,21 @@ Some Popgun attributes that you can define are:
 
 ### DOM Events
 Throughout the life cycle of the popover, Popgun will fire the following events onto the target:
-* PopgunHidden
+
+**Show States**
 * PopgunContentSetup
 * PopgunPrePosition
 * PopgunPreShow
 * PopgunShowing
+
+**Hide States**
 * PopgunPreHide
+* PopgunHidden
 
 **js**
 ```javascript
-el.addEventListener('PopgunContentSetup', function(e) {
-  console.log('PopgunContentSetup');
+el.addEventListener('PopgunPreShow', function(e) {
+  console.log('PopgunPreShow');
 }, false);
 ```
 
