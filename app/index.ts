@@ -54,3 +54,11 @@ el.addEventListener('PopgunPreShow', function(e) {
 el.addEventListener('PopgunShowing', function(e) {
   console.log('PopgunShowing');
 }, false);
+
+el.addEventListener('PopgunPreHide', function(e) {
+  console.log('PopgunPreHide');
+}, false);
+
+el.addEventListener('PopgunHidden', function(e) {
+  console.log('PopgunHidden');
+}, false);
