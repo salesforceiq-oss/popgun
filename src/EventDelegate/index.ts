@@ -19,8 +19,9 @@ export class EventDelegate {
   public onClick(e: MouseEvent): void {
     let t: string = TriggerEventType.triggerEventTypeToTriggerType(e.type);
     let trigger: Trigger = new Trigger(t);
-    let target: Element = <Element>closest(e.target, '[popgun]', true);
+    let target: Element = <Element>closest(e.target, '[popgun]', true) || <Element>closest(e.target, '[pop]', true);
     let isPinned = trigger.name === TriggerType.CLICK;
+
     if (popEngine.isPopForTrigger(target, trigger)) {
       if (popEngine.isPopAlreadyOpen(target)) {
         popEngine.maybePinOrUnpinPopAndParentPops(target, isPinned);
@@ -28,11 +29,7 @@ export class EventDelegate {
         let pop = new Pop(target, trigger);
         popEngine.showPop(target, isPinned, pop);
       }
-    }
-    if (popEngine.isPopForTrigger(target, trigger) && !popEngine.isPopAlreadyOpen(target)) {
-      let pop = new Pop(target, trigger);
-      popEngine.showPop(target, isPinned, pop);
-    } else if (!popEngine.isPopTarget(target)) {
+    } else if (!popEngine.isPopTarget(target) && !popEngine.isPop(target)) {
       popEngine.popTopPop();
     }
   }
@@ -40,7 +37,8 @@ export class EventDelegate {
   public onHover(e: MouseEvent): void {
     let t: string = TriggerEventType.triggerEventTypeToTriggerType(e.type);
     let trigger: Trigger = new Trigger(t);
-    let target: Element = <Element>closest(e.target, '[popgun]', true);
+    let target: Element = <Element>closest(e.target, '[popgun]', true) || <Element>closest(e.target, '[pop]', true);
+
     if (popEngine.isPopForTrigger(target, trigger)) {
       if (popEngine.isPopAlreadyOpen(target)) {
         popEngine.clearTimeout(target);
@@ -49,23 +47,22 @@ export class EventDelegate {
         let isPinned = trigger.name === TriggerType.CLICK;
         popEngine.showPop(target, isPinned, pop);
       }
-    } else {
-      target = <Element>closest(e.target, '[pop]', true);
-      if (popEngine.isPop(target)) {
-        popEngine.clearTimeout(target);
-      }
+    } else if (popEngine.isPop(target)) {
+      popEngine.clearTimeout(target);
     }
   }
 
   public onFocus(e: Event): void {
     let t: string = TriggerEventType.triggerEventTypeToTriggerType(e.type);
     let trigger: Trigger = new Trigger(t);
-    let target: Element = <Element>closest(e.target, '[popgun]', true);
+    let target: Element = <Element>closest(e.target, '[popgun]', true) || <Element>closest(e.target, '[pop]', true);
 
     if (popEngine.isPopForTrigger(target, trigger)) {
       let pop = new Pop(target, trigger);
       let isPinned = false; // not pinned because the the trigger was not a click
       popEngine.showPop(target, isPinned, pop);
+    } else if (popEngine.isPop(target)) {
+      popEngine.clearTimeout(target);
     }
   }
 
