@@ -37,6 +37,16 @@ el.setAttribute('popgun-html', 'Pirates are way cooler than ninjas.');
 el.innerText = 'Hover Me!';
 document.body.appendChild(el);
 
+let inp = document.createElement('input');
+inp.setAttribute('type', 'text');
+inp.setAttribute('placeholder', 'Focus me!');
+inp.setAttribute('popgun', '');
+inp.setAttribute('popgun-group', 'test3');
+inp.setAttribute('popgun-trigger', 'focus');
+inp.setAttribute('popgun-placement', 'right');
+inp.setAttribute('popgun-html', '<div>Wow! Focusing too?!</div>');
+document.body.appendChild(inp);
+
 // Test Event Listeners
 
 el.addEventListener('PopgunContentSetup', function(e) {
