@@ -97,11 +97,10 @@ export class PopEngine {
     this.clearTimeout(targetElement);
     this._timeouts.hoverdelay = setTimeout(function(): void {
       let animationEndStates = {};
-      let container = <Element>null;
+      let container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
 
-      if (isAlreadyShowing) {
+      if (isAlreadyShowing && !!container) {
         // if pop is already showing for group, reuse
-        container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
         container.removeChild(container.getElementsByClassName('pop-content')[0]);
         this._maybeClearHandler(this._handlers[groupId]);
       } else {
@@ -160,7 +159,9 @@ export class PopEngine {
 
       this.setState(pop, PopStateType.HIDDEN, pop.opts, null, false);
 
-      document.body.removeChild(popEl);
+      if (!!popEl) {
+        document.body.removeChild(popEl);
+      }
       this.addPopToPopStore(groupId, null);
     }.bind(this), pop.opts.timeToHoverOnPop);
   }
