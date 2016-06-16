@@ -46,6 +46,18 @@ export class Popgun {
     return pop.state;
   }
 
+  // Show the popover for a particular target element
+  public showPop(target: Element, isPinned: boolean, trigger: string): void {
+    let t: Trigger = new Trigger(trigger);
+    let pop = new Pop(target, t);
+    popEngine.showPop(target, isPinned, pop);
+  }
+
+  // Hide the popover for a particular target element
+  public hidePop(target: Element): void {
+    popEngine.hidePop(target);
+  }
+
 }
 
 export default new Popgun();
