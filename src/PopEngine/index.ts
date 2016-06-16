@@ -76,7 +76,7 @@ export class PopEngine {
   public createPopElement(targetElement: Element): Element {
     let container: Element = document.createElement('div');
     let nose: Element = document.createElement('div');
-    container.classList.add('pop');
+    container.classList.add('popover');
     container.classList.add('hidden');
     container.setAttribute('pop-id', targetElement.getAttribute('popgun-group'));
     container.setAttribute('pop', '');
@@ -261,7 +261,7 @@ export class PopEngine {
   }
 
   private _positionOpenPops(): void {
-    let popElementsList = Array.prototype.slice.call(document.body.getElementsByClassName('pop'));
+    let popElementsList = Array.prototype.slice.call(document.body.getElementsByClassName('popover'));
     popElementsList.forEach(function(popEl: Element): void {
       let groupId = popEl.getAttribute('pop-id');
       this._maybeClearTimeout(this._timeouts.scrollTimer, groupId);

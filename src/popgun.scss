@@ -178,7 +178,7 @@ $boxShadowPop: 1px 2px 2px rgba(#1a333d, 0.15);
   border: 1px solid #cacac9;
 }
 
-.pop {
+.popover {
   @include riq-tip-skin;
   display: flex;
   flex-direction: column;
@@ -192,7 +192,7 @@ $boxShadowPop: 1px 2px 2px rgba(#1a333d, 0.15);
 
   transition: top .25s ease-out, left .25s ease-out;
 
-  &.pop-no-transition {
+  &.popover-no-transition {
     &, & .nose-triangle {
       transition: none;
     }
