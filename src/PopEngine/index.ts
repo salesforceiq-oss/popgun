@@ -117,7 +117,7 @@ export class PopEngine {
 
       // CONTENT SETUP
       this.setState(pop, PopStateType.CONTENT_SETUP, pop.opts, null, false);
-      container.appendChild(pop.popEl.element);
+      container.appendChild(pop.popOver.element);
 
       // PRE POSITION
       this.setState(pop, PopStateType.PRE_POSITION, pop.opts, null, false);
@@ -151,16 +151,16 @@ export class PopEngine {
     this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
 
     this._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
-      let popEl = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
+      let popOver = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
       targetElement.removeAttribute('pinned-pop');
 
       this._maybeClearHandler(this._handlers[groupId]);
-      this._listenForScroll(false, groupId, popEl);
+      this._listenForScroll(false, groupId, popOver);
 
       this.setState(pop, PopStateType.HIDDEN, pop.opts, null, false);
 
-      if (!!popEl) {
-        document.body.removeChild(popEl);
+      if (!!popOver) {
+        document.body.removeChild(popOver);
       }
       this.addPopToPopStore(groupId, null);
     }.bind(this), pop.opts.timeToHoverOnPop);
@@ -262,11 +262,11 @@ export class PopEngine {
 
   private _positionOpenPops(): void {
     let popElementsList = Array.prototype.slice.call(document.body.getElementsByClassName('popover'));
-    popElementsList.forEach(function(popEl: Element): void {
-      let groupId = popEl.getAttribute('pop-id');
+    popElementsList.forEach(function(popOver: Element): void {
+      let groupId = popOver.getAttribute('pop-id');
       this._maybeClearTimeout(this._timeouts.scrollTimer, groupId);
       this._timeouts.scrollTimer[groupId] = setTimeout(function(): void {
-        this._setPosition(this.getPopFromGroupId(groupId), popEl);
+        this._setPosition(this.getPopFromGroupId(groupId), popOver);
       }.bind(this), 100);
     }, this);
   }

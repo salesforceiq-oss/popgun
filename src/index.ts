@@ -13,7 +13,7 @@ import Pop from './Pop';
 import popEngine from './PopEngine';
 import PopStateType from './PopStateType';
 import popStore from './PopStore';
-import PopTarget from './PopTarget';
+import PopOver from './PopOver';
 import schemaStore from './SchemaStore';
 import Trigger from './Trigger';
 import TriggerEventType from './TriggerEventType';

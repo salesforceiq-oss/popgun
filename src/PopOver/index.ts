@@ -1,6 +1,6 @@
 import Trigger from '../Trigger';
 
-export default class PopTarget {
+export default class PopOver {
   element: Element;
   trigger: Trigger;
 
