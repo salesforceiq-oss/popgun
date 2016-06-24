@@ -26,7 +26,7 @@ fi
 
 git remote | grep bedrock > /dev/null
 if [ $? -gt 0 ]; then
-    git remote add bedrock git://github.com/relateiq/bedrock.git -t iqproj-webmodule
+    git remote add bedrock git://github.com/relateiq/bedrock.git -t iqproj
 fi
 
 git fetch bedrock
@@ -35,6 +35,7 @@ git reset
 if [ -z "$1" ]; then
     system_files=(
         bin/iqb
+        bin/headless
         build/deploy
         build/start-server
         build/update

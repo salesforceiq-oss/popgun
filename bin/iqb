@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 self=$0
 command=$1
@@ -7,227 +7,331 @@ shift
 # allow normal shell commands to be executed (eg: npm install)
 # # when the script is used as an ENTRYPOINT for a docker container
 if [ "$command" = "exec" ]; then
-    exec "$@"
+  exec "$@"
 fi
 
 #################################################################################
 # environment checks for parallel and jq
 # TODO: don't check on *every* run...that's a lot of checks
 which parallel > /dev/null
+
 if [ $? -gt 0 ]; then
-    echo "!! parallel not found.  installing..."
-    brew install parallel
-    mkdir -p ~/.parallel
-    touch ~/.parallel/will-cite
+  echo "!! parallel not found.  installing..."
+  brew install parallel
+  mkdir -p ~/.parallel
+  touch ~/.parallel/will-cite
 fi
 
 which jq > /dev/null
 if [ $? -gt 0 ]; then
-    echo "!! jq not found.  installing..."
-    brew install jq
+  echo "!! jq not found.  installing..."
+  brew install jq
 fi
 
 #################################################################################
 # configuration (export because `parallel`)
-export TAPE_CMD=node_modules/tape/bin/tape
-export KARMA_CMD=node_modules/karma/bin/karma
-export BROWSERIFY_CMD=node_modules/browserify/bin/cmd.js
-export EXORCIST_CMD=node_modules/exorcist/bin/exorcist.js
-export WATCHIFY_CMD=node_modules/watchify/bin/cmd.js
-export WATCH_CMD=node_modules/chokidar-cli/index.js
-export SASS_CMD=node_modules/node-sass/bin/node-sass
-export TSC_CMD=node_modules/typescript/bin/tsc
-PARALLEL_CMD='parallel --line-buffer --halt 2'
+export TERM=xterm-256color 
+
+export CMD_NPM=npm
+export CMD_TAPE=node_modules/tape/bin/tape
+export CMD_KARMA=node_modules/karma/bin/karma
+export CMD_BROWSERIFY=node_modules/browserify/bin/cmd.js
+export CMD_EXORCIST=node_modules/exorcist/bin/exorcist.js
+export CMD_WATCHIFY=node_modules/watchify/bin/cmd.js
+export CMD_WATCH=node_modules/chokidar-cli/index.js
+export CMD_SASS=node_modules/node-sass/bin/node-sass
+export CMD_TSC=node_modules/typescript/bin/tsc
+export CMD_TYPINGS=node_modules/typings/dist/bin.js
+export CMD_PARALLEL="parallel --line-buffer --halt 2"
 
 # read some names out of the package.json
 export ENTRY_POINT=$(jq -r .main package.json);
 export SRC_MAIN=$(jq -r .iqproj.main package.json);
 export DEFAULT_NAME=$(jq -r .name package.json);
 
-# configuration settings
-export FEAT_APP=$(jq -r '.iqproj.app //empty' package.json)
-export FEAT_TEMPLATES=$(jq -r '.iqproj.templates //empty' package.json)
-export FEAT_TS=$(jq -r '.iqproj.typescript //empty' package.json)
+
+#################################################################################
+# Built-in [standard] commands
+OPT_SKIP_TESTS=''
+OPT_COLOR_LEVEL=$OPT_COLOR_LEVEL
+OPT_INCLUDE_INTEGRATIONS=''
+CFG_KARMA_REPORTERS='progress'
+CFG_TAPE_REPORTER=node_modules/tap-min/bin/tap-min
+
+ARGSARR=( "$@" )
+ix=1
+
+while [ $ix -le ${#ARGSARR[@]} ]; do
+  echo ${ARGSARR[$ix]} | grep -E '^\-\w\w' > /dev/null
+
+  if [ $? -eq 0 ]; then
+    ARGSARR+=($(echo ${ARGSARR[$ix]} | sed 's,-,,g' | sed -E 's,[a-zA-Z],-& ,g'))
+  else
+    case ${ARGSARR[$ix]} in
+      "-c"|"--no-color") OPT_COLOR_LEVEL='nocolor' ;;
+      "-t"|"--no-test"|"--no-tests") OPT_SKIP_TESTS='true' ;;
+      "-T"|"--teamcity")
+        CFG_KARMA_REPORTERS='teamcity'
+        CFG_TAPE_REPORTER=node_modules/riq-tap-teamcity/bin/cmd.js
+        ;;
+      "-i"|"--integration-tests") OPT_INCLUDE_INTEGRATIONS='true' ;;
+      "-f"|"--test-files")
+        ix=$(($ix + 1))
+        OPT_TEST_FILES="${ARGSARR[$ix]}"
+        ;;
+    esac
+  fi
+
+  ix=$(($ix + 1))
+done
 
 #################################################################################
 # utilities
+# if tput isn't found (eg: teamcity, docker containers, etc.) turn it into a no-op
+declare -A colors
+
+# dont print shell codes if running in a dumb terminal
+if [ -z "$OPT_COLOR_LEVEL" ]; then
+  colors[black]=$(echo -e '\e[30m')
+  colors[red]=$(echo -e '\e[31m')
+  colors[green]=$(echo -e '\e[32m')
+  colors[brown]=$(echo -e '\e[33m')
+  colors[blue]=$(echo -e '\e[34m')
+  colors[purple]=$(echo -e '\e[35m')
+  colors[cyan]=$(echo -e '\e[36m')
+  colors[light_gray]=$(echo -e '\e[37m')
+  colors[gray]=$(echo -e '\e[90m')
+  colors[light_red]=$(echo -e '\e[91m')
+  colors[light_green]=$(echo -e '\e[92m')
+  colors[yellow]=$(echo -e '\e[93m')
+  colors[light_blue]=$(echo -e '\e[94m')
+  colors[light_purple]=$(echo -e '\e[95m')
+  colors[light_cyan]=$(echo -e '\e[96m')
+  colors[white]=$(echo -e '\e[97m')
+  colors[reset]=$(echo -e '\e[0m')
+else
+  export OPT_COLOR_LEVEL="nocolor"
+fi
+
 function find-next-open-port() {
-    for port in $(seq $1 $(($1 + 1000))); do
-        echo "\035" | /usr/bin/nc 127.0.0.1 $port > /dev/null
-        if [ $? -gt 0 ]; then
-            echo $port
-            return 0
-        fi
-    done
-    return 1
+  set +e
+
+  for port in $(seq $1 $(($1 + 1000))); do
+    echo "\035" | /usr/bin/nc 127.0.0.1 $port > /dev/null
+    if [ $? -gt 0 ]; then
+      echo $port
+      set -e
+      return 0
+    fi
+  done
+
+  set -e
+  return 1
 }
 
 #################################################################################
-# informational messages
-echo "# RUN $command $@"
-
-# essential prep
-# iqb outputs all build artifacts to the release/ folder
+# essential prep -- iqb outputs all build artifacts to the release/ folder
 mkdir -p release/
 
-# super basic override functionality.  allow shipping with a base task,
-# but allow that task to be overridden by creating a file in build/commandname
-# BONUS: also lets you add new commands (written in any language!)
+#################################################################################
+# super basic override functionality.  here it's mostly used to run build steps
+# written in non-bash or that are complicated enough to merit their own file
 if [ -f "build/$command" ]; then
-    echo "** Override: $command (build/$command)"
-    exec build/$command "$@"
+  echo "• ${colors[brown]}RUN${colors[reset]} ${command} ===> build/$command $@"
+  exec build/$command "$@"
+else
+  echo "• ${colors[blue]}RUN${colors[reset]} $command $@"
 fi
+
+# NOTE: this uses node to get precision beyond seconds
+START_TIME=$(node -e "console.log(+new Date())")
 
 #################################################################################
 # Built-in [standard] commands
 # Any of these can be overridden by creating a `build/<taskname>` file
-START_TIME=$(node -e "console.log(+new Date())")
-
 set -e
 case $command in
-    # npm lifecycle commands
-    "test")
-        if [ "$FEAT_APP" = "true" ]; then
-            $KARMA_CMD start --single-run --no-auto-watch karma.conf.js
-        else
-            $TAPE_CMD ${1:-src/**/*.spec.js}
-        fi
-        ;;
+  ###############################################################################
+  # misc
+  ###############################################################################
+  "clean")
+    set +e
+    rm -rf .src
+    rm -rf .app
+    rm -rf release
+    set -e
+    ;;
 
-    # basic housekeeping tasks
-    "clean")
-        rm -rf release/*
-        ;;
-    "assets")     [ -d src/assets ] && cp -R src/assets release ;;
+  "assets")
+    setopt null_glob
+    [ -n "$(echo assets/*)" ] && cp -R assets release
+    unsetopt null_glob
+    cp -R node_modules/uiq/src/assets release
+    ;;
 
-    "install")
-        npm install
+  "install")
+    $CMD_NPM install
+    $CMD_TYPINGS install
+    ;;
 
-        if [ "$FEAT_TS" = "true" ]; then
-            tsd install
-        fi
-        ;;
+  ##############################################################################
+  # tests
+  ###########################################################################################################
+  "test") $self test:unit $@ && $self test:integration $@ ;;
+  "watch:test")
+    testcmds=("$self watch:test:unit $*")
 
-    "templates")
-        # this task is gross. don't use it. we needed it for back-compat
-        mkdir -p tmp
-        outfile=$(pwd)/tmp/templates.js
+    [ -n "$OPT_INCLUDE_INTEGRATIONS" ] && testcmds+=("$self watch:test:integration $*");
 
-        echo 'module.exports = angular.module("templates", []).run(function($templateCache) {' > $outfile
-        find src app ts \
-            | grep '.html' \
-            | xargs -P 6 -n 1 -I{} bash -c 'echo "$(basename {}) {}"' \
-            | xargs -P 6 -n 2 node -e "console.log( \
-                '    \$templateCache.put(\"' + process.argv[1] + '\", ', \
-                JSON.stringify(require('fs').readFileSync(process.argv[2]).toString()), \
-                ');' \
-              );" \
-            >> $outfile
-        echo '});' >> $outfile
-        ;;
+    ${=CMD_PARALLEL} ::: "${testcmds[@]}"
+    ;;
 
-    "watch:templates")
-        $WATCH_CMD --silent src/**/*.html app/**/*.html ts/**/*.html -c "$self templates"
-        ;;
+  "watch:test:unit")
+    # use polling because somehow the typescript compiler's watch doesn't fire change events...
+    # neither vim nor chokidar realized that the files had changed
+    $CMD_WATCH --silent -i -p '.src/**/*.spec.js' -c "$self test:unit $*";
+    ;;
 
-    # testing
-    "watch:test")
-        if [ "$FEAT_APP" = "true" ]; then
-            $KARMA_CMD start karma.conf.js
-        else
-            $self test && $WATCH_CMD --silent ${1-src/**/*.spec.js} -c "$self test"
-        fi
-        ;;
+  "test:unit")
+    if [ -z "$OPT_COLOR_LEVEL" ]; then
+      (set -o pipefail; $CMD_TAPE "${OPT_TEST_FILES:-.src/**/*.spec.js}" | $CFG_TAPE_REPORTER)
+    else
+      $CMD_TAPE "${OPT_TEST_FILES:-.src/**/*.spec.js}"
+    fi
+    ;;
 
-    # browserify feature
-    "watch:js")   $WATCHIFY_CMD $ENTRY_POINT -d -v -o "$EXORCIST_CMD release/${DEFAULT_NAME}.js.map > release/${DEFAULT_NAME}.js" ;;
-    "build:js")   $BROWSERIFY_CMD $ENTRY_POINT -d | $EXORCIST_CMD release/${DEFAULT_NAME}.js.map > release/${DEFAULT_NAME}.js ;;
+  "watch:test:integration") $CMD_KARMA start ;;
+  "test:integration")       $CMD_KARMA start --single-run --reporters $CFG_KARMA_REPORTERS ;;
 
-    # the ts tasks will convert all ts => js
-    # the browserify task can be used to compile it all down into 1 binary
-    "build:ts")   $TSC_CMD -p ts/ ;;
-    "watch:ts")   $TSC_CMD -w -p ts/ ;;
 
-    # scss feature
-    "watch:scss") $self build:scss && $WATCH_CMD --silent 'src/**/*.scss' -c "$self build:scss" ;;
-    "build:scss")
-        [ -f src/scss/${DEFAULT_NAME}.scss ] && ($SASS_CMD src/scss/${DEFAULT_NAME}.scss > release/${DEFAULT_NAME}.css || exit 1);
-        [ -f src/scss/app.scss ] && ($SASS_CMD src/scss/app.scss > release/app.css || exit 1);
-        ;;
+  ###########################################################################################################
+  # scss
+  ###########################################################################################################
+  "watch:scss") $self build:scss $@ && $CMD_WATCH --silent 'src/**/*.scss' -c "$self build:scss $@" ;;
+  "build:scss") [ -f app/app.scss ] && ($CMD_SASS app/app.scss > release/app.css || exit 1) ;;
 
-    # app feature
-    "watch:html") $self build:html && $WATCH_CMD --silent app/* -c "$self build:html" ;;
-    "build:html") cp app/index.html release/ ;;
+  ###########################################################################################################
+  # typescript
+  ###########################################################################################################
+  "build:ts")           $CMD_TSC -p src/ ;;
+  "watch:ts")           $CMD_TSC -w -p src/ ;;
+  "watch:ts:templates") $CMD_WATCH --silent 'src/**/*.html' -c "$self build:ts:templates $@" ;;
+  "build:ts:templates") 
+    mkdir -p ../.src
 
-    "watch:app")  $self build:app && $WATCHIFY_CMD app/index.js -d -o "$EXORCIST_CMD release/app.js.map > release/app.js" ;;
-    "build:app")  $BROWSERIFY_CMD app/index.js -d | $EXORCIST_CMD release/app.js.map > release/app.js ;;
+    pushd src > /dev/null
+      # you're weird rsync 
+      rsync -am --include='*/' --include='*.html' --exclude='*' . ../.src
+    popd > /dev/null
+  ;;
 
-    "livereload") $WATCH_CMD --silent release/* -c "curl -s http://localhost:${1:-35729}/changed\?files\=index.html" ;;
-    "serve")
-        SRV_PORT=$(find-next-open-port 8080)
-        LR_PORT=$(find-next-open-port 35729)
-        $PARALLEL_CMD ::: "$self start-server --port $SRV_PORT --lr-port $LR_PORT release" "$self livereload $LR_PORT"
-        ;;
+  "test:ts")
+    if [ -z "$OPT_TEST_FILES" ]; then
+      echo "Must specify (a) spec file(s) using the '-f' flag"
+      exit 1;
+    fi
 
-    # entry points
-    "start"|"watch")
-        features=("$self assets" "$self watch:test")
+    $self "test" $@ -f $(echo $OPT_TEST_FILES | sed s,ts$,js,g | sed s,src/,.src/,g)
+    ;;
 
-        if [ "$FEAT_TEMPLATES" = "true" ]; then
-            $self "templates"
-            features+=("$self watch:templates")
-        fi
+  "test:debug")
+    if [ -z "$OPT_TEST_FILES" ]; then
+      echo "Must specify a spec file"
+      exit 1;
+    fi
 
-        if [ "$FEAT_TS" = "true" ]; then
-            $self "build:ts"
-            features+=("$self watch:ts")
-        fi
+    node-debug $TAPE_CMD $(echo $OPT_TEST_FILES | sed s,ts$,js,g | sed s,src/,.src/,g)
+    ;;
 
-        if [ "$FEAT_APP" = "true" ]; then
-            features+=(
-                "$self watch:app"
-                "$self watch:html"
-                "$self watch:scss"
-                "$self watch:js"
-                "$self serve"
-            );
-        fi
+  ###########################################################################################################
+  # js (browserify)
+  ###########################################################################################################
+  "watch:js")           $CMD_WATCHIFY $ENTRY_POINT -d -v -o "$CMD_EXORCIST release/${DEFAULT_NAME}.js.map > release/${DEFAULT_NAME}.js" ;;
+  "build:js")           $CMD_BROWSERIFY $ENTRY_POINT -d | $CMD_EXORCIST release/${DEFAULT_NAME}.js.map > release/${DEFAULT_NAME}.js ;;
 
-        $PARALLEL_CMD ::: "${features[@]}"
-        ;;
+  ###########################################################################################################
+  # local app 
+  ###########################################################################################################
+  "watch:app:html") $self build:app:html && $CMD_WATCH --silent 'app/**/*' -c "$self build:app:html" ;;
+  "build:app:html") 
+    mkdir -p .app/src
 
-    "build")
-        if [ "$FEAT_TEMPLATES" = "true" ]; then
-            $self "templates"
-        fi
+    pushd app > /dev/null
+      rsync -am --include='*/' --include='*.html' --exclude='*' . ../.app
+    popd > /dev/null
 
-        if [ "$FEAT_TS" = "true" ]; then
-            "$self build:ts"
-        fi
+    cp app/index.html release/ 
+    ;;
 
-        features=("$self assets" "$self test")
+  "watch:app:ts")   $CMD_TSC -w -p app/ ;;
+  "build:app:ts")   $CMD_TSC -p app/ ;;
 
-        if [ "$FEAT_APP" = "true" ]; then
-            features+=(
-                "$self build:scss"
-                "$self build:js"
-                "$self build:app"
-                "$self build:html"
-            );
-        fi
+  "watch:app:js")   $CMD_WATCHIFY .app/index.js -d -o "$CMD_EXORCIST release/app.js.map > release/app.js" ;;
+  "build:app:js")   $CMD_BROWSERIFY .app/index.js -d | $CMD_EXORCIST release/app.js.map > release/app.js ;;
 
-        $self clean &&
-        $PARALLEL_CMD ::: "${features[@]}"
-        ;;
+  "livereload")     $CMD_WATCH --silent release/* -c "curl -s http://localhost:${1:-35729}/changed\?files\=index.html" ;;
+  "serve")
+    SRV_PORT=$(find-next-open-port 8080)
+    LR_PORT=$(find-next-open-port 35729)
+    ${=CMD_PARALLEL} ::: "$self start-server --port $SRV_PORT --lr-port $LR_PORT release" "$self livereload $LR_PORT"
+    ;;
 
-    *)
-        echo "Unknown command: $command"
-        exit 1
+  ###########################################################################################################
+  # primary entry points
+  ###########################################################################################################
+  "start"|"watch")
+    $self clean $@
+
+    prebuild=(
+      "$self assets $*"
+      "$self build:app:html $*"
+      "$self build:ts $*"
+      "$self build:ts:templates $*"
+    )
+    ${=CMD_PARALLEL} ::: "${prebuild[@]}"
+
+    $self build:app:ts $@
+
+    features=(
+      "$self serve $*"
+      "$self watch:js $*"
+      "$self watch:scss $*"
+      "$self watch:test $*"
+      "$self watch:ts $*"
+      "$self watch:ts:templates $*"
+      "$self watch:app:js $*"
+      "$self watch:app:ts $*"
+      "$self watch:app:html $*"
+    )
+
+    ${=CMD_PARALLEL} ::: "${features[@]}"
+    ;;
+
+  "build")
+    $self clean
+    ${=CMD_PARALLEL} ::: "$self build:ts $*" "$self build:ts:templates $*" "$self build:app:html $*";
+
+    $self build:app:ts $@
+    $self test:unit $@
+
+    features=(
+      "$self assets $*"
+      "$self build:scss $*"
+      "$self build:js $*"
+      "$self build:app:js $*"
+    );
+
+    ${=CMD_PARALLEL} ::: "${features[@]}"
+    $self test:integration $@
+    ;;
+
+  *)
+    echo "Unknown command: $command"
+    exit 1
 esac
 
 END_TIME=$(node -e "console.log(+new Date())")
 ELAPSED=$(( $END_TIME - $START_TIME ))
 TIMESTR=$(node -e "console.log($ELAPSED < 1000 ? $ELAPSED + 'ms' : ($ELAPSED / 1000.0) + 's')");
 
-echo "---DONE [ $TIMESTR ] $command $*"
-
+echo "✓ ${colors[green]}DONE [ $TIMESTR ]${colors[reset]} $command $@"
