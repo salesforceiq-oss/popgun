@@ -1,0 +1,16 @@
+#!/bin/bash
+
+DCOS_APP_NAME=popgun
+cp build/start-server docker/
+cp -R release docker/public
+
+pushd docker > /dev/null
+  echo -n 'Building container for DCOS-deployed Web Module...'
+  container_id=$(docker build . | tail -n 1 | cut -d ' ' -f 3)
+  echo "DONE -- $container_id"
+  echo 'Tag and push...'
+
+  docker tag -f $container_id docker.amz.relateiq.com/dcos-webmod/$DCOS_APP_NAME:latest
+  docker push docker.amz.relateiq.com/dcos-webmod/$DCOS_APP_NAME:latest
+popd > /dev/null
+
