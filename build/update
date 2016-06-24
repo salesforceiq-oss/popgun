@@ -30,25 +30,31 @@ if [ $? -gt 0 ]; then
 fi
 
 git fetch bedrock
+git reset
 
 if [ -z "$1" ]; then
     system_files=(
         bin/iqb
-        bin/headless
-        build/feat
+        build/deploy
         build/start-server
         build/update
+        docker-dev/Dockerfile
+        docker-dev/README.md
+        docker/Dockerfile
+        docker/package.json
+        docker/README.md
     )
 
     # update the core system files
-    git checkout bedrock/iqproj "${system_files[@]}"
+    git checkout bedrock/iqproj-webmodule "${system_files[@]}"
+    git add -- "${system_files[@]}"
 else
     # update one specific file (or set of files)
-    git checkout bedrock/iqproj "$@"
+    git checkout bedrock/iqproj-webmodule "$@"
+    git add -- "$@"
 fi
 
 if [ ! -z "$(git status -s)" ]; then
-    git add -A
     git commit -m "update bedrock"
     echo '---- Done -----'
 else
