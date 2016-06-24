@@ -29,8 +29,6 @@ fi
 
 #################################################################################
 # configuration (export because `parallel`)
-export TERM=xterm-256color 
-
 export TAPE_CMD=node_modules/tape/bin/tape
 export KARMA_CMD=node_modules/karma/bin/karma
 export BROWSERIFY_CMD=node_modules/browserify/bin/cmd.js
@@ -48,6 +46,7 @@ export DEFAULT_NAME=$(jq -r .name package.json);
 
 # configuration settings
 export FEAT_APP=$(jq -r '.iqproj.app //empty' package.json)
+export FEAT_TEMPLATES=$(jq -r '.iqproj.templates //empty' package.json)
 export FEAT_TS=$(jq -r '.iqproj.typescript //empty' package.json)
 
 #################################################################################
@@ -86,16 +85,20 @@ START_TIME=$(node -e "console.log(+new Date())")
 
 set -e
 case $command in
-    ###########################################################################################################
-    # misc
-    ###########################################################################################################
-    "clean")
-        rm -rf .src
-        rm -rf .app-src
-        rm -rf release/*
+    # npm lifecycle commands
+    "test")
+        if [ "$FEAT_APP" = "true" ]; then
+            $KARMA_CMD start --single-run --no-auto-watch karma.conf.js
+        else
+            $TAPE_CMD ${1:-src/**/*.spec.js}
+        fi
         ;;
 
-    "assets")     [ -d assets ] && cp -R assets release ;;
+    # basic housekeeping tasks
+    "clean")
+        rm -rf release/*
+        ;;
+    "assets")     [ -d src/assets ] && cp -R src/assets release ;;
 
     "install")
         npm install
@@ -105,9 +108,29 @@ case $command in
         fi
         ;;
 
-    ###########################################################################################################
-    # tests
-    ###########################################################################################################
+    "templates")
+        # this task is gross. don't use it. we needed it for back-compat
+        mkdir -p tmp
+        outfile=$(pwd)/tmp/templates.js
+
+        echo 'module.exports = angular.module("templates", []).run(function($templateCache) {' > $outfile
+        find src app ts \
+            | grep '.html' \
+            | xargs -P 6 -n 1 -I{} bash -c 'echo "$(basename {}) {}"' \
+            | xargs -P 6 -n 2 node -e "console.log( \
+                '    \$templateCache.put(\"' + process.argv[1] + '\", ', \
+                JSON.stringify(require('fs').readFileSync(process.argv[2]).toString()), \
+                ');' \
+              );" \
+            >> $outfile
+        echo '});' >> $outfile
+        ;;
+
+    "watch:templates")
+        $WATCH_CMD --silent src/**/*.html app/**/*.html ts/**/*.html -c "$self templates"
+        ;;
+
+    # testing
     "watch:test")
         if [ "$FEAT_APP" = "true" ]; then
             $KARMA_CMD start karma.conf.js
@@ -116,114 +139,84 @@ case $command in
         fi
         ;;
 
-    "test")
-        if [ "$FEAT_APP" = "true" ]; then
-            $KARMA_CMD start --single-run --no-auto-watch karma.conf.js
-        else
-            $TAPE_CMD ${1:-src/**/*.spec.js}
-        fi
-        ;;
+    # browserify feature
+    "watch:js")   $WATCHIFY_CMD $ENTRY_POINT -d -v -o "$EXORCIST_CMD release/${DEFAULT_NAME}.js.map > release/${DEFAULT_NAME}.js" ;;
+    "build:js")   $BROWSERIFY_CMD $ENTRY_POINT -d | $EXORCIST_CMD release/${DEFAULT_NAME}.js.map > release/${DEFAULT_NAME}.js ;;
 
-    ###########################################################################################################
-    # scss
-    ###########################################################################################################
+    # the ts tasks will convert all ts => js
+    # the browserify task can be used to compile it all down into 1 binary
+    "build:ts")   $TSC_CMD -p ts/ ;;
+    "watch:ts")   $TSC_CMD -w -p ts/ ;;
+
+    # scss feature
     "watch:scss") $self build:scss && $WATCH_CMD --silent 'src/**/*.scss' -c "$self build:scss" ;;
-    "build:scss") [ -f app/app.scss ] && ($SASS_CMD app/app.scss > release/app.css || exit 1) ;;
-
-    ###########################################################################################################
-    # typescript
-    ###########################################################################################################
-    "build:ts")           $TSC_CMD -p src/ ;;
-    "watch:ts")           $TSC_CMD -w -p src/ ;;
-    "watch:ts:templates") $WATCH_CMD --silent 'src/**/*.html' -c "$self build:ts:templates" ;;
-    "build:ts:templates") 
-        mkdir -p ../.src
-
-        pushd src > /dev/null
-        # you're weird rsync 
-        rsync -am --include='*/' --include='*.html' --exclude='*' . ../.src
-        popd > /dev/null
+    "build:scss")
+        [ -f src/scss/${DEFAULT_NAME}.scss ] && ($SASS_CMD src/scss/${DEFAULT_NAME}.scss > release/${DEFAULT_NAME}.css || exit 1);
+        [ -f src/scss/app.scss ] && ($SASS_CMD src/scss/app.scss > release/app.css || exit 1);
         ;;
 
-    ###########################################################################################################
-    # js (browserify)
-    ###########################################################################################################
-    "watch:js")           $WATCHIFY_CMD $ENTRY_POINT -d -v -o "$EXORCIST_CMD release/${DEFAULT_NAME}.js.map > release/${DEFAULT_NAME}.js" ;;
-    "build:js")           $BROWSERIFY_CMD $ENTRY_POINT -d | $EXORCIST_CMD release/${DEFAULT_NAME}.js.map > release/${DEFAULT_NAME}.js ;;
+    # app feature
+    "watch:html") $self build:html && $WATCH_CMD --silent app/* -c "$self build:html" ;;
+    "build:html") cp app/index.html release/ ;;
 
-    ###########################################################################################################
-    # local app 
-    ###########################################################################################################
-    "watch:app:html") $self build:app:html && $WATCH_CMD --silent app/* -c "$self build:app:html" ;;
-    "build:app:html") 
-        mkdir -p .app-src/src
+    "watch:app")  $self build:app && $WATCHIFY_CMD app/index.js -d -o "$EXORCIST_CMD release/app.js.map > release/app.js" ;;
+    "build:app")  $BROWSERIFY_CMD app/index.js -d | $EXORCIST_CMD release/app.js.map > release/app.js ;;
 
-        pushd app > /dev/null
-          rsync -am --include='*/' --include='*.html' --exclude='*' . ../.app-src/src
-        popd > /dev/null
-
-        cp app/index.html release/ 
-        ;;
-
-    "watch:app:ts")   $TSC_CMD -w -p app/ ;;
-    "build:app:ts")   $TSC_CMD -p app/ ;;
-
-    "watch:app:js")   $WATCHIFY_CMD .app-src/index.js -d -o "$EXORCIST_CMD release/app.js.map > release/app.js" ;;
-    "build:app:js")   $BROWSERIFY_CMD .app-src/index.js -d | $EXORCIST_CMD release/app.js.map > release/app.js ;;
-
-    "livereload")     $WATCH_CMD --silent release/* -c "curl -s http://localhost:${1:-35729}/changed\?files\=index.html" ;;
+    "livereload") $WATCH_CMD --silent release/* -c "curl -s http://localhost:${1:-35729}/changed\?files\=index.html" ;;
     "serve")
         SRV_PORT=$(find-next-open-port 8080)
         LR_PORT=$(find-next-open-port 35729)
         $PARALLEL_CMD ::: "$self start-server --port $SRV_PORT --lr-port $LR_PORT release" "$self livereload $LR_PORT"
         ;;
 
-    ###########################################################################################################
-    # primary entry points
-    ###########################################################################################################
+    # entry points
     "start"|"watch")
-        $self clean
+        features=("$self assets" "$self watch:test")
 
-        prebuild=(
-            "$self assets"
-            "$self build:app:html"
-            "$self build:ts"
-            "$self build:ts:templates"
-        )
-        $PARALLEL_CMD ::: "${prebuild[@]}"
+        if [ "$FEAT_TEMPLATES" = "true" ]; then
+            $self "templates"
+            features+=("$self watch:templates")
+        fi
 
-        $self "build:app:ts"
+        if [ "$FEAT_TS" = "true" ]; then
+            $self "build:ts"
+            features+=("$self watch:ts")
+        fi
 
-        features=(
-            "$self serve"
-            "$self watch:js"
-            "$self watch:scss"
-            "$self watch:test"
-            "$self watch:ts"
-            "$self watch:ts:templates"
-            "$self watch:app:js"
-            "$self watch:app:ts"
-            "$self watch:app:html"
-        )
+        if [ "$FEAT_APP" = "true" ]; then
+            features+=(
+                "$self watch:app"
+                "$self watch:html"
+                "$self watch:scss"
+                "$self watch:js"
+                "$self serve"
+            );
+        fi
 
         $PARALLEL_CMD ::: "${features[@]}"
         ;;
 
     "build")
-        $self clean
-        $PARALLEL_CMD ::: "$self build:ts" "$self build:ts:templates";
+        if [ "$FEAT_TEMPLATES" = "true" ]; then
+            $self "templates"
+        fi
 
-        $self "build:app:ts"
+        if [ "$FEAT_TS" = "true" ]; then
+            "$self build:ts"
+        fi
 
-        features=(
-            "$self assets"
-            "$self test"
-            "$self build:scss"
-            "$self build:js"
-            "$self build:app:js"
-            "$self build:app:html"
-        );
+        features=("$self assets" "$self test")
 
+        if [ "$FEAT_APP" = "true" ]; then
+            features+=(
+                "$self build:scss"
+                "$self build:js"
+                "$self build:app"
+                "$self build:html"
+            );
+        fi
+
+        $self clean &&
         $PARALLEL_CMD ::: "${features[@]}"
         ;;
 
