@@ -1,4 +1,4 @@
-///<reference path="../typings/tsd.d.ts"/>
+///<reference path="../typings/index.d.ts"/>
 declare var require: NodeRequire;
 let popgun = require('../.src').default;
 
