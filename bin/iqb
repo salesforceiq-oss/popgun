@@ -312,7 +312,7 @@ case $command in
       "$self build:scss $*"
       "$self build:js $*"
       "$self build:app:js $*"
-      "$self test:integration $*"
+      # "$self test:integration $*"
     );
 
     ${=CMD_PARALLEL} ::: "${features[@]}"
