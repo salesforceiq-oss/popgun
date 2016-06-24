@@ -157,7 +157,7 @@ case $command in
   "clean")
     set +e
     rm -rf .src
-    rm -rf .app
+    rm -rf .app-src
     rm -rf release
     set -e
     ;;
@@ -177,28 +177,22 @@ case $command in
   ##############################################################################
   # tests
   ###########################################################################################################
-  "test") $self test:unit $@ && $self test:integration $@ ;;
-  "watch:test")
-    testcmds=("$self watch:test:unit $*")
+  "test") $self test:integration $@ ;;
+  "watch:test") $self watch:test:integration $@ ;;
 
-    [ -n "$OPT_INCLUDE_INTEGRATIONS" ] && testcmds+=("$self watch:test:integration $*");
+  # "watch:test:unit")
+  #   # use polling because somehow the typescript compiler's watch doesn't fire change events...
+  #   # neither vim nor chokidar realized that the files had changed
+  #   $CMD_WATCH --silent -i -p '.src/**/*.spec.js' -c "$self test:unit $*";
+  #   ;;
 
-    ${=CMD_PARALLEL} ::: "${testcmds[@]}"
-    ;;
-
-  "watch:test:unit")
-    # use polling because somehow the typescript compiler's watch doesn't fire change events...
-    # neither vim nor chokidar realized that the files had changed
-    $CMD_WATCH --silent -i -p '.src/**/*.spec.js' -c "$self test:unit $*";
-    ;;
-
-  "test:unit")
-    if [ -z "$OPT_COLOR_LEVEL" ]; then
-      (set -o pipefail; $CMD_TAPE "${OPT_TEST_FILES:-.src/**/*.spec.js}" | $CFG_TAPE_REPORTER)
-    else
-      $CMD_TAPE "${OPT_TEST_FILES:-.src/**/*.spec.js}"
-    fi
-    ;;
+  # "test:unit")
+  #   if [ -z "$OPT_COLOR_LEVEL" ]; then
+  #     (set -o pipefail; $CMD_TAPE "${OPT_TEST_FILES:-.src/**/*.spec.js}" | $CFG_TAPE_REPORTER)
+  #   else
+  #     $CMD_TAPE "${OPT_TEST_FILES:-.src/**/*.spec.js}"
+  #   fi
+  #   ;;
 
   "watch:test:integration") $CMD_KARMA start ;;
   "test:integration")       $CMD_KARMA start --single-run --reporters $CFG_KARMA_REPORTERS ;;
@@ -254,10 +248,10 @@ case $command in
   ###########################################################################################################
   "watch:app:html") $self build:app:html && $CMD_WATCH --silent 'app/**/*' -c "$self build:app:html" ;;
   "build:app:html") 
-    mkdir -p .app/src
+    mkdir -p .app-src/src
 
     pushd app > /dev/null
-      rsync -am --include='*/' --include='*.html' --exclude='*' . ../.app
+      rsync -am --include='*/' --include='*.html' --exclude='*' . ../.app-src/src
     popd > /dev/null
 
     cp app/index.html release/ 
@@ -266,8 +260,8 @@ case $command in
   "watch:app:ts")   $CMD_TSC -w -p app/ ;;
   "build:app:ts")   $CMD_TSC -p app/ ;;
 
-  "watch:app:js")   $CMD_WATCHIFY .app/index.js -d -o "$CMD_EXORCIST release/app.js.map > release/app.js" ;;
-  "build:app:js")   $CMD_BROWSERIFY .app/index.js -d | $CMD_EXORCIST release/app.js.map > release/app.js ;;
+  "watch:app:js")   $CMD_WATCHIFY .app-src/index.js -d -o "$CMD_EXORCIST release/app.js.map > release/app.js" ;;
+  "build:app:js")   $CMD_BROWSERIFY .app-src/index.js -d | $CMD_EXORCIST release/app.js.map > release/app.js ;;
 
   "livereload")     $CMD_WATCH --silent release/* -c "curl -s http://localhost:${1:-35729}/changed\?files\=index.html" ;;
   "serve")
@@ -312,17 +306,16 @@ case $command in
     ${=CMD_PARALLEL} ::: "$self build:ts $*" "$self build:ts:templates $*" "$self build:app:html $*";
 
     $self build:app:ts $@
-    $self test:unit $@
 
     features=(
       "$self assets $*"
       "$self build:scss $*"
       "$self build:js $*"
       "$self build:app:js $*"
+      "$self test:integration $*"
     );
 
     ${=CMD_PARALLEL} ::: "${features[@]}"
-    $self test:integration $@
     ;;
 
   *)
