@@ -1,0 +1,103 @@
+#!/bin/bash
+
+###################################################################################################
+# Util
+function print-usage() {
+  echo "Deploy an instance of the webapp to DCOS with the format"
+  echo "http://wm-{vhost}.amz.relateiq.com"
+  echo
+  echo "Usage:"
+  echo "    $0 [<options>]"
+  echo
+  echo "Options:"
+  echo "    --no-build\tDon't run 'iqb build' before deploying; just push what's in release/"
+  echo "    --api url\tURL of the server that should handle backend requests"
+}
+
+if [ -z "$(which docker)" ]; then
+  echo "docker not found in PATH"
+  exit 1;
+fi
+
+echo "Pulling latest infraiq_cli image..."
+docker pull docker.amz.relateiq.com/relateiq/infraiq_cli:staging
+
+mkdir -p ~/.salesforceiq
+if [ ! -f ~/.salesforceiq/infraiq_cookie ]; then
+  echo "!!! WARNING: Before deploying you need to login with your SalesforceIQ LDAP Credentials"
+
+  docker run -it --rm \
+    -e AUTH_DIR=/auth \
+    -v $HOME/.salesforceiq:/auth \
+    docker.amz.relateiq.com/relateiq/infraiq_cli:staging \
+    login
+
+  if [ ! -f ~/.salesforceiq/infraiq_cookie ]; then
+    echo '!!! CREDENTIALS NOT FOUND'
+    exit 1
+  fi
+fi
+
+
+###################################################################################################
+# OPTIONS
+SKIP_BUILD=''
+PROXY_HOST='https://app-staging.salesforceiq.com'
+
+while [ $# -gt 0 ]; do
+  case $1 in
+    "-b"|"--no-build") SKIP_BUILD='true' ;;
+    "--api")
+      ix=$(($ix + 1))
+      PROXY_HOST="${!ix}"
+      ;;
+    *)
+      DCOS_APP_NAME=$1
+      break;
+  esac
+
+  shift
+done
+
+###################################################################################################
+# DETERMINE THE HOSTNAME
+if [ -z "$DCOS_APP_NAME" ]; then
+  DCOS_APP_NAME=wm-$(jq -r ".name" package.json)
+fi
+
+###################################################################################################
+# RUN
+if [ -z "$SKIP_BUILD" ]; then
+  bin/iqb build --minify --no-test
+  echo '-------------------------------------------------------------'
+fi
+
+set -e
+echo "Deploying local state to DCOS [$DCOS_APP_NAME]"
+echo -n 'Copying assets... '
+
+cp build/start-server docker/
+cp -R release docker/public
+
+echo 'DONE'
+
+pushd docker > /dev/null
+  echo -n 'Building container for DCOS-deployed Web Module...'
+  container_id=$(docker build . | tail -n 1 | cut -d ' ' -f 3)
+  echo "DONE -- $container_id"
+  echo 'Tag and push...'
+
+  docker tag -f $container_id docker.amz.relateiq.com/dcos-webmod/$DCOS_APP_NAME:latest
+  docker push docker.amz.relateiq.com/dcos-webmod/$DCOS_APP_NAME:latest
+
+  echo '-------------------------------------------------------------'
+  echo 'Deploying...'
+  docker run --rm                                        \
+    -e AUTH_DIR=/auth                                    \
+    -e IQ_SERVER_PROXY=$PROXY_HOST                       \
+    -v $HOME/.salesforceiq:/auth                         \
+    docker.amz.relateiq.com/relateiq/infraiq_cli:staging \
+    run                                                  \
+    -a $DCOS_APP_NAME                                    \
+    docker.amz.relateiq.com/dcos-webmod/${DCOS_APP_NAME}:latest
+popd > /dev/null
