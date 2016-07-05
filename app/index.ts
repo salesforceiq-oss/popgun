@@ -5,7 +5,7 @@ let popgun = require('../.src').default;
 let testSchema = { showDelay: 1000, trigger: 'hover' };
 let groupOpts = {
   schema: 'testSchema',
-  options: { showDelay: 250, text: 'Wow! I cannot believe Popgun actually works!' }
+  options: { showDelay: 250, html: '<div popgun popgun-group="test5" popgun-trigger="click" popgun-text="hi">Wow! I cannot believe Popgun actually works!</div>' }
 };
 popgun.registerSchema('testSchema', testSchema);
 popgun.registerGroup('test', groupOpts);
@@ -15,7 +15,7 @@ el.setAttribute('popgun', '');
 el.setAttribute('class', 'target');
 el.setAttribute('popgun-group', 'test1');
 el.setAttribute('popgun-trigger', 'click');
-el.setAttribute('popgun-html', '<div popgun popgun-group="test">Hover here for a nested pop!</div>');
+el.setAttribute('popgun-html', '<div popgun popgun-group="test" popgun-trigger="click hover">Click/Hover here for a nested pop!</div>');
 el.innerText = 'Click Me!';
 document.body.appendChild(el);
 

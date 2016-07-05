@@ -54,8 +54,8 @@ export class Popgun {
   }
 
   // Hide the popover for a particular target element
-  public hidePop(target: Element): void {
-    popEngine.hidePop(target);
+  public hidePop(target: Element, hideFullChain: boolean): void {
+    popEngine.hidePop(target, hideFullChain);
   }
 
 }

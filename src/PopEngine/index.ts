@@ -5,6 +5,7 @@ import Options from '../Options';
 import IGroup from '../IGroup';
 import PopStateType from '../PopStateType';
 import Pop from '../Pop';
+import popChainManager from '../PopChainManager';
 let camelize = require('camelize');
 let closest = require('closest');
 let positioner = require('positioner');
@@ -12,6 +13,14 @@ let escapeStack = require('escape-stack')();
 let zIndexManager = require('z-index-manager').default;
 
 export class PopEngine {
+
+  /*********************
+  TO DO:
+  - Handle parent/child pops being closed in window
+  - Expose isAlreadyShowing amongst other things in API
+  - Race Condition
+  - Styling
+  *********************/
 
   _timeouts: {
     hoverdelay: any
@@ -91,6 +100,7 @@ export class PopEngine {
     let groupId = targetElement.getAttribute('popgun-group');
     let isAlreadyShowing = this._isPopAlreadyShowingForGroup(groupId);
 
+    let oldPop = this.getPopFromGroupId(groupId);
     this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
 
     // clear any timeouts and do a timeout and show pop
@@ -100,6 +110,11 @@ export class PopEngine {
       let container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
 
       if (isAlreadyShowing && !!container) {
+        if (!!oldPop && !!oldPop.childPops.length) {
+          oldPop.childPops.forEach(function(child: Pop): void {
+            this.hidePop(child.targetEl, false);
+          }, this);
+        }
         // if pop is already showing for group, reuse
         container.removeChild(container.getElementsByClassName('pop-content')[0]);
         this._maybeClearHandler(this._handlers[groupId]);
@@ -109,7 +124,7 @@ export class PopEngine {
       }
 
       if (isPinned) {
-        this.maybePinOrUnpinPopAndParentPops(targetElement, true);
+        popChainManager.maybePinOrUnpinPopAndParentPops(targetElement, true);
       }
 
       this._maybeClearTimeout(this._timeouts.popHover, null);
@@ -132,7 +147,7 @@ export class PopEngine {
 
         this._maybeClearTimeout(this._timeouts.hoverdelay, null);
         this._handlers[groupId] = escapeStack.add(function(): boolean {
-          this.hidePop(pop.targetEl);
+          this.hidePop(pop.targetEl, true);
           return true;
         }.bind(this));
 
@@ -144,13 +159,21 @@ export class PopEngine {
     }.bind(this), delay);
   }
 
-  public hidePop(targetElement: Element): void {
+  public hidePop(targetElement: Element, hideFullChain: boolean): void {
     let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
     let pop = this.getPopFromGroupId(groupId);
 
     this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
 
     this._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
+      // hide children
+      if (!!pop.childPops.length) {
+        pop.childPops.forEach(function(child: Pop): void {
+          this.hidePop(child.targetEl, hideFullChain);
+        }, this);
+      }
+
+      // hide pop
       let popOver = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
       targetElement.removeAttribute('pinned-pop');
 
@@ -163,22 +186,22 @@ export class PopEngine {
         document.body.removeChild(popOver);
       }
       this.addPopToPopStore(groupId, null);
+
+      // hide parents
+      if (!!pop.parentPop) {
+        let idx = pop.parentPop.childPops.indexOf(pop);
+        if (idx !== -1) {
+          pop.parentPop.childPops.splice(idx, 1);
+        }
+      }
+      if (hideFullChain && !!pop.parentPop) {
+        this.hidePop(pop.parentPop.targetEl, hideFullChain);
+      }
     }.bind(this), pop.opts.timeToHoverOnPop);
   }
 
   public popTopPop(): void {
     escapeStack.pop();
-  }
-
-  public maybePinOrUnpinPopAndParentPops(target: Element, pin: boolean): void {
-    let groupId = target.getAttribute('popgun-group');
-    let pop = this.getPopFromGroupId(groupId);
-    pop.isPinned = pin;
-    target.setAttribute('pinned-pop', '');
-    let parentPop = this._getParentPop(pop);
-    if (parentPop) {
-      this.maybePinOrUnpinPopAndParentPops(parentPop.targetEl, pin);
-    }
   }
 
   public isPopAlreadyOpen(targetElement: Element): boolean {

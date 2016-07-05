@@ -2,6 +2,7 @@ import PopStateType from '../PopStateType';
 import Options from '../Options';
 import Trigger from '../Trigger';
 import PopOver from '../PopOver';
+let closest = require('closest');
 
 export default class Pop {
   opts: Options;
@@ -10,6 +11,8 @@ export default class Pop {
   isPinned: boolean;
   popOver: PopOver;
   trigger: Trigger;
+  parentPop: Pop;
+  childPops: Pop[];
 
   constructor(el: Element, trigger: Trigger) {
     this.targetEl = el;
@@ -17,6 +20,8 @@ export default class Pop {
     this.opts = Options.fromElement(el);
     this.state = PopStateType.HIDDEN;
     this.isPinned = false;
+    this.parentPop = null;
+    this.childPops = [];
 
     let target = this._buildPopOver(this.opts.html || this.opts.text);
     this.popOver = (new PopOver(target, trigger));
