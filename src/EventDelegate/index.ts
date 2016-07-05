@@ -101,8 +101,8 @@ export class EventDelegate {
   }
 
   private _setEventListener(trigger: Trigger, listener: (e: Event) => void): void {
-    document.removeEventListener(<string>trigger.eventType, listener);
-    document.addEventListener(<string>trigger.eventType, listener, trigger.useCapture);
+    document.removeEventListener(<string>trigger.eventType, listener.bind(this));
+    document.addEventListener(<string>trigger.eventType, listener.bind(this), trigger.useCapture);
   }
 
   private _maybeSetParentChildRelationship(pop: Pop): void {
