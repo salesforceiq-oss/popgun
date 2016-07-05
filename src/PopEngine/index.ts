@@ -92,6 +92,8 @@ export class PopEngine {
     let groupId = targetElement.getAttribute('popgun-group');
     let isAlreadyShowing = this._isPopAlreadyShowingForGroup(groupId);
 
+    // this is gross and should be refactored
+    // we store the old pop because it will be overwritten and we need it later
     let oldPop = this.getPopFromGroupId(groupId);
     this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
 
