@@ -28,11 +28,7 @@ export class EventDelegate {
         popChainManager.maybePinOrUnpinPopAndParentPops(target, isPinned);
       } else {
         let pop = new Pop(target, trigger);
-        // if pop is nested within another pop, set parent-child relationship
-        if (!!popChainManager.isNestedPop(pop)) {
-          let parent = popEngine.getPopFromGroupId((<Element>closest(pop.targetEl, '[pop]', true)).getAttribute('pop-id'));
-          popChainManager.setParentChildRelationship(parent, pop);
-        }
+        this._maybeSetParentChildRelationship(pop);
         popEngine.showPop(target, isPinned, pop);
       }
     } else if (!popEngine.isPopTarget(target) && !popEngine.isPop(target)) {
@@ -50,10 +46,7 @@ export class EventDelegate {
         popEngine.clearTimeout(target);
       } else {
         let pop = new Pop(target, trigger);
-        if (!!popChainManager.isNestedPop(pop)) {
-          let parent = popEngine.getPopFromGroupId((<Element>closest(pop.targetEl, '[pop]', true)).getAttribute('pop-id'));
-          popChainManager.setParentChildRelationship(parent, pop);
-        }
+        this._maybeSetParentChildRelationship(pop);
         let isPinned = trigger.name === TriggerType.CLICK;
         popEngine.showPop(target, isPinned, pop);
       }
@@ -69,10 +62,7 @@ export class EventDelegate {
 
     if (popEngine.isPopForTrigger(target, trigger)) {
       let pop = new Pop(target, trigger);
-      if (!!popChainManager.isNestedPop(pop)) {
-        let parent = popEngine.getPopFromGroupId((<Element>closest(pop.targetEl, '[pop]', true)).getAttribute('pop-id'));
-        popChainManager.setParentChildRelationship(parent, pop);
-      }
+      this._maybeSetParentChildRelationship(pop);
       let isPinned = false; // not pinned because the the trigger was not a click
       popEngine.showPop(target, isPinned, pop);
     } else if (popEngine.isPop(target)) {
@@ -87,10 +77,7 @@ export class EventDelegate {
 
     if (popEngine.isPopForTrigger(target, trigger)) {
       let pop = new Pop(target, trigger);
-      if (!!popChainManager.isNestedPop(pop)) {
-        let parent = popEngine.getPopFromGroupId((<Element>closest(pop.targetEl, '[pop]', true)).getAttribute('pop-id'));
-        popChainManager.setParentChildRelationship(parent, pop);
-      }
+      this._maybeSetParentChildRelationship(pop);
       let isPinned = trigger.name === TriggerType.CLICK;
       popEngine.showPop(target, isPinned, pop);
     }
@@ -116,6 +103,14 @@ export class EventDelegate {
   private _setEventListener(trigger: Trigger, listener: (e: Event) => void): void {
     document.removeEventListener(<string>trigger.eventType, listener);
     document.addEventListener(<string>trigger.eventType, listener, trigger.useCapture);
+  }
+
+  private _maybeSetParentChildRelationship(pop: Pop): void {
+    // if pop is nested within another pop, set parent-child relationship
+    if (!!popChainManager.isNestedPop(pop)) {
+      let parent = popEngine.getPopFromGroupId((<Element>closest(pop.targetEl, '[pop]', true)).getAttribute('pop-id'));
+      popChainManager.setParentChildRelationship(parent, pop);
+    }
   }
 }
 
