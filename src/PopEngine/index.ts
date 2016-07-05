@@ -14,14 +14,6 @@ let zIndexManager = require('z-index-manager').default;
 
 export class PopEngine {
 
-  /*********************
-  TO DO:
-  - Handle parent/child pops being closed in window
-  - Expose isAlreadyShowing amongst other things in API
-  - Race Condition
-  - Styling
-  *********************/
-
   _timeouts: {
     hoverdelay: any
     popHover: any
