@@ -139,7 +139,7 @@ export class PopEngine {
 
         this._maybeClearTimeout(this._timeouts.hoverdelay, null);
         this._handlers[groupId] = escapeStack.add(function(): boolean {
-          this.hidePop(pop.targetEl, true);
+          this.hidePop(pop.targetEl, false);
           return true;
         }.bind(this));
 
@@ -185,9 +185,9 @@ export class PopEngine {
         if (idx !== -1) {
           pop.parentPop.childPops.splice(idx, 1);
         }
-      }
-      if (hideFullChain && !!pop.parentPop) {
-        this.hidePop(pop.parentPop.targetEl, hideFullChain);
+        if (hideFullChain) {
+          this.hidePop(pop.parentPop.targetEl, hideFullChain);
+        }
       }
     }.bind(this), pop.opts.timeToHoverOnPop);
   }
