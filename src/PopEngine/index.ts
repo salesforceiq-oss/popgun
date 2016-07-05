@@ -100,14 +100,15 @@ export class PopEngine {
     this._timeouts.hoverdelay = setTimeout(function(): void {
       let animationEndStates = {};
       let container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
+      this._maybeSetParentChildRelationship(pop);
 
       if (isAlreadyShowing && !!container) {
+        // if pop is already showing for group, reuse
         if (!!oldPop && !!oldPop.childPops.length) {
           oldPop.childPops.forEach(function(child: Pop): void {
             this.hidePop(child.targetEl, false);
           }, this);
         }
-        // if pop is already showing for group, reuse
         container.removeChild(container.getElementsByClassName('pop-content')[0]);
         this._maybeClearHandler(this._handlers[groupId]);
       } else {
@@ -199,7 +200,8 @@ export class PopEngine {
   public isPopAlreadyOpen(targetElement: Element): boolean {
     let groupId = targetElement.getAttribute('popgun-group');
     if (this.getPopFromGroupId(groupId)) {
-      return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING) &&
+      return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING ||
+                this.getPopFromGroupId(groupId).state === PopStateType.PRE_HIDE) &&
         (this.getPopFromGroupId(groupId).targetEl === targetElement));
     }
     return false;
@@ -296,6 +298,13 @@ export class PopEngine {
     };
     positioner(container, pop.targetEl, positionOpts)
               .at(pop.opts.placement, pop.opts.optimizePlacement, pop.opts.alignment);
+  }
+
+  private _maybeSetParentChildRelationship(pop: Pop): void {
+    if (!!popChainManager.isNestedPop(pop)) {
+      let parent = this.getPopFromGroupId((<Element>closest(pop.targetEl, '[pop]', true)).getAttribute('pop-id'));
+      popChainManager.setParentChildRelationship(parent, pop);
+    }
   }
 
 }

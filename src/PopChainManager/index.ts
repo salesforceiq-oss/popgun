@@ -4,8 +4,6 @@ let closest = require('closest');
 
 export class PopChainManager {
 
-  // Methods that could poentially belong here?
-
   public isNestedPop(pop: Pop): boolean {
     return closest(pop.targetEl, '[pop]', true);
   }
@@ -14,7 +12,7 @@ export class PopChainManager {
     let groupId = target.getAttribute('popgun-group');
     let pop = popStore.get(groupId);
     pop.isPinned = pin;
-    target.setAttribute('pinned-pop', '');
+    !!pin ? target.setAttribute('pinned-pop', '') : target.removeAttribute('pinned-pop');
     if (pop.parentPop) {
       this.maybePinOrUnpinPopAndParentPops(pop.parentPop.targetEl, pin);
     }
