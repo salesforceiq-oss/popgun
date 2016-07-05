@@ -61,6 +61,28 @@ export class PopEngine {
     return popStore.get(groupId);
   }
 
+  public popTopPop(): void {
+    escapeStack.pop();
+  }
+
+  public isPopAlreadyOpenForGroup(groupId: string): boolean {
+    if (this.getPopFromGroupId(groupId)) {
+      return (this.getPopFromGroupId(groupId).state === PopStateType.SHOWING ||
+              this.getPopFromGroupId(groupId).state === PopStateType.PRE_HIDE);
+    }
+    return false;
+  }
+
+  public isPopAlreadyOpenForTarget(targetElement: Element): boolean {
+    let groupId = targetElement.getAttribute('popgun-group');
+    if (this.getPopFromGroupId(groupId)) {
+      return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING ||
+                this.getPopFromGroupId(groupId).state === PopStateType.PRE_HIDE) &&
+        (this.getPopFromGroupId(groupId).targetEl === targetElement));
+    }
+    return false;
+  }
+
   public setState(pop: Pop, state: string, targetOpts: Options, result: any, renotify: boolean): void {
     if (state !== pop.state || renotify) {
       pop.state = state;
@@ -90,7 +112,7 @@ export class PopEngine {
   public showPop(targetElement: Element, isPinned: boolean, pop: Pop): void {
     let delay = isPinned ? 0 : pop.opts.showDelay;
     let groupId = targetElement.getAttribute('popgun-group');
-    let isAlreadyShowing = this._isPopAlreadyShowingForGroup(groupId);
+    let isAlreadyShowing = this.isPopAlreadyOpenForGroup(groupId);
 
     // this is gross and should be refactored
     // we store the old pop because it will be overwritten and we need it later
@@ -195,20 +217,6 @@ export class PopEngine {
     }.bind(this), pop.opts.timeToHoverOnPop);
   }
 
-  public popTopPop(): void {
-    escapeStack.pop();
-  }
-
-  public isPopAlreadyOpen(targetElement: Element): boolean {
-    let groupId = targetElement.getAttribute('popgun-group');
-    if (this.getPopFromGroupId(groupId)) {
-      return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING ||
-                this.getPopFromGroupId(groupId).state === PopStateType.PRE_HIDE) &&
-        (this.getPopFromGroupId(groupId).targetEl === targetElement));
-    }
-    return false;
-  }
-
   private _fireEvent(state: string, pop: Pop): void {
     let event = document.createEvent('CustomEvent');
     event.initCustomEvent(camelize('Popgun_' + state), true, true, {'pop': pop});
@@ -253,14 +261,6 @@ export class PopEngine {
 
   private _maybeClearHandler(watch: any): void {
     return this._maybeClear(watch, false, null);
-  }
-
-  private _isPopAlreadyShowingForGroup(groupId: string): boolean {
-    if (this.getPopFromGroupId(groupId)) {
-      return (this.getPopFromGroupId(groupId).state === PopStateType.SHOWING ||
-              this.getPopFromGroupId(groupId).state === PopStateType.PRE_HIDE);
-    }
-    return false;
   }
 
   private _getParentPop(pop: Pop): Pop {

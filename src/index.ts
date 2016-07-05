@@ -46,6 +46,16 @@ export class Popgun {
     return pop.state;
   }
 
+  // returns whether a pop for a specific target is alrady open
+  public isPopAlreadyOpenForTarget(target: Element): boolean {
+    return popEngine.isPopAlreadyOpenForTarget(target);
+  }
+
+  // returns whether a pop is already open for any group
+  public isPopAlreadyOpenForGroup(groupId: string): boolean {
+    return popEngine.isPopAlreadyOpenForGroup(groupId);
+  }
+
   // Show the popover for a particular target element
   public showPop(target: Element, isPinned: boolean, trigger: string): void {
     let t: Trigger = new Trigger(trigger);

@@ -24,7 +24,7 @@ export class EventDelegate {
     let isPinned = trigger.name === TriggerType.CLICK;
 
     if (popEngine.isPopForTrigger(target, trigger)) {
-      if (popEngine.isPopAlreadyOpen(target)) {
+      if (popEngine.isPopAlreadyOpenForTarget(target)) {
         popChainManager.maybePinOrUnpinPopAndParentPops(target, isPinned);
       } else {
         let pop = new Pop(target, trigger);
@@ -41,7 +41,7 @@ export class EventDelegate {
     let target: Element = <Element>closest(e.target, '[popgun]', true) || <Element>closest(e.target, '[pop]', true);
 
     if (popEngine.isPopForTrigger(target, trigger)) {
-      if (popEngine.isPopAlreadyOpen(target)) {
+      if (popEngine.isPopAlreadyOpenForTarget(target)) {
         popEngine.clearTimeout(target);
       } else {
         let pop = new Pop(target, trigger);
