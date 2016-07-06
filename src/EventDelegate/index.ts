@@ -4,6 +4,7 @@ import TriggerEventType from '../TriggerEventType';
 import EnumUtil from '../EnumUtil';
 import Pop from '../Pop';
 import popEngine from '../PopEngine';
+import popChainManager from '../PopChainManager';
 let closest = require('closest');
 
 export class EventDelegate {
@@ -23,8 +24,8 @@ export class EventDelegate {
     let isPinned = trigger.name === TriggerType.CLICK;
 
     if (popEngine.isPopForTrigger(target, trigger)) {
-      if (popEngine.isPopAlreadyOpen(target)) {
-        popEngine.maybePinOrUnpinPopAndParentPops(target, isPinned);
+      if (popEngine.isPopAlreadyOpenForTarget(target)) {
+        popChainManager.maybePinOrUnpinPopAndParentPops(target, isPinned);
       } else {
         let pop = new Pop(target, trigger);
         popEngine.showPop(target, isPinned, pop);
@@ -40,7 +41,7 @@ export class EventDelegate {
     let target: Element = <Element>closest(e.target, '[popgun]', true) || <Element>closest(e.target, '[pop]', true);
 
     if (popEngine.isPopForTrigger(target, trigger)) {
-      if (popEngine.isPopAlreadyOpen(target)) {
+      if (popEngine.isPopAlreadyOpenForTarget(target)) {
         popEngine.clearTimeout(target);
       } else {
         let pop = new Pop(target, trigger);
@@ -83,21 +84,21 @@ export class EventDelegate {
     let relatedTarget: Element = <Element>e.relatedTarget;
     if ((popEngine.isPopForTrigger(target, (new Trigger('hover')))) &&
       !(target).hasAttribute('pinned-pop')) {
-      popEngine.hidePop(target);
+      popEngine.hidePop(target, false);
     }
 
     target = closest(e.target, '[pop]', true);
     if (target && target.hasAttribute('pop') &&
         !popEngine.getPopFromGroupId(target.getAttribute('pop-id')).isPinned) {
       if (!(popEngine.isPopTarget(relatedTarget)) && !(popEngine.isPop(relatedTarget))) {
-        popEngine.hidePop(target);
+        popEngine.hidePop(target, false);
       }
     }
   }
 
   private _setEventListener(trigger: Trigger, listener: (e: Event) => void): void {
-    document.removeEventListener(<string>trigger.eventType, listener);
-    document.addEventListener(<string>trigger.eventType, listener, trigger.useCapture);
+    document.removeEventListener(<string>trigger.eventType, listener.bind(this));
+    document.addEventListener(<string>trigger.eventType, listener.bind(this), trigger.useCapture);
   }
 }
 

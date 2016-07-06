@@ -20,10 +20,12 @@ import TriggerEventType from './TriggerEventType';
 
 export class Popgun {
 
+  listener: EventListener = null;
+
   // registers mutation observer and sets up eventListeners
   public constructor() {
-    mutationHandler.registerObserver();
-    eventDelegate.init();
+    this.listener = this._initializePopgun.bind(this);
+    document.addEventListener('DOMContentLoaded', this.listener, true);
   }
 
   // Store a group w/ options to reuse 
@@ -46,6 +48,16 @@ export class Popgun {
     return pop.state;
   }
 
+  // returns whether a pop for a specific target is alrady open
+  public isPopAlreadyOpenForTarget(target: Element): boolean {
+    return popEngine.isPopAlreadyOpenForTarget(target);
+  }
+
+  // returns whether a pop is already open for any group
+  public isPopAlreadyOpenForGroup(groupId: string): boolean {
+    return popEngine.isPopAlreadyOpenForGroup(groupId);
+  }
+
   // Show the popover for a particular target element
   public showPop(target: Element, isPinned: boolean, trigger: string): void {
     let t: Trigger = new Trigger(trigger);
@@ -54,8 +66,14 @@ export class Popgun {
   }
 
   // Hide the popover for a particular target element
-  public hidePop(target: Element): void {
-    popEngine.hidePop(target);
+  public hidePop(target: Element, hideFullChain: boolean): void {
+    popEngine.hidePop(target, hideFullChain);
+  }
+
+  private _initializePopgun(e: Event): void {
+    document.removeEventListener(e.type, this.listener, true);
+    mutationHandler.registerObserver();
+    eventDelegate.init();
   }
 
 }

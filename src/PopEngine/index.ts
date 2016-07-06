@@ -5,6 +5,7 @@ import Options from '../Options';
 import IGroup from '../IGroup';
 import PopStateType from '../PopStateType';
 import Pop from '../Pop';
+import popChainManager from '../PopChainManager';
 let camelize = require('camelize');
 let closest = require('closest');
 let positioner = require('positioner');
@@ -60,6 +61,28 @@ export class PopEngine {
     return popStore.get(groupId);
   }
 
+  public popTopPop(): void {
+    escapeStack.pop();
+  }
+
+  public isPopAlreadyOpenForGroup(groupId: string): boolean {
+    if (this.getPopFromGroupId(groupId)) {
+      return (this.getPopFromGroupId(groupId).state === PopStateType.SHOWING ||
+              this.getPopFromGroupId(groupId).state === PopStateType.PRE_HIDE);
+    }
+    return false;
+  }
+
+  public isPopAlreadyOpenForTarget(targetElement: Element): boolean {
+    let groupId = targetElement.getAttribute('popgun-group');
+    if (this.getPopFromGroupId(groupId)) {
+      return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING ||
+                this.getPopFromGroupId(groupId).state === PopStateType.PRE_HIDE) &&
+        (this.getPopFromGroupId(groupId).targetEl === targetElement));
+    }
+    return false;
+  }
+
   public setState(pop: Pop, state: string, targetOpts: Options, result: any, renotify: boolean): void {
     if (state !== pop.state || renotify) {
       pop.state = state;
@@ -89,8 +112,11 @@ export class PopEngine {
   public showPop(targetElement: Element, isPinned: boolean, pop: Pop): void {
     let delay = isPinned ? 0 : pop.opts.showDelay;
     let groupId = targetElement.getAttribute('popgun-group');
-    let isAlreadyShowing = this._isPopAlreadyShowingForGroup(groupId);
+    let isAlreadyShowing = this.isPopAlreadyOpenForGroup(groupId);
 
+    // this is gross and should be refactored
+    // we store the old pop because it will be overwritten and we need it later
+    let oldPop = this.getPopFromGroupId(groupId);
     this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
 
     // clear any timeouts and do a timeout and show pop
@@ -98,9 +124,15 @@ export class PopEngine {
     this._timeouts.hoverdelay = setTimeout(function(): void {
       let animationEndStates = {};
       let container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
+      this._maybeSetParentChildRelationship(pop);
 
       if (isAlreadyShowing && !!container) {
         // if pop is already showing for group, reuse
+        if (!!oldPop && !!oldPop.childPops.length) {
+          oldPop.childPops.forEach(function(child: Pop): void {
+            this.hidePop(child.targetEl, false);
+          }, this);
+        }
         container.removeChild(container.getElementsByClassName('pop-content')[0]);
         this._maybeClearHandler(this._handlers[groupId]);
       } else {
@@ -109,7 +141,7 @@ export class PopEngine {
       }
 
       if (isPinned) {
-        this.maybePinOrUnpinPopAndParentPops(targetElement, true);
+        popChainManager.maybePinOrUnpinPopAndParentPops(targetElement, true);
       }
 
       this._maybeClearTimeout(this._timeouts.popHover, null);
@@ -132,7 +164,7 @@ export class PopEngine {
 
         this._maybeClearTimeout(this._timeouts.hoverdelay, null);
         this._handlers[groupId] = escapeStack.add(function(): boolean {
-          this.hidePop(pop.targetEl);
+          this.hidePop(pop.targetEl, false);
           return true;
         }.bind(this));
 
@@ -144,13 +176,21 @@ export class PopEngine {
     }.bind(this), delay);
   }
 
-  public hidePop(targetElement: Element): void {
+  public hidePop(targetElement: Element, hideFullChain: boolean): void {
     let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
     let pop = this.getPopFromGroupId(groupId);
 
     this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
 
     this._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
+      // hide children
+      if (!!pop.childPops.length) {
+        pop.childPops.forEach(function(child: Pop): void {
+          this.hidePop(child.targetEl, hideFullChain);
+        }, this);
+      }
+
+      // hide pop
       let popOver = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
       targetElement.removeAttribute('pinned-pop');
 
@@ -163,31 +203,18 @@ export class PopEngine {
         document.body.removeChild(popOver);
       }
       this.addPopToPopStore(groupId, null);
+
+      // hide parents
+      if (!!pop.parentPop) {
+        let idx = pop.parentPop.childPops.indexOf(pop);
+        if (idx !== -1) {
+          pop.parentPop.childPops.splice(idx, 1);
+        }
+        if (hideFullChain) {
+          this.hidePop(pop.parentPop.targetEl, hideFullChain);
+        }
+      }
     }.bind(this), pop.opts.timeToHoverOnPop);
-  }
-
-  public popTopPop(): void {
-    escapeStack.pop();
-  }
-
-  public maybePinOrUnpinPopAndParentPops(target: Element, pin: boolean): void {
-    let groupId = target.getAttribute('popgun-group');
-    let pop = this.getPopFromGroupId(groupId);
-    pop.isPinned = pin;
-    target.setAttribute('pinned-pop', '');
-    let parentPop = this._getParentPop(pop);
-    if (parentPop) {
-      this.maybePinOrUnpinPopAndParentPops(parentPop.targetEl, pin);
-    }
-  }
-
-  public isPopAlreadyOpen(targetElement: Element): boolean {
-    let groupId = targetElement.getAttribute('popgun-group');
-    if (this.getPopFromGroupId(groupId)) {
-      return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING) &&
-        (this.getPopFromGroupId(groupId).targetEl === targetElement));
-    }
-    return false;
   }
 
   private _fireEvent(state: string, pop: Pop): void {
@@ -236,14 +263,6 @@ export class PopEngine {
     return this._maybeClear(watch, false, null);
   }
 
-  private _isPopAlreadyShowingForGroup(groupId: string): boolean {
-    if (this.getPopFromGroupId(groupId)) {
-      return (this.getPopFromGroupId(groupId).state === PopStateType.SHOWING ||
-              this.getPopFromGroupId(groupId).state === PopStateType.PRE_HIDE);
-    }
-    return false;
-  }
-
   private _getParentPop(pop: Pop): Pop {
     let parentEl = closest(pop.targetEl, 'div[pop=""]');
     if (parentEl) {
@@ -281,6 +300,13 @@ export class PopEngine {
     };
     positioner(container, pop.targetEl, positionOpts)
               .at(pop.opts.placement, pop.opts.optimizePlacement, pop.opts.alignment);
+  }
+
+  private _maybeSetParentChildRelationship(pop: Pop): void {
+    if (!!popChainManager.isNestedPop(pop)) {
+      let parent = this.getPopFromGroupId((<Element>closest(pop.targetEl, '[pop]', true)).getAttribute('pop-id'));
+      popChainManager.setParentChildRelationship(parent, pop);
+    }
   }
 
 }
