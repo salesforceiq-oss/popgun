@@ -24,8 +24,8 @@ export class Popgun {
 
   // registers mutation observer and sets up eventListeners
   public constructor() {
-    this.listener = this._initializePopgun.bind(this);
-    document.addEventListener('DOMContentLoaded', this.listener, true);
+    mutationHandler.registerObserver();
+    eventDelegate.init();
   }
 
   // Store a group w/ options to reuse 
@@ -68,12 +68,6 @@ export class Popgun {
   // Hide the popover for a particular target element
   public hidePop(target: Element, hideFullChain: boolean): void {
     popEngine.hidePop(target, hideFullChain);
-  }
-
-  private _initializePopgun(e: Event): void {
-    document.removeEventListener(e.type, this.listener, true);
-    mutationHandler.registerObserver();
-    eventDelegate.init();
   }
 
 }
