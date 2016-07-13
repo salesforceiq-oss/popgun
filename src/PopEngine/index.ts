@@ -6,6 +6,7 @@ import IGroup from '../IGroup';
 import PopStateType from '../PopStateType';
 import Pop from '../Pop';
 import popChainManager from '../PopChainManager';
+import UserAgentUtil from '../UserAgentUtil'
 let camelize = require('camelize');
 let closest = require('closest');
 let positioner = require('positioner');
@@ -146,11 +147,10 @@ export class PopEngine {
         document.body.appendChild(container);
       }
 
-      if (this._isSafari()) {
+      if (UserAgentUtil.isSafari()) {
         document.querySelector('div[pop-id="' + groupId + '"]').addEventListener('transitionend', function(): void {
-        console.log('transition!!');
-        container.classList.remove('hidden');
-      }.bind(this), true);
+          container.classList.remove('hidden');
+        }.bind(this), true);
       }
 
       if (isPinned) {
@@ -183,7 +183,7 @@ export class PopEngine {
 
         // SHOWING
         this.setState(pop, PopStateType.SHOWING, pop.opts, null, false);
-        if (!this._isSafari()) {
+        if (!UserAgentUtil.isSafari()) {
           container.classList.remove('hidden');
         }
 
@@ -323,18 +323,6 @@ export class PopEngine {
       popChainManager.setParentChildRelationship(parent, pop);
     }
   }
-
-  private _userAgentHas(keyword: string): boolean {
-    return !!keyword && window.navigator.userAgent.toLowerCase().indexOf(keyword) > -1;
-  }
-
-  private _isBrowser(keyword: string, excludeKeyWord: string): boolean {
-      return this._userAgentHas(keyword) && !this._userAgentHas(excludeKeyWord);
-  }
-
-  private _isSafari(): boolean {
-    return this._isBrowser('safari', 'chrome');
-  };
 
 }
 
