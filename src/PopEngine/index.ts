@@ -146,6 +146,13 @@ export class PopEngine {
         document.body.appendChild(container);
       }
 
+      if (this._isSafari()) {
+        document.querySelector('div[pop-id="' + groupId + '"]').addEventListener('transitionend', function(): void {
+        console.log('transition!!');
+        container.classList.remove('hidden');
+      }.bind(this), true);
+      }
+
       if (isPinned) {
         popChainManager.maybePinOrUnpinPopAndParentPops(targetElement, true);
       }
@@ -176,7 +183,9 @@ export class PopEngine {
 
         // SHOWING
         this.setState(pop, PopStateType.SHOWING, pop.opts, null, false);
-        container.classList.remove('hidden');
+        if (!this._isSafari()) {
+          container.classList.remove('hidden');
+        }
 
       }.bind(this));
     }.bind(this), delay);
@@ -314,6 +323,18 @@ export class PopEngine {
       popChainManager.setParentChildRelationship(parent, pop);
     }
   }
+
+  private _userAgentHas(keyword: string): boolean {
+    return !!keyword && window.navigator.userAgent.toLowerCase().indexOf(keyword) > -1;
+  }
+
+  private _isBrowser(keyword: string, excludeKeyWord: string): boolean {
+      return this._userAgentHas(keyword) && !this._userAgentHas(excludeKeyWord);
+  }
+
+  private _isSafari(): boolean {
+    return this._isBrowser('safari', 'chrome');
+  };
 
 }
 
