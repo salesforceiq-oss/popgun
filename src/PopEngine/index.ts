@@ -31,6 +31,10 @@ export class PopEngine {
     [groupId: string]: any
   } = {};
 
+  _transitionendCallbacks: {
+    [groupId: string]: any
+  } = {};
+
   public isPopTarget(el: Element): boolean {
     return !!(el && el.hasAttribute('popgun'));
   }
@@ -148,9 +152,8 @@ export class PopEngine {
       }
 
       if (UserAgentUtil.isSafari()) {
-        document.querySelector('div[pop-id="' + groupId + '"]').addEventListener('transitionend', function(): void {
-          container.classList.remove('hidden');
-        }.bind(this), true);
+        this._transitionendCallbacks[groupId] = this._removeHiddenClass.bind(this);
+        document.querySelector('div[pop-id="' + groupId + '"]').addEventListener('transitionend', this._transitionendCallbacks[groupId], true);
       }
 
       if (isPinned) {
@@ -322,6 +325,12 @@ export class PopEngine {
       let parent = this.getPopFromGroupId((<Element>closest(pop.targetEl, '[pop]', true)).getAttribute('pop-id'));
       popChainManager.setParentChildRelationship(parent, pop);
     }
+  }
+
+  private _removeHiddenClass(e: Event): void {
+    let groupId = (<Element>e.target).getAttribute('pop-id');
+    e.target.removeEventListener(e.type, this._transitionendCallbacks[groupId], true);
+    (<Element>e.target).classList.remove('hidden');
   }
 
 }
