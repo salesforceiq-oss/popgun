@@ -22,10 +22,10 @@ export class Popgun {
 
   // registers mutation observer and sets up eventListeners
   public init(): void {
-    if (!document.body.hasAttribute('popgunExists')) {
+    if (!document.body.hasAttribute('popgun-exists')) {
       mutationHandler.registerObserver();
       eventDelegate.init();
-      document.body.setAttribute('popgunExists', '');
+      document.body.setAttribute('popgun-exists', '');
     } else {
       console.error('Popgun has already been instantiated. Do not instantiate again.');
     }
