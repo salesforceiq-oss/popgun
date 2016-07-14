@@ -27,7 +27,7 @@ export class Popgun {
       eventDelegate.init();
       document.body.setAttribute('popgun-exists', '');
     } else {
-      console.error('Popgun has already been instantiated. Do not instantiate again.');
+      throw new Error('Popgun has already been instantiated. Do not instantiate again.');
     }
   }
 
