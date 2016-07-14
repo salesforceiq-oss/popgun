@@ -74,22 +74,18 @@ export class EventDelegate {
 
   public onMouseOut(e: MouseEvent): void {
     let target: Element = <Element>closest(e.target, '[popgun]', true);
-    let relatedTarget: Element = <Element>e.relatedTarget;
     if ((popEngine.isPopForTrigger(target, (new Trigger('hover')))) &&
       !(target).hasAttribute('pinned-pop')) {
-      popEngine.hidePop(target, false);
-    }
-
-    target = closest(e.target, '[pop]', true);
-    if (target && target.hasAttribute('pop') &&
-        !popEngine.getPopFromGroupId(target.getAttribute('pop-id')).isPinned) {
-
-      let targetGroup = relatedTarget.getAttribute('popgun-group') || relatedTarget.getAttribute('pop-id');
-      let relatedTargetGroup = target.getAttribute('popgun-group') || target.getAttribute('pop-id');
-
-      if (!(popEngine.isPopTarget(relatedTarget) || popEngine.isPop(relatedTarget)) ||
-          targetGroup !== relatedTargetGroup) {
-        popEngine.hidePop(target, false);
+      popEngine.hidePop(<Element>e.target, false);
+    } else {
+      target = <Element>closest(e.target, '[pop]', true);
+      let relatedTarget: Element = <Element>closest(e.target, '[pop]', true);
+      if ((target && relatedTarget) && (target !== relatedTarget)) {
+        let targetPop: Pop = popEngine.getPopFromGroupId(target.getAttribute('pop-id'));
+        let relatedTargetPop: Pop = popEngine.getPopFromGroupId(relatedTarget.getAttribute('pop-id'));
+        if (!(targetPop.parentPop === relatedTargetPop || relatedTargetPop.parentPop === targetPop)) {
+          popEngine.hidePop(<Element>e.target, false);
+        }
       }
     }
   }

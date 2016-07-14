@@ -6,12 +6,12 @@ import IGroup from '../IGroup';
 import PopStateType from '../PopStateType';
 import Pop from '../Pop';
 import popChainManager from '../PopChainManager';
-import UserAgentUtil from '../UserAgentUtil'
+import UserAgentUtil from '../UserAgentUtil';
 let camelize = require('camelize');
 let closest = require('closest');
 let positioner = require('positioner');
-let escapeStack = require('escape-stack')();
 let zIndexManager = require('z-index-manager').default;
+const createEscapeStack = require('escape-stack').default;
 
 export class PopEngine {
 
@@ -34,6 +34,12 @@ export class PopEngine {
   _transitionendCallbacks: {
     [groupId: string]: any
   } = {};
+
+  escapeStack: any = null;
+
+  constructor() {
+    this.escapeStack = createEscapeStack();
+  }
 
   public isPopTarget(el: Element): boolean {
     return !!(el && el.hasAttribute('popgun'));
@@ -67,7 +73,7 @@ export class PopEngine {
   }
 
   public popTopPop(): void {
-    escapeStack.pop();
+    this.escapeStack.pop();
   }
 
   public isPopAlreadyOpenForGroup(groupId: string): boolean {
@@ -179,7 +185,7 @@ export class PopEngine {
         this.setState(pop, PopStateType.PRE_SHOW, pop.opts, null, false);
 
         this._maybeClearTimeout(this._timeouts.hoverdelay, null);
-        this._handlers[groupId] = escapeStack.add(function(): boolean {
+        this._handlers[groupId] = this.escapeStack.add(function(): boolean {
           this.hidePop(pop.targetEl, false);
           return true;
         }.bind(this));

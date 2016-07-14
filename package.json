@@ -65,7 +65,7 @@
   "dependencies": {
     "camelize": "~1.0.0",
     "closest": "~0.0.1",
-    "escape-stack": "~0.2.0",
+    "escape-stack": "~0.3.1",
     "extend": "~3.0.0",
     "focusin": "~2.0.0",
     "positioner": "~0.2.0",
