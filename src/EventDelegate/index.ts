@@ -73,22 +73,39 @@ export class EventDelegate {
   }
 
   public onMouseOut(e: MouseEvent): void {
-    // gross, might be buggy, needs refactoring
     let target: Element = <Element>closest(e.target, '[popgun]', true);
-    let related: Element = <Element>closest(e.relatedTarget, '[popgun]', true);
-    if ((popEngine.isPopForTrigger(target, (new Trigger('hover')))) && (target !== related) &&
+    let relatedTarget: Element = <Element>e.relatedTarget;
+    // this checks if the element we are leaving is a hover and is not pinned, then hide
+    // this also assume that the target is a trigger element
+    if ((popEngine.isPopForTrigger(target, (new Trigger('hover')))) &&
       !(target).hasAttribute('pinned-pop')) {
       popEngine.hidePop(target, false);
-    } else {
-      target = <Element>closest(e.target, '[pop]', true);
-      let relatedTarget: Element = <Element>closest(e.target, '[pop]', true);
-      if ((target && relatedTarget) && (target !== relatedTarget)) {
-        let targetPop: Pop = popEngine.getPopFromGroupId(target.getAttribute('pop-id'));
-        let relatedTargetPop: Pop = popEngine.getPopFromGroupId(relatedTarget.getAttribute('pop-id'));
-        if (!(targetPop.parentPop === relatedTargetPop || relatedTargetPop.parentPop === targetPop)) {
-          target = <Element>closest(e.target, '[pop]', true);
-          popEngine.hidePop(target, false);
-        }
+    }
+
+    target = closest(e.target, '[pop]', true);
+    // this now assume sthat the target is a pop element
+    // check if the pop has NOT been pinned and is actually a pop
+    if (target && target.hasAttribute('pop') &&
+        !popEngine.getPopFromGroupId(target.getAttribute('pop-id')).isPinned) {
+
+      let targetGroup = /* target.getAttribute('popgun-group') || */ target.getAttribute('pop-id');
+      let relatedTargetGroup = relatedTarget.getAttribute('popgun-group');
+
+      let targetPop = popEngine.getPopFromGroupId(targetGroup);
+      let relatedPop = popEngine.getPopFromGroupId(relatedTargetGroup);
+
+      // if (!(targetPop.parentPop === relatedPop || relatedPop.parentPop === targetPop)) {
+      //   popEngine.hidePop(target, false);
+      // }
+
+      relatedTarget = closest(relatedTarget, '[pop]');
+      if (relatedTarget && relatedTarget.getAttribute('pop-id') === targetGroup) {
+        return;
+      }
+
+      if (!(popEngine.isPopTarget(relatedTarget) || popEngine.isPop(relatedTarget)) ||
+          targetGroup !== relatedTargetGroup) {
+        popEngine.hidePop(target, false);
       }
     }
   }
