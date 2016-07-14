@@ -73,10 +73,11 @@ export class EventDelegate {
   }
 
   public onMouseOut(e: MouseEvent): void {
+    // gross, might be buggy, needs refactoring
     let target: Element = <Element>closest(e.target, '[popgun]', true);
     if ((popEngine.isPopForTrigger(target, (new Trigger('hover')))) &&
       !(target).hasAttribute('pinned-pop')) {
-      popEngine.hidePop(<Element>e.target, false);
+      popEngine.hidePop(target, false);
     } else {
       target = <Element>closest(e.target, '[pop]', true);
       let relatedTarget: Element = <Element>closest(e.target, '[pop]', true);
@@ -84,7 +85,8 @@ export class EventDelegate {
         let targetPop: Pop = popEngine.getPopFromGroupId(target.getAttribute('pop-id'));
         let relatedTargetPop: Pop = popEngine.getPopFromGroupId(relatedTarget.getAttribute('pop-id'));
         if (!(targetPop.parentPop === relatedTargetPop || relatedTargetPop.parentPop === targetPop)) {
-          popEngine.hidePop(<Element>e.target, false);
+          target = <Element>closest(e.target, '[pop]', true);
+          popEngine.hidePop(target, false);
         }
       }
     }
