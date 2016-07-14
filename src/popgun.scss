@@ -191,10 +191,12 @@ $boxShadowPop: 1px 2px 2px $boxShadowColor;
   overflow: visible;
   white-space: normal;
 
+  -webkit-transition: top .25s ease-out, left .25s ease-out;
   transition: top .25s ease-out, left .25s ease-out;
 
   &.popover-no-transition {
     &, & .nose-triangle {
+      -webkit-transition: none;
       transition: none;
     }
   }

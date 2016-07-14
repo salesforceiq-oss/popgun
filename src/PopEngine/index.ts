@@ -6,6 +6,7 @@ import IGroup from '../IGroup';
 import PopStateType from '../PopStateType';
 import Pop from '../Pop';
 import popChainManager from '../PopChainManager';
+import UserAgentUtil from '../UserAgentUtil'
 let camelize = require('camelize');
 let closest = require('closest');
 let positioner = require('positioner');
@@ -27,6 +28,10 @@ export class PopEngine {
   };
 
   _handlers: {
+    [groupId: string]: any
+  } = {};
+
+  _transitionendCallbacks: {
     [groupId: string]: any
   } = {};
 
@@ -146,6 +151,11 @@ export class PopEngine {
         document.body.appendChild(container);
       }
 
+      if (UserAgentUtil.isSafari() && !this._transitionendCallbacks[groupId]) {
+        this._transitionendCallbacks[groupId] = this._removeHiddenClass.bind(this);
+        document.querySelector('div[pop-id="' + groupId + '"]').addEventListener('transitionend', this._transitionendCallbacks[groupId], true);
+      }
+
       if (isPinned) {
         popChainManager.maybePinOrUnpinPopAndParentPops(targetElement, true);
       }
@@ -176,7 +186,9 @@ export class PopEngine {
 
         // SHOWING
         this.setState(pop, PopStateType.SHOWING, pop.opts, null, false);
-        container.classList.remove('hidden');
+        if (!UserAgentUtil.isSafari()) {
+          container.classList.remove('hidden');
+        }
 
       }.bind(this));
     }.bind(this), delay);
@@ -313,6 +325,13 @@ export class PopEngine {
       let parent = this.getPopFromGroupId((<Element>closest(pop.targetEl, '[pop]', true)).getAttribute('pop-id'));
       popChainManager.setParentChildRelationship(parent, pop);
     }
+  }
+
+  private _removeHiddenClass(e: Event): void {
+    let groupId = (<Element>e.target).getAttribute('pop-id');
+    e.target.removeEventListener(e.type, this._transitionendCallbacks[groupId], true);
+    this._transitionendCallbacks[groupId] = null;
+    (<Element>e.target).classList.remove('hidden');
   }
 
 }
