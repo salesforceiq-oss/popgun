@@ -20,12 +20,15 @@ import TriggerEventType from './TriggerEventType';
 
 export class Popgun {
 
-  listener: EventListener = null;
-
   // registers mutation observer and sets up eventListeners
-  public constructor() {
-    mutationHandler.registerObserver();
-    eventDelegate.init();
+  public init(): void {
+    if (!document.body.hasAttribute('popgun-exists')) {
+      mutationHandler.registerObserver();
+      eventDelegate.init();
+      document.body.setAttribute('popgun-exists', '');
+    } else {
+      throw new Error('Popgun has already been instantiated. Do not instantiate again.');
+    }
   }
 
   // Store a group w/ options to reuse 
