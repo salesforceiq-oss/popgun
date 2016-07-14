@@ -330,6 +330,7 @@ export class PopEngine {
   private _removeHiddenClass(e: Event): void {
     let groupId = (<Element>e.target).getAttribute('pop-id');
     e.target.removeEventListener(e.type, this._transitionendCallbacks[groupId], true);
+    this._transitionendCallbacks[groupId] = null;
     (<Element>e.target).classList.remove('hidden');
   }
 
