@@ -151,7 +151,7 @@ export class PopEngine {
         document.body.appendChild(container);
       }
 
-      if (UserAgentUtil.isSafari()) {
+      if (UserAgentUtil.isSafari() && !this._transitionendCallbacks[groupId]) {
         this._transitionendCallbacks[groupId] = this._removeHiddenClass.bind(this);
         document.querySelector('div[pop-id="' + groupId + '"]').addEventListener('transitionend', this._transitionendCallbacks[groupId], true);
       }
