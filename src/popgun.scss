@@ -190,8 +190,8 @@ $boxShadowPop: 1px 2px 2px rgba(#1a333d, 0.15);
   overflow: visible;
   white-space: normal;
 
-  -webkit-transition: top .25s ease-in-out, left .25s ease-in-out;
-  transition: top .25s ease-in-out, left .25s ease-in-out;
+  -webkit-transition: top .25s ease-out, left .25s ease-out;
+  transition: top .25s ease-out, left .25s ease-out;
 
   &.popover-no-transition {
     &, & .nose-triangle {
