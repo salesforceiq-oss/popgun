@@ -143,11 +143,11 @@ export class PopEngine {
           oldPop.childPops.forEach(function(child: Pop): void {
             this.hidePop(child.targetEl, false);
           }, this);
-          if (!!oldPop.parentPop) {
-            let idx = oldPop.parentPop.childPops.indexOf(oldPop);
-            if (idx !== -1) {
-              oldPop.parentPop.childPops.splice(idx, 1);
-            }
+        }
+        if (!!oldPop && !!oldPop.parentPop) {
+          let idx = oldPop.parentPop.childPops.indexOf(oldPop);
+          if (idx !== -1) {
+            oldPop.parentPop.childPops.splice(idx, 1);
           }
         }
         container.removeChild(container.getElementsByClassName('pop-content')[0]);
