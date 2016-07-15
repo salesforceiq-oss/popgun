@@ -73,39 +73,44 @@ export class EventDelegate {
   }
 
   public onMouseOut(e: MouseEvent): void {
-    let target: Element = <Element>closest(e.target, '[popgun]', true);
-    let relatedTarget: Element = <Element>e.relatedTarget;
-    // this checks if the element we are leaving is a hover and is not pinned, then hide
-    // this also assume that the target is a trigger element
-    if ((popEngine.isPopForTrigger(target, (new Trigger('hover')))) &&
-      !(target).hasAttribute('pinned-pop')) {
-      popEngine.hidePop(target, false);
+    let target: Element = <Element>closest(e.target, '[pop]', true);
+    if (!!target) {
+      let relatedTarget: Element = <Element>closest(e.relatedTarget, '[pop]', true);
+      if (!!relatedTarget && target !== relatedTarget) {
+        // hovering into another pop
+        // ensure its not the same closest pop
+        // see if they are in the same chain..
+        let targetPop = popEngine.getPopFromGroupId(target.getAttribute('pop-id'));
+        let relatedPop = popEngine.getPopFromGroupId(relatedTarget.getAttribute('pop-id'));
+        if (!(targetPop.parentPop === relatedPop || relatedPop.parentPop === targetPop) && !targetPop.targetEl.hasAttribute('pinned-pop')) {
+          // if they arent related to each other
+          popEngine.hidePop(targetPop.targetEl, false);
+          return;
+        }
+      } else if (!relatedTarget) {
+        // hovering into nothing
+        let pop = popEngine.getPopFromGroupId(target.getAttribute('pop-id'));
+        if (popEngine.isPopForTrigger(pop.targetEl, (new Trigger('hover'))) && !pop.targetEl.hasAttribute('pinned-pop')) {
+          // hide pop is the target is not pinned
+          popEngine.hidePop(pop.targetEl, false);
+          return;
+        }
+      }
     }
 
-    target = closest(e.target, '[pop]', true);
-    // this now assume sthat the target is a pop element
-    // check if the pop has NOT been pinned and is actually a pop
-    if (target && target.hasAttribute('pop') &&
-        !popEngine.getPopFromGroupId(target.getAttribute('pop-id')).isPinned) {
-
-      let targetGroup = /* target.getAttribute('popgun-group') || */ target.getAttribute('pop-id');
-      let relatedTargetGroup = relatedTarget.getAttribute('popgun-group');
-
-      let targetPop = popEngine.getPopFromGroupId(targetGroup);
-      let relatedPop = popEngine.getPopFromGroupId(relatedTargetGroup);
-
-      // if (!(targetPop.parentPop === relatedPop || relatedPop.parentPop === targetPop)) {
-      //   popEngine.hidePop(target, false);
-      // }
-
-      relatedTarget = closest(relatedTarget, '[pop]');
-      if (relatedTarget && relatedTarget.getAttribute('pop-id') === targetGroup) {
-        return;
-      }
-
-      if (!(popEngine.isPopTarget(relatedTarget) || popEngine.isPop(relatedTarget)) ||
-          targetGroup !== relatedTargetGroup) {
+    target = <Element>closest(e.target, '[popgun]', true);
+    if (!!target) {
+      let relatedTarget: Element = <Element>closest(e.relatedTarget, '[popgun]', true);
+      if (!!relatedTarget && target !== relatedTarget) {
+        // hovering into a popgun element
+        // ensure its not the same closest el
         popEngine.hidePop(target, false);
+        return;
+      } else if (!relatedTarget && popEngine.isPopForTrigger(target, (new Trigger('hover'))) && !target.hasAttribute('pinned-pop')) {
+        // hovering into nothing
+        // hide if pop isn't pinned
+        popEngine.hidePop(target, false);
+        return;
       }
     }
   }

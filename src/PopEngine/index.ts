@@ -124,6 +124,7 @@ export class PopEngine {
     let delay = isPinned ? 0 : pop.opts.showDelay;
     let groupId = targetElement.getAttribute('popgun-group');
     let isAlreadyShowing = this.isPopAlreadyOpenForGroup(groupId);
+    console.log('showing');
 
     // this is gross and should be refactored
     // we store the old pop because it will be overwritten and we need it later
@@ -206,41 +207,43 @@ export class PopEngine {
     let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
     let pop = this.getPopFromGroupId(groupId);
 
-    this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
+    if (pop) {
+      this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
 
-    this._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
-      // hide children
-      if (!!pop.childPops.length) {
-        pop.childPops.forEach(function(child: Pop): void {
-          this.hidePop(child.targetEl, hideFullChain);
-        }, this);
-      }
-
-      // hide pop
-      let popOver = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
-      targetElement.removeAttribute('pinned-pop');
-
-      this._maybeClearHandler(this._handlers[groupId]);
-      this._listenForScroll(false, groupId, popOver);
-
-      this.setState(pop, PopStateType.HIDDEN, pop.opts, null, false);
-
-      if (!!popOver) {
-        document.body.removeChild(popOver);
-      }
-      this.addPopToPopStore(groupId, null);
-
-      // hide parents
-      if (!!pop.parentPop) {
-        let idx = pop.parentPop.childPops.indexOf(pop);
-        if (idx !== -1) {
-          pop.parentPop.childPops.splice(idx, 1);
+      this._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
+        // hide children
+        if (!!pop.childPops.length) {
+          pop.childPops.forEach(function(child: Pop): void {
+            this.hidePop(child.targetEl, hideFullChain);
+          }, this);
         }
-        if (hideFullChain) {
-          this.hidePop(pop.parentPop.targetEl, hideFullChain);
+
+        // hide pop
+        let popOver = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
+        targetElement.removeAttribute('pinned-pop');
+
+        this._maybeClearHandler(this._handlers[groupId]);
+        this._listenForScroll(false, groupId, popOver);
+
+        this.setState(pop, PopStateType.HIDDEN, pop.opts, null, false);
+
+        if (!!popOver) {
+          document.body.removeChild(popOver);
         }
-      }
-    }.bind(this), pop.opts.timeToHoverOnPop);
+        this.addPopToPopStore(groupId, null);
+
+        // hide parents
+        if (!!pop.parentPop) {
+          let idx = pop.parentPop.childPops.indexOf(pop);
+          if (idx !== -1) {
+            pop.parentPop.childPops.splice(idx, 1);
+          }
+          if (hideFullChain) {
+            this.hidePop(pop.parentPop.targetEl, hideFullChain);
+          }
+        }
+      }.bind(this), pop.opts.timeToHoverOnPop);
+    }
   }
 
   private _fireEvent(state: string, pop: Pop): void {
