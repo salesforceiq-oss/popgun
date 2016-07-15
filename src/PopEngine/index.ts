@@ -124,7 +124,6 @@ export class PopEngine {
     let delay = isPinned ? 0 : pop.opts.showDelay;
     let groupId = targetElement.getAttribute('popgun-group');
     let isAlreadyShowing = this.isPopAlreadyOpenForGroup(groupId);
-    console.log('showing');
 
     // this is gross and should be refactored
     // we store the old pop because it will be overwritten and we need it later
