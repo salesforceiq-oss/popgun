@@ -132,6 +132,7 @@ export class PopEngine {
     this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
     this._maybeSetParentChildRelationship(pop);
     if (isAlreadyShowing && !!container) {
+      oldPop.targetEl.removeAttribute('pinned-pop');
       if (!!oldPop && !!oldPop.childPops.length) {
         oldPop.childPops.forEach(function(child: Pop): void {
           this.hidePop(child.targetEl, false);
