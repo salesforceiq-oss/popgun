@@ -58,7 +58,7 @@ export class PopEngine {
     groupStore.add(groupId, group);
   }
 
-  // Get group 
+  // Get group
   public getGroupOptionsFromGroupId(groupId: string): IGroup {
     return groupStore.get(groupId);
   }
@@ -125,31 +125,31 @@ export class PopEngine {
     let groupId = targetElement.getAttribute('popgun-group');
     let isAlreadyShowing = this.isPopAlreadyOpenForGroup(groupId);
 
-    // this is gross and should be refactored
-    // we store the old pop because it will be overwritten and we need it later
-    let container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
-    let oldPop = this.getPopFromGroupId(groupId);
-    this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
-    this._maybeSetParentChildRelationship(pop);
-    if (isAlreadyShowing && !!container) {
-      oldPop.targetEl.removeAttribute('pinned-pop');
-      if (!!oldPop && !!oldPop.childPops.length) {
-        oldPop.childPops.forEach(function(child: Pop): void {
-          this.hidePop(child.targetEl, false);
-        }, this);
-      }
-      if (!!oldPop && !!oldPop.parentPop) {
-        let idx = oldPop.parentPop.childPops.indexOf(oldPop);
-        if (idx !== -1) {
-          oldPop.parentPop.childPops.splice(idx, 1);
-        }
-      }
-    }
-
     // clear any timeouts and do a timeout and show pop
     this.clearTimeout(targetElement);
     this._timeouts.hoverdelay = setTimeout(function(): void {
       let animationEndStates = {};
+
+      // this is gross and should be refactored
+      // we store the old pop because it will be overwritten and we need it later
+      let container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
+      let oldPop = this.getPopFromGroupId(groupId);
+      this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
+      this._maybeSetParentChildRelationship(pop);
+      if (isAlreadyShowing && !!container) {
+        oldPop.targetEl.removeAttribute('pinned-pop');
+        if (!!oldPop && !!oldPop.childPops.length) {
+          oldPop.childPops.forEach(function(child: Pop): void {
+            this.hidePop(child.targetEl, false);
+          }, this);
+        }
+        if (!!oldPop && !!oldPop.parentPop) {
+          let idx = oldPop.parentPop.childPops.indexOf(oldPop);
+          if (idx !== -1) {
+            oldPop.parentPop.childPops.splice(idx, 1);
+          }
+        }
+      }
 
       if (isAlreadyShowing && !!container) {
         // if pop is already showing for group, reuse

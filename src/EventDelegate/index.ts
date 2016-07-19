@@ -101,7 +101,7 @@ export class EventDelegate {
     target = <Element>closest(e.target, '[popgun]', true);
     if (!!target) {
       let relatedTarget: Element = <Element>closest(e.relatedTarget, '[popgun]', true);
-      if (!!relatedTarget && target !== relatedTarget) {
+      if (!!relatedTarget && target !== relatedTarget && !target.hasAttribute('pinned-pop')) {
         // hovering into a popgun element
         // ensure its not the same closest el
         popEngine.hidePop(target, false);
