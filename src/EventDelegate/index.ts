@@ -95,6 +95,10 @@ export class EventDelegate {
           popEngine.hidePop(pop.targetEl, false);
           return;
         }
+      } else {
+        let pop = popEngine.getPopFromGroupId(target.getAttribute('pop-id'));
+        popEngine.clearTimeout(pop.targetEl);
+        return;
       }
     }
 
@@ -110,6 +114,9 @@ export class EventDelegate {
         // hovering into nothing
         // hide if pop isn't pinned
         popEngine.hidePop(target, false);
+        return;
+      } else {
+        popEngine.clearTimeout(target);
         return;
       }
     }
