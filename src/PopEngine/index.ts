@@ -238,7 +238,7 @@ export class PopEngine {
           if (idx !== -1) {
             pop.parentPop.childPops.splice(idx, 1);
           }
-          if (hideFullChain) {
+          if (hideFullChain || !pop.parentPop.isPinned) {
             this.hidePop(pop.parentPop.targetEl, hideFullChain);
           }
         }
