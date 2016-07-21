@@ -22,25 +22,11 @@ export class PopChainManager {
 
     while (!!stack.length) {
       pop = stack.pop();
-
-      if (!!pop.parentPop) {
-        let idx = pop.parentPop.childPops.indexOf(pop);
-        if (idx !== -1) {
-          pop.parentPop.childPops.splice(idx, 1);
-        }
-        pop.parentPop = null;
-      }
-
       if (!!pop.childPops.length) {
         pop.childPops.forEach(function(child: Pop, index: number): void {
-          /* Removes reference to parent since the parent now disowned the child.
-          ** This is also a mutation that probably does not belong here, or rename method. */
-          pop.childPops.splice(index, 1);
-          child.parentPop = null;
           stack.push(child);
         });
       }
-
       popChain.push(pop);
     }
 

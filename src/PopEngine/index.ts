@@ -215,6 +215,14 @@ export class PopEngine {
         let popChain = popChainManager.getFullPopChain(pop, hideFullChain);
 
         popChain.forEach(function(p: Pop): void {
+          if (!!p.parentPop) {
+            let index = p.parentPop.childPops.indexOf(p);
+            if (index !== -1) {
+              p.parentPop.childPops.splice(index, 1);
+            }
+            p.parentPop = null;
+          }
+
           let popOver = closest(p.popOver.element, 'div[pop=""]');
           if (popOver) {
             let g = popOver.getAttribute('pop-id');
