@@ -126,10 +126,10 @@ export class EventDelegate {
   }
 
   private _clearParentPops(pop: Pop): void {
-    if (!!pop.parentPop) {
-      popEngine.clearTimeout(pop.parentPop.targetEl);
-      if (!!pop.parentPop.parentPop) {
-        this._clearParentPops(pop.parentPop);
+    if (pop) {
+      while (!!pop.parentPop) {
+        popEngine.clearTimeout(pop.parentPop.targetEl);
+        pop = pop.parentPop;
       }
     }
   }
