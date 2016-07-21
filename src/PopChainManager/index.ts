@@ -11,27 +11,37 @@ export class PopChainManager {
   public getFullPopChain(pop: Pop, hideFullChain: boolean): Pop[] {
     let popChain: Pop[] = [];
 
-    if (!!pop.childPops.length) {
-      pop.childPops.forEach(function(child: Pop): void {
-        let idx = child.parentPop.childPops.indexOf(child);
-        if (idx !== -1) {
-          child.parentPop.childPops.splice(idx, 1);
-        }
-        child.parentPop = null;
-        popChain = popChain.concat(this.getFullPopChain(child, hideFullChain));
-      }, this);
+    if (hideFullChain) {
+      pop = this._getRootPop(pop);
+    } else {
+      pop = this._getFirstUnpinnedParentPop(pop);
     }
 
-    popChain.push(pop);
+    let stack: Pop[] = [];
+    stack.push(pop);
 
-    if (!!pop.parentPop) {
-      let idx = pop.parentPop.childPops.indexOf(pop);
-      if (idx !== -1) {
-        pop.parentPop.childPops.splice(idx, 1);
+    while (!!stack.length) {
+      pop = stack.pop();
+
+      if (!!pop.parentPop) {
+        let idx = pop.parentPop.childPops.indexOf(pop);
+        if (idx !== -1) {
+          pop.parentPop.childPops.splice(idx, 1);
+        }
+        pop.parentPop = null;
       }
-      if (!pop.parentPop.isPinned || hideFullChain) {
-        popChain = popChain.concat(this.getFullPopChain(pop.parentPop, hideFullChain));
+
+      if (!!pop.childPops.length) {
+        pop.childPops.forEach(function(child: Pop, index: number): void {
+          /* Removes reference to parent since the parent now disowned the child.
+          ** This is also a mutation that probably does not belong here, or rename method. */
+          pop.childPops.splice(index, 1);
+          child.parentPop = null;
+          stack.push(child);
+        });
       }
+
+      popChain.push(pop);
     }
 
     return popChain;
@@ -58,6 +68,22 @@ export class PopChainManager {
 
   private _addChildPop(parent: Pop, child: Pop): void {
     parent.childPops.push(child);
+  }
+
+  private _getRootPop(pop: Pop): Pop {
+    if (!!pop) {
+      while (!!pop.parentPop) {
+        pop = pop.parentPop;
+      }
+      return pop;
+    }
+  }
+
+  private _getFirstUnpinnedParentPop(pop: Pop): Pop {
+    while (!!pop.parentPop && !pop.parentPop.isPinned) {
+      pop = pop.parentPop;
+    }
+    return pop;
   }
 
 }
