@@ -216,18 +216,20 @@ export class PopEngine {
 
         popChain.forEach(function(p: Pop): void {
           let popOver = closest(p.popOver.element, 'div[pop=""]');
-          let g = popOver.getAttribute('pop-id');
-          p.targetEl.removeAttribute('pinned-pop');
+          if (popOver) {
+            let g = popOver.getAttribute('pop-id');
+            p.targetEl.removeAttribute('pinned-pop');
 
-          this._maybeClearHandler(this._handlers[g]);
-          this._listenForScroll(false, g, popOver);
+            this._maybeClearHandler(this._handlers[g]);
+            this._listenForScroll(false, g, popOver);
 
-          this.setState(p, PopStateType.HIDDEN, p.opts, null, false);
+            this.setState(p, PopStateType.HIDDEN, p.opts, null, false);
 
-          if (!!popOver) {
-            document.body.removeChild(popOver);
+            if (!!popOver) {
+              document.body.removeChild(popOver);
+            }
+            this.addPopToPopStore(g, null);
           }
-          this.addPopToPopStore(g, null);
         }, this);
 
       }.bind(this), pop.opts.timeToHoverOnPop);
