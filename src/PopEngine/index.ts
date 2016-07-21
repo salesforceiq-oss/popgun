@@ -138,6 +138,7 @@ export class PopEngine {
       this._maybeSetParentChildRelationship(pop);
       if (isAlreadyShowing && !!container) {
         oldPop.targetEl.removeAttribute('pinned-pop');
+        oldPop.targetEl.removeAttribute('unpinned-pop');
         if (!!oldPop && !!oldPop.childPops.length) {
           oldPop.childPops.forEach(function(child: Pop): void {
             this.hidePop(child.targetEl, false);
@@ -219,6 +220,7 @@ export class PopEngine {
           if (popOver) {
             let g = popOver.getAttribute('pop-id');
             p.targetEl.removeAttribute('pinned-pop');
+            p.targetEl.removeAttribute('unpinned-pop');
 
             this._maybeClearHandler(this._handlers[g]);
             this._listenForScroll(false, g, popOver);

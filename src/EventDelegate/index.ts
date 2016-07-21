@@ -25,7 +25,12 @@ export class EventDelegate {
 
     if (popEngine.isPopForTrigger(target, trigger)) {
       if (popEngine.isPopAlreadyOpenForTarget(target)) {
-        popChainManager.maybePinOrUnpinPopAndParentPops(target, isPinned);
+        if (target.hasAttribute('pinned-pop')) {
+          target.setAttribute('unpinned-pop', '');
+          popEngine.hidePop(target, false);
+        } else {
+          popChainManager.maybePinOrUnpinPopAndParentPops(target, isPinned);
+        }
       } else {
         this._showPop(target, trigger);
       }
@@ -43,7 +48,9 @@ export class EventDelegate {
       if (popEngine.isPopAlreadyOpenForTarget(target)) {
         popEngine.clearTimeout(target);
       } else {
-        this._showPop(target, trigger);
+        if (!target.hasAttribute('unpinned-pop')) {
+          this._showPop(target, trigger);
+        }
       }
     } else if (popEngine.isPop(target)) {
       target = <Element>closest(e.target, '[pop]', true);
