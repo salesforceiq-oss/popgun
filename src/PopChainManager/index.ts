@@ -8,6 +8,35 @@ export class PopChainManager {
     return closest(pop.targetEl, '[pop]', true);
   }
 
+  public getFullPopChain(pop: Pop, hideFullChain: boolean): Pop[] {
+    let popChain: Pop[] = [];
+
+    if (!!pop.childPops.length) {
+      pop.childPops.forEach(function(child: Pop): void {
+        let idx = child.parentPop.childPops.indexOf(child);
+        if (idx !== -1) {
+          child.parentPop.childPops.splice(idx, 1);
+        }
+        child.parentPop = null;
+        popChain = popChain.concat(this.getFullPopChain(child, hideFullChain));
+      }, this);
+    }
+
+    popChain.push(pop);
+
+    if (!!pop.parentPop) {
+      let idx = pop.parentPop.childPops.indexOf(pop);
+      if (idx !== -1) {
+        pop.parentPop.childPops.splice(idx, 1);
+      }
+      if (!pop.parentPop.isPinned || hideFullChain) {
+        popChain = popChain.concat(this.getFullPopChain(pop.parentPop, hideFullChain));
+      }
+    }
+
+    return popChain;
+  }
+
   public maybePinOrUnpinPopAndParentPops(target: Element, pin: boolean): void {
     let groupId = target.getAttribute('popgun-group');
     let pop = popStore.get(groupId);
