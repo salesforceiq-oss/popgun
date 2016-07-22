@@ -72,6 +72,10 @@ describe('Options - ', () => {
       expect((new Options()).containerCushion).toBe(10);
     });
 
+    it('should default disableClickOff to false', () => {
+      expect((new Options()).disableClickOff).toBe(false);
+    });
+
   });
 
   describe('extend - ', () => {
