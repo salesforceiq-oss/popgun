@@ -16,6 +16,7 @@ interface IOptions {
     fadeDuration?: number;
     cushion?: number;
     containerCushion?: number;
+    disableClickOff?: boolean;
 }
 
 export default IOptions;

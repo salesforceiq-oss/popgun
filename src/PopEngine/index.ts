@@ -189,10 +189,12 @@ export class PopEngine {
         this.setState(pop, PopStateType.PRE_SHOW, pop.opts, null, false);
 
         this._maybeClearTimeout(this._timeouts.hoverdelay, null);
-        this._handlers[groupId] = this.escapeStack.add(function(): boolean {
-          this.hidePop(pop.targetEl, false);
-          return true;
-        }.bind(this));
+        if (!pop.opts.disableClickOff) {
+          this._handlers[groupId] = this.escapeStack.add(function(): boolean {
+            this.hidePop(pop.targetEl, false);
+            return true;
+          }.bind(this));
+        }
 
         // SHOWING
         this.setState(pop, PopStateType.SHOWING, pop.opts, null, false);
@@ -216,6 +218,7 @@ export class PopEngine {
         let popChain = popChainManager.getFullPopChain(pop, hideFullChain);
 
         popChain.forEach(function(p: Pop): void {
+          popChainManager.removeParentChildRelationship(p);
           let popOver = closest(p.popOver.element, 'div[pop=""]');
           if (popOver) {
             let g = popOver.getAttribute('pop-id');
