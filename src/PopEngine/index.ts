@@ -211,37 +211,28 @@ export class PopEngine {
       this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
 
       this._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
-        // hide children
-        if (!!pop.childPops.length) {
-          pop.childPops.forEach(function(child: Pop): void {
-            this.hidePop(child.targetEl, hideFullChain);
-          }, this);
-        }
 
-        // hide pop
-        let popOver = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
-        targetElement.removeAttribute('pinned-pop');
+        let popChain = popChainManager.getFullPopChain(pop, hideFullChain);
 
-        this._maybeClearHandler(this._handlers[groupId]);
-        this._listenForScroll(false, groupId, popOver);
+        popChain.forEach(function(p: Pop): void {
+          popChainManager.removeParentChildRelationship(p);
+          let popOver = closest(p.popOver.element, 'div[pop=""]');
+          if (popOver) {
+            let g = popOver.getAttribute('pop-id');
+            p.targetEl.removeAttribute('pinned-pop');
 
-        this.setState(pop, PopStateType.HIDDEN, pop.opts, null, false);
+            this._maybeClearHandler(this._handlers[g]);
+            this._listenForScroll(false, g, popOver);
 
-        if (!!popOver) {
-          document.body.removeChild(popOver);
-        }
-        this.addPopToPopStore(groupId, null);
+            this.setState(p, PopStateType.HIDDEN, p.opts, null, false);
 
-        // hide parents
-        if (!!pop.parentPop) {
-          let idx = pop.parentPop.childPops.indexOf(pop);
-          if (idx !== -1) {
-            pop.parentPop.childPops.splice(idx, 1);
+            if (!!popOver) {
+              document.body.removeChild(popOver);
+            }
+            this.addPopToPopStore(g, null);
           }
-          if (hideFullChain || !pop.parentPop.isPinned) {
-            this.hidePop(pop.parentPop.targetEl, hideFullChain);
-          }
-        }
+        }, this);
+
       }.bind(this), pop.opts.timeToHoverOnPop);
     }
   }

@@ -46,7 +46,10 @@ export class EventDelegate {
         this._showPop(target, trigger);
       }
     } else if (popEngine.isPop(target)) {
-      popEngine.clearTimeout(target);
+      target = <Element>closest(e.target, '[pop]', true);
+      let pop = popEngine.getPopFromGroupId(target.getAttribute('pop-id'));
+      popEngine.clearTimeout(pop.targetEl);
+      this._clearParentPops(pop);
     }
   }
 
@@ -118,6 +121,15 @@ export class EventDelegate {
       } else {
         popEngine.clearTimeout(target);
         return;
+      }
+    }
+  }
+
+  private _clearParentPops(pop: Pop): void {
+    if (pop) {
+      while (!!pop.parentPop) {
+        popEngine.clearTimeout(pop.parentPop.targetEl);
+        pop = pop.parentPop;
       }
     }
   }
