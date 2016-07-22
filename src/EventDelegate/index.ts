@@ -102,6 +102,7 @@ export class EventDelegate {
         let pop = popEngine.getPopFromGroupId(target.getAttribute('pop-id'));
         if (popEngine.isPopForTrigger(pop.targetEl, (new Trigger('hover'))) && !pop.targetEl.hasAttribute('pinned-pop')) {
           // hide pop is the target is not pinned
+          pop.targetEl.removeAttribute('unpinned-pop');
           popEngine.hidePop(pop.targetEl, false);
           return;
         }
@@ -123,6 +124,7 @@ export class EventDelegate {
       } else if (!relatedTarget && popEngine.isPopForTrigger(target, (new Trigger('hover'))) && !target.hasAttribute('pinned-pop')) {
         // hovering into nothing
         // hide if pop isn't pinned
+        target.removeAttribute('unpinned-pop');
         popEngine.hidePop(target, false);
         return;
       } else {

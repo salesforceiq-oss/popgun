@@ -223,7 +223,6 @@ export class PopEngine {
           if (popOver) {
             let g = popOver.getAttribute('pop-id');
             p.targetEl.removeAttribute('pinned-pop');
-            p.targetEl.removeAttribute('unpinned-pop');
 
             this._maybeClearHandler(this._handlers[g]);
             this._listenForScroll(false, g, popOver);
