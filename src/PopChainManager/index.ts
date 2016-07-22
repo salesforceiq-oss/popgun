@@ -43,6 +43,16 @@ export class PopChainManager {
     }
   }
 
+  public removeParentChildRelationship(pop: Pop): void {
+    if (!!pop.parentPop) {
+      let index = pop.parentPop.childPops.indexOf(pop);
+      if (index !== -1) {
+        pop.parentPop.childPops.splice(index, 1);
+      }
+      pop.parentPop = null;
+    }
+  }
+
   public setParentChildRelationship(parent: Pop, child: Pop): void {
     this._setParentPop(parent, child);
     this._addChildPop(parent, child);
