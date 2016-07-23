@@ -25,7 +25,12 @@ export class EventDelegate {
 
     if (popEngine.isPopForTrigger(target, trigger)) {
       if (popEngine.isPopAlreadyOpenForTarget(target)) {
-        popChainManager.maybePinOrUnpinPopAndParentPops(target, isPinned);
+        if (target.hasAttribute('pinned-pop')) {
+          target.setAttribute('unpinned-pop', '');
+          popEngine.hidePop(target, false);
+        } else {
+          popChainManager.maybePinOrUnpinPopAndParentPops(target, isPinned);
+        }
       } else {
         this._showPop(target, trigger);
       }
@@ -43,7 +48,9 @@ export class EventDelegate {
       if (popEngine.isPopAlreadyOpenForTarget(target)) {
         popEngine.clearTimeout(target);
       } else {
-        this._showPop(target, trigger);
+        if (!target.hasAttribute('unpinned-pop')) {
+          this._showPop(target, trigger);
+        }
       }
     } else if (popEngine.isPop(target)) {
       target = <Element>closest(e.target, '[pop]', true);
@@ -95,6 +102,7 @@ export class EventDelegate {
         let pop = popEngine.getPopFromGroupId(target.getAttribute('pop-id'));
         if (popEngine.isPopForTrigger(pop.targetEl, (new Trigger('hover'))) && !pop.targetEl.hasAttribute('pinned-pop')) {
           // hide pop is the target is not pinned
+          pop.targetEl.removeAttribute('unpinned-pop');
           popEngine.hidePop(pop.targetEl, false);
           return;
         }
@@ -116,6 +124,7 @@ export class EventDelegate {
       } else if (!relatedTarget && popEngine.isPopForTrigger(target, (new Trigger('hover'))) && !target.hasAttribute('pinned-pop')) {
         // hovering into nothing
         // hide if pop isn't pinned
+        target.removeAttribute('unpinned-pop');
         popEngine.hidePop(target, false);
         return;
       } else {
