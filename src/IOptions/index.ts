@@ -17,6 +17,7 @@ interface IOptions {
     cushion?: number;
     containerCushion?: number;
     disableClickOff?: boolean;
+    tipClass?: string;
 }
 
 export default IOptions;

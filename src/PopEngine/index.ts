@@ -158,6 +158,12 @@ export class PopEngine {
         this._maybeClearHandler(this._handlers[groupId]);
       } else {
         container = this.createPopElement(targetElement);
+        if (!!pop.opts.tipClass) {
+          let classes = pop.opts.tipClass.split(' ');
+          classes.forEach(function (className: string): void {
+            container.classList.add(className);
+          });
+        }
         document.body.appendChild(container);
       }
 
