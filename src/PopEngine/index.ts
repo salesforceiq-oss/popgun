@@ -162,7 +162,7 @@ export class PopEngine {
           let classes = pop.opts.tipClass.split(' ');
           classes.forEach(function (className: string): void {
             container.classList.add(className);
-          });
+          }, this);
         }
         document.body.appendChild(container);
       }
