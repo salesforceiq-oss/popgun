@@ -17,7 +17,8 @@ let defaultOptions: IOptions = {
     fadeDuration: 100,
     cushion: 8,
     containerCushion: 10,
-    disableClickOff: false
+    disableClickOff: false,
+    tipClass: ''
 };
 
 export default defaultOptions;

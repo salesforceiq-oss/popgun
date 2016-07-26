@@ -76,6 +76,10 @@ describe('Options - ', () => {
       expect((new Options()).disableClickOff).toBe(false);
     });
 
+    it('should default tipClass to an empty string', () => {
+      expect((new Options()).tipClass).toBe('');
+    });
+
   });
 
   describe('extend - ', () => {

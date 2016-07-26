@@ -87,11 +87,13 @@ describe('OptionsParser -', () => {
         expect(OptionsParser.fromLiteral({
           text: val,
           placement: val,
-          alignment: val
+          alignment: val,
+          tipClass: val
         })).toEqual({
           text: val,
           placement: val,
-          alignment: val
+          alignment: val,
+          tipClass: val
         });
 
       });
