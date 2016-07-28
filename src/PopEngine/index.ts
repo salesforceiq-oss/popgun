@@ -197,7 +197,7 @@ export class PopEngine {
         this._maybeClearTimeout(this._timeouts.hoverdelay, null);
         if (!pop.opts.disableClickOff) {
           this._handlers[groupId] = this.escapeStack.add(function(): boolean {
-            this.hidePop(pop.targetEl, false);
+            this.synchronousHidePop(pop.targetEl, false);
             return true;
           }.bind(this));
         }
@@ -220,29 +220,38 @@ export class PopEngine {
       this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
 
       this._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
-
-        let popChain = popChainManager.getFullPopChain(pop, hideFullChain);
-
-        popChain.forEach(function(p: Pop): void {
-          popChainManager.removeParentChildRelationship(p);
-          let popOver = closest(p.popOver.element, 'div[pop=""]');
-          if (popOver) {
-            let g = popOver.getAttribute('pop-id');
-            p.targetEl.removeAttribute('pinned-pop');
-
-            this._maybeClearHandler(this._handlers[g]);
-            this._listenForScroll(false, g, popOver);
-
-            this.setState(p, PopStateType.HIDDEN, p.opts, null, false);
-
-            if (!!popOver) {
-              document.body.removeChild(popOver);
-            }
-            this.addPopToPopStore(g, null);
-          }
-        }, this);
-
+        this.synchronousHidePop(targetElement, hideFullChain);
       }.bind(this), pop.opts.timeToHoverOnPop);
+    }
+  }
+
+  public synchronousHidePop(targetElement: Element, hideFullChain: boolean): void {
+    let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
+    let pop = this.getPopFromGroupId(groupId);
+
+    if (pop) {
+      this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
+
+      let popChain = popChainManager.getFullPopChain(pop, hideFullChain);
+
+      popChain.forEach(function(p: Pop): void {
+        popChainManager.removeParentChildRelationship(p);
+        let popOver = closest(p.popOver.element, 'div[pop=""]');
+        if (popOver) {
+          let g = popOver.getAttribute('pop-id');
+          p.targetEl.removeAttribute('pinned-pop');
+
+          this._maybeClearHandler(this._handlers[g]);
+          this._listenForScroll(false, g, popOver);
+
+          this.setState(p, PopStateType.HIDDEN, p.opts, null, false);
+
+          if (!!popOver) {
+            document.body.removeChild(popOver);
+          }
+          this.addPopToPopStore(g, null);
+        }
+      }, this);
     }
   }
 
