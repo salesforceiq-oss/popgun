@@ -109,12 +109,8 @@ export class PopEngine {
     this._clearTimeoutByGroupId(groupId);
   }
 
-  public listenForScroll(listen: boolean): void {
-    if (!listen) {
-      document.removeEventListener('scroll', this._scrollListener, true);
-    } else {
-      document.addEventListener('scroll', this._scrollListener, true);
-    }
+  public listenForScroll(): void {
+    document.addEventListener('scroll', this._scrollListener, true);
   }
 
   public createPopElement(targetElement: Element): Element {
