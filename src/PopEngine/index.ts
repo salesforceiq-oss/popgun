@@ -35,10 +35,12 @@ export class PopEngine {
     [groupId: string]: any
   } = {};
 
-  escapeStack: any = null;
+  _escapeStack: any = null;
+  _scrollListener: any = null;
 
   constructor() {
-    this.escapeStack = createEscapeStack();
+    this._escapeStack = createEscapeStack();
+    this._scrollListener = this._positionOpenPops.bind(this);
   }
 
   public isPopTarget(el: Element): boolean {
@@ -73,7 +75,7 @@ export class PopEngine {
   }
 
   public popTopPop(): void {
-    this.escapeStack.pop();
+    this._escapeStack.pop();
   }
 
   public isPopAlreadyOpenForGroup(groupId: string): boolean {
@@ -105,6 +107,10 @@ export class PopEngine {
   public clearTimeout(targetElement: Element): void {
     let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
     this._clearTimeoutByGroupId(groupId);
+  }
+
+  public listenForScroll(): void {
+    document.addEventListener('scroll', this._scrollListener, true);
   }
 
   public createPopElement(targetElement: Element): Element {
@@ -177,7 +183,6 @@ export class PopEngine {
       }
 
       this._maybeClearTimeout(this._timeouts.popHover, null);
-      this._listenForScroll(true, groupId, container);
 
       // CONTENT SETUP
       this.setState(pop, PopStateType.CONTENT_SETUP, pop.opts, null, false);
@@ -196,7 +201,7 @@ export class PopEngine {
 
         this._maybeClearTimeout(this._timeouts.hoverdelay, null);
         if (!pop.opts.disableClickOff) {
-          this._handlers[groupId] = this.escapeStack.add(function(): boolean {
+          this._handlers[groupId] = this._escapeStack.add(function(): boolean {
             this.synchronousHidePop(pop.targetEl, false);
             return true;
           }.bind(this));
@@ -242,7 +247,6 @@ export class PopEngine {
           p.targetEl.removeAttribute('pinned-pop');
 
           this._maybeClearHandler(this._handlers[g]);
-          this._listenForScroll(false, g, popOver);
 
           this.setState(p, PopStateType.HIDDEN, p.opts, null, false);
 
@@ -307,14 +311,6 @@ export class PopEngine {
       return this.getPopFromGroupId(parentEl.getAttribute('pop-id'));
     }
     return null;
-  }
-
-  private _listenForScroll(listen: boolean, groupId: string, container: Element): void {
-    if (!listen) {
-      document.removeEventListener('scroll', this._positionOpenPops.bind(this), true);
-    } else {
-      document.addEventListener('scroll', this._positionOpenPops.bind(this), true);
-    }
   }
 
   private _positionOpenPops(): void {

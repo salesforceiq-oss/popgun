@@ -15,6 +15,7 @@ export class EventDelegate {
     this._setEventListener(new Trigger(TriggerType[TriggerType['FOCUS']]), this.onFocus);
     this._setEventListener(new Trigger(TriggerType[TriggerType['MANUAL']]), this.onManual);
     this._setEventListener(new Trigger(TriggerType[TriggerType['MOUSEOUT']]), this.onMouseOut);
+    popEngine.listenForScroll();
   }
 
   public onClick(e: MouseEvent): void {
