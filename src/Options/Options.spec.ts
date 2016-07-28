@@ -80,6 +80,10 @@ describe('Options - ', () => {
       expect((new Options()).tipClass).toBe('');
     });
 
+    it('should default darkStyle to false', () => {
+      expect((new Options()).darkStyle).toBe(false);
+    });
+
   });
 
   describe('extend - ', () => {

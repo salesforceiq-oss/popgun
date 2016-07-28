@@ -119,41 +119,49 @@ describe('OptionsParser -', () => {
         expect(OptionsParser.fromLiteral({
           optimizePlacement: 'true',
           transitionPlacement: 'false',
-          disableClickOff: 'true'
+          disableClickOff: 'true',
+          darkStyle: 'true'
         })).toEqual({
           optimizePlacement: true,
           transitionPlacement: false,
-          disableClickOff: true
+          disableClickOff: true,
+          darkStyle: true
         });
 
         expect(OptionsParser.fromLiteral({
           optimizePlacement: true,
           transitionPlacement: false,
-          disableClickOff: true
+          disableClickOff: true,
+          darkStyle: true
         })).toEqual({
           optimizePlacement: true,
           transitionPlacement: false,
-          disableClickOff: true
+          disableClickOff: true,
+          darkStyle: true
         });
 
         expect(OptionsParser.fromLiteral({
           optimizePlacement: 1,
           transitionPlacement: 0,
-          disableClickOff: 0
+          disableClickOff: 0,
+          darkStyle: 0
         })).toEqual({
           optimizePlacement: true,
           transitionPlacement: false,
-          disableClickOff: false
+          disableClickOff: false,
+          darkStyle: false
         });
 
         expect(OptionsParser.fromLiteral({
           optimizePlacement: '1',
           transitionPlacement: '0',
-          disableClickOff: '0'
+          disableClickOff: '0',
+          darkStyle: '0'
         })).toEqual({
           optimizePlacement: false,
           transitionPlacement: false,
-          disableClickOff: false
+          disableClickOff: false,
+          darkStyle: false
         });
 
       });
@@ -244,6 +252,11 @@ describe('OptionsParser -', () => {
     it('should set disableClickOff from element attribute', () => {
       let opts = fromSingleAttribute('popgun-disable-click-off', 'true');
       expect(opts.disableClickOff).toEqual(true);
+    });
+
+    it('should set darkStyle from element attribute', () => {
+      let opts = fromSingleAttribute('popgun-dark-style', 'true');
+      expect(opts.darkStyle).toEqual(true);
     });
 
     it('should exclude popgun-schema', () => {

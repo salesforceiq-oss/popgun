@@ -16,6 +16,7 @@ let el = document.createElement('div');
 el.setAttribute('popgun', '');
 el.setAttribute('class', 'target');
 el.setAttribute('popgun-group', 'test1');
+el.setAttribute('popgun-dark-style', 'true');
 el.setAttribute('popgun-trigger', 'click');
 el.setAttribute('popgun-html', '<div popgun popgun-group="test" popgun-trigger="click hover">Click/Hover here for a nested pop!</div>');
 el.innerText = 'Click Me!';

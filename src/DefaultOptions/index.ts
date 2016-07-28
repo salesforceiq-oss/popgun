@@ -18,7 +18,8 @@ let defaultOptions: IOptions = {
     cushion: 8,
     containerCushion: 10,
     disableClickOff: false,
-    tipClass: ''
+    tipClass: '',
+    darkStyle: false
 };
 
 export default defaultOptions;

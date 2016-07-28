@@ -113,11 +113,14 @@ export class PopEngine {
     document.addEventListener('scroll', this._scrollListener, true);
   }
 
-  public createPopElement(targetElement: Element): Element {
+  public createPopElement(targetElement: Element, isDark: boolean): Element {
     let container: Element = document.createElement('div');
     let nose: Element = document.createElement('div');
     container.classList.add('popover');
     container.classList.add('hidden');
+    if (isDark) {
+      container.classList.add('dark-style');
+    }
     container.setAttribute('pop-id', targetElement.getAttribute('popgun-group'));
     container.setAttribute('pop', '');
     nose.setAttribute('class', 'nose-triangle');
@@ -163,7 +166,7 @@ export class PopEngine {
         container.removeChild(container.getElementsByClassName('pop-content')[0]);
         this._maybeClearHandler(this._handlers[groupId]);
       } else {
-        container = this.createPopElement(targetElement);
+        container = this.createPopElement(targetElement, pop.opts.darkStyle);
         if (!!pop.opts.tipClass) {
           let classes = pop.opts.tipClass.split(' ');
           classes.forEach(function (className: string): void {
