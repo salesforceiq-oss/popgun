@@ -65,8 +65,12 @@ export class Popgun {
   // reposition a pop based on the groupId
   public reposition(groupId: string): void {
     let pop = popEngine.getPopFromGroupId(groupId);
-    let container = closest(pop.popOver.element, 'div[pop=""]');
-    popEngine.setPosition(pop, container);
+    if (!!pop) {
+      let container = closest(pop.popOver.element, 'div[pop=""]');
+      popEngine.setPosition(pop, container);
+    } else {
+      throw new Error('No pop open for this groupId.');
+    }
   }
 
   // Show the popover for a particular target element
