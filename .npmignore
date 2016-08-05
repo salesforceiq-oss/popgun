@@ -1,6 +1,10 @@
 # TypeScript files
 *.ts
 
+# Ignore the example
+.app
+.app-src
+
 # Tests
 src/**/*.spec.js
 
