@@ -20,6 +20,9 @@ export default class Options implements IOptions {
   fadeDuration: number;
   cushion: number;
   containerCushion: number;
+  disableClickOff: boolean;
+  tipClass: string;
+  darkStyle: boolean;
 
   static fromElement(el: Element): Options {
     return (new Options()).extend(OptionsParser.fromElement(el));

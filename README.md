@@ -1,3 +1,7 @@
+[![npm][npm-badge]][npm-badge-url]
+[npm-badge]: https://img.shields.io/npm/v/popgun.svg
+[npm-badge-url]: https://www.npmjs.com/package/popgun
+
 # Popgun
 
 ## What is Popgun?

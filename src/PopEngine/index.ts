@@ -35,10 +35,12 @@ export class PopEngine {
     [groupId: string]: any
   } = {};
 
-  escapeStack: any = null;
+  _escapeStack: any = null;
+  _scrollListener: any = null;
 
   constructor() {
-    this.escapeStack = createEscapeStack();
+    this._escapeStack = createEscapeStack();
+    this._scrollListener = this._positionOpenPops.bind(this);
   }
 
   public isPopTarget(el: Element): boolean {
@@ -58,7 +60,7 @@ export class PopEngine {
     groupStore.add(groupId, group);
   }
 
-  // Get group 
+  // Get group
   public getGroupOptionsFromGroupId(groupId: string): IGroup {
     return groupStore.get(groupId);
   }
@@ -73,7 +75,7 @@ export class PopEngine {
   }
 
   public popTopPop(): void {
-    this.escapeStack.pop();
+    this._escapeStack.pop();
   }
 
   public isPopAlreadyOpenForGroup(groupId: string): boolean {
@@ -107,11 +109,18 @@ export class PopEngine {
     this._clearTimeoutByGroupId(groupId);
   }
 
-  public createPopElement(targetElement: Element): Element {
+  public listenForScroll(): void {
+    document.addEventListener('scroll', this._scrollListener, true);
+  }
+
+  public createPopElement(targetElement: Element, isDark: boolean): Element {
     let container: Element = document.createElement('div');
     let nose: Element = document.createElement('div');
     container.classList.add('popover');
     container.classList.add('hidden');
+    if (isDark) {
+      container.classList.add('dark-style');
+    }
     container.setAttribute('pop-id', targetElement.getAttribute('popgun-group'));
     container.setAttribute('pop', '');
     nose.setAttribute('class', 'nose-triangle');
@@ -125,37 +134,45 @@ export class PopEngine {
     let groupId = targetElement.getAttribute('popgun-group');
     let isAlreadyShowing = this.isPopAlreadyOpenForGroup(groupId);
 
-    // this is gross and should be refactored
-    // we store the old pop because it will be overwritten and we need it later
-    let container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
-    let oldPop = this.getPopFromGroupId(groupId);
-    this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
-    this._maybeSetParentChildRelationship(pop);
-    if (isAlreadyShowing && !!container) {
-      if (!!oldPop && !!oldPop.childPops.length) {
-        oldPop.childPops.forEach(function(child: Pop): void {
-          this.hidePop(child.targetEl, false);
-        }, this);
-      }
-      if (!!oldPop && !!oldPop.parentPop) {
-        let idx = oldPop.parentPop.childPops.indexOf(oldPop);
-        if (idx !== -1) {
-          oldPop.parentPop.childPops.splice(idx, 1);
-        }
-      }
-    }
-
     // clear any timeouts and do a timeout and show pop
     this.clearTimeout(targetElement);
     this._timeouts.hoverdelay = setTimeout(function(): void {
       let animationEndStates = {};
+
+      // this is gross and should be refactored
+      // we store the old pop because it will be overwritten and we need it later
+      let container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
+      let oldPop = this.getPopFromGroupId(groupId);
+      this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
+      this._maybeSetParentChildRelationship(pop);
+      if (isAlreadyShowing && !!container) {
+        oldPop.targetEl.removeAttribute('pinned-pop');
+        oldPop.targetEl.removeAttribute('unpinned-pop');
+        if (!!oldPop && !!oldPop.childPops.length) {
+          oldPop.childPops.forEach(function(child: Pop): void {
+            this.hidePop(child.targetEl, false);
+          }, this);
+        }
+        if (!!oldPop && !!oldPop.parentPop) {
+          let idx = oldPop.parentPop.childPops.indexOf(oldPop);
+          if (idx !== -1) {
+            oldPop.parentPop.childPops.splice(idx, 1);
+          }
+        }
+      }
 
       if (isAlreadyShowing && !!container) {
         // if pop is already showing for group, reuse
         container.removeChild(container.getElementsByClassName('pop-content')[0]);
         this._maybeClearHandler(this._handlers[groupId]);
       } else {
-        container = this.createPopElement(targetElement);
+        container = this.createPopElement(targetElement, pop.opts.darkStyle);
+        if (!!pop.opts.tipClass) {
+          let classes = pop.opts.tipClass.split(' ');
+          classes.forEach(function (className: string): void {
+            container.classList.add(className);
+          });
+        }
         document.body.appendChild(container);
       }
 
@@ -169,7 +186,6 @@ export class PopEngine {
       }
 
       this._maybeClearTimeout(this._timeouts.popHover, null);
-      this._listenForScroll(true, groupId, container);
 
       // CONTENT SETUP
       this.setState(pop, PopStateType.CONTENT_SETUP, pop.opts, null, false);
@@ -187,10 +203,12 @@ export class PopEngine {
         this.setState(pop, PopStateType.PRE_SHOW, pop.opts, null, false);
 
         this._maybeClearTimeout(this._timeouts.hoverdelay, null);
-        this._handlers[groupId] = this.escapeStack.add(function(): boolean {
-          this.hidePop(pop.targetEl, false);
-          return true;
-        }.bind(this));
+        if (!pop.opts.disableClickOff) {
+          this._handlers[groupId] = this._escapeStack.add(function(): boolean {
+            this.synchronousHidePop(pop.targetEl, false);
+            return true;
+          }.bind(this));
+        }
 
         // SHOWING
         this.setState(pop, PopStateType.SHOWING, pop.opts, null, false);
@@ -210,38 +228,37 @@ export class PopEngine {
       this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
 
       this._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
-        // hide children
-        if (!!pop.childPops.length) {
-          pop.childPops.forEach(function(child: Pop): void {
-            this.hidePop(child.targetEl, hideFullChain);
-          }, this);
-        }
-
-        // hide pop
-        let popOver = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
-        targetElement.removeAttribute('pinned-pop');
-
-        this._maybeClearHandler(this._handlers[groupId]);
-        this._listenForScroll(false, groupId, popOver);
-
-        this.setState(pop, PopStateType.HIDDEN, pop.opts, null, false);
-
-        if (!!popOver) {
-          document.body.removeChild(popOver);
-        }
-        this.addPopToPopStore(groupId, null);
-
-        // hide parents
-        if (!!pop.parentPop) {
-          let idx = pop.parentPop.childPops.indexOf(pop);
-          if (idx !== -1) {
-            pop.parentPop.childPops.splice(idx, 1);
-          }
-          if (hideFullChain) {
-            this.hidePop(pop.parentPop.targetEl, hideFullChain);
-          }
-        }
+        this.synchronousHidePop(targetElement, hideFullChain);
       }.bind(this), pop.opts.timeToHoverOnPop);
+    }
+  }
+
+  public synchronousHidePop(targetElement: Element, hideFullChain: boolean): void {
+    let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
+    let pop = this.getPopFromGroupId(groupId);
+
+    if (pop) {
+      this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
+
+      let popChain = popChainManager.getFullPopChain(pop, hideFullChain);
+
+      popChain.forEach(function(p: Pop): void {
+        popChainManager.removeParentChildRelationship(p);
+        let popOver = closest(p.popOver.element, 'div[pop=""]');
+        if (popOver) {
+          let g = popOver.getAttribute('pop-id');
+          p.targetEl.removeAttribute('pinned-pop');
+
+          this._maybeClearHandler(this._handlers[g]);
+
+          this.setState(p, PopStateType.HIDDEN, p.opts, null, false);
+
+          if (!!popOver) {
+            document.body.removeChild(popOver);
+          }
+          this.addPopToPopStore(g, null);
+        }
+      }, this);
     }
   }
 
@@ -297,14 +314,6 @@ export class PopEngine {
       return this.getPopFromGroupId(parentEl.getAttribute('pop-id'));
     }
     return null;
-  }
-
-  private _listenForScroll(listen: boolean, groupId: string, container: Element): void {
-    if (!listen) {
-      document.removeEventListener('scroll', this._positionOpenPops.bind(this), true);
-    } else {
-      document.addEventListener('scroll', this._positionOpenPops.bind(this), true);
-    }
   }
 
   private _positionOpenPops(): void {

@@ -15,6 +15,7 @@ export class EventDelegate {
     this._setEventListener(new Trigger(TriggerType[TriggerType['FOCUS']]), this.onFocus);
     this._setEventListener(new Trigger(TriggerType[TriggerType['MANUAL']]), this.onManual);
     this._setEventListener(new Trigger(TriggerType[TriggerType['MOUSEOUT']]), this.onMouseOut);
+    popEngine.listenForScroll();
   }
 
   public onClick(e: MouseEvent): void {
@@ -25,7 +26,12 @@ export class EventDelegate {
 
     if (popEngine.isPopForTrigger(target, trigger)) {
       if (popEngine.isPopAlreadyOpenForTarget(target)) {
-        popChainManager.maybePinOrUnpinPopAndParentPops(target, isPinned);
+        if (target.hasAttribute('pinned-pop')) {
+          target.setAttribute('unpinned-pop', '');
+          popEngine.hidePop(target, false);
+        } else {
+          popChainManager.maybePinOrUnpinPopAndParentPops(target, isPinned);
+        }
       } else {
         this._showPop(target, trigger);
       }
@@ -43,10 +49,15 @@ export class EventDelegate {
       if (popEngine.isPopAlreadyOpenForTarget(target)) {
         popEngine.clearTimeout(target);
       } else {
-        this._showPop(target, trigger);
+        if (!target.hasAttribute('unpinned-pop')) {
+          this._showPop(target, trigger);
+        }
       }
     } else if (popEngine.isPop(target)) {
-      popEngine.clearTimeout(target);
+      target = <Element>closest(e.target, '[pop]', true);
+      let pop = popEngine.getPopFromGroupId(target.getAttribute('pop-id'));
+      popEngine.clearTimeout(pop.targetEl);
+      this._clearParentPops(pop);
     }
   }
 
@@ -92,16 +103,21 @@ export class EventDelegate {
         let pop = popEngine.getPopFromGroupId(target.getAttribute('pop-id'));
         if (popEngine.isPopForTrigger(pop.targetEl, (new Trigger('hover'))) && !pop.targetEl.hasAttribute('pinned-pop')) {
           // hide pop is the target is not pinned
+          pop.targetEl.removeAttribute('unpinned-pop');
           popEngine.hidePop(pop.targetEl, false);
           return;
         }
+      } else {
+        let pop = popEngine.getPopFromGroupId(target.getAttribute('pop-id'));
+        popEngine.clearTimeout(pop.targetEl);
+        return;
       }
     }
 
     target = <Element>closest(e.target, '[popgun]', true);
     if (!!target) {
       let relatedTarget: Element = <Element>closest(e.relatedTarget, '[popgun]', true);
-      if (!!relatedTarget && target !== relatedTarget) {
+      if (!!relatedTarget && target !== relatedTarget && !target.hasAttribute('pinned-pop')) {
         // hovering into a popgun element
         // ensure its not the same closest el
         popEngine.hidePop(target, false);
@@ -109,8 +125,21 @@ export class EventDelegate {
       } else if (!relatedTarget && popEngine.isPopForTrigger(target, (new Trigger('hover'))) && !target.hasAttribute('pinned-pop')) {
         // hovering into nothing
         // hide if pop isn't pinned
+        target.removeAttribute('unpinned-pop');
         popEngine.hidePop(target, false);
         return;
+      } else {
+        popEngine.clearTimeout(target);
+        return;
+      }
+    }
+  }
+
+  private _clearParentPops(pop: Pop): void {
+    if (pop) {
+      while (!!pop.parentPop) {
+        popEngine.clearTimeout(pop.parentPop.targetEl);
+        pop = pop.parentPop;
       }
     }
   }

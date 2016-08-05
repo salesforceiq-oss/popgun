@@ -32,6 +32,8 @@ export default class OptionsParser {
             break;
           case 'optimizePlacement':
           case 'transitionPlacement':
+          case 'disableClickOff':
+          case 'darkStyle':
             value = typeof value === 'string' ? value === 'true' : !!value;
             break;
         }

@@ -171,6 +171,7 @@ $boxShadowColor: rgba(#1a333d, 0.15);
 //NOTE: that if you CHANGE this box shadow to have more extension in the left direction, it will make sub menus look STUPID
 //if you must change it please talk to sterling or go override the box shadow in menuPopup.scss with the one that's here right now
 $boxShadowPop: 1px 2px 2px $boxShadowColor;
+$darkColorBackground: rgba(#133340, 0.88);
 
 @mixin riq-tip-skin() {
   background: #fff;
@@ -193,6 +194,16 @@ $boxShadowPop: 1px 2px 2px $boxShadowColor;
 
   -webkit-transition: top .25s ease-out, left .25s ease-out;
   transition: top .25s ease-out, left .25s ease-out;
+
+  &.dark-style {
+    border: 1px solid transparent;
+    color: #fff;
+    background-color: $darkColorBackground;
+
+    .nose-triangle {
+      @include inlineNoseTriangle(7px, $darkColorBackground, 0px, transparent, 50%, 50%, 50%, 50%, absolute, false);
+    }
+  }
 
   &.popover-no-transition {
     &, & .nose-triangle {

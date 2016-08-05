@@ -72,6 +72,18 @@ describe('Options - ', () => {
       expect((new Options()).containerCushion).toBe(10);
     });
 
+    it('should default disableClickOff to false', () => {
+      expect((new Options()).disableClickOff).toBe(false);
+    });
+
+    it('should default tipClass to an empty string', () => {
+      expect((new Options()).tipClass).toBe('');
+    });
+
+    it('should default darkStyle to false', () => {
+      expect((new Options()).darkStyle).toBe(false);
+    });
+
   });
 
   describe('extend - ', () => {
