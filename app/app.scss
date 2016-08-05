@@ -1,1 +1,21 @@
-@import '../src/popgun'
+@import '../src/popgun';
+
+html, body, #popgun-examples-container {
+	height: 100%;
+	width: 100%;
+}
+
+#popgunPerfSection {
+	display: flex;
+	flex-wrap: wrap;
+
+	> .popgun-example {
+		flex: 1;
+		margin: 0 1em 1em 0;
+	}
+}
+
+.pop-example-block {
+	width: 200px;
+	height: 200px;
+}

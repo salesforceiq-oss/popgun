@@ -254,7 +254,8 @@ case $command in
       rsync -am --include='*/' --include='*.html' --exclude='*' . ../.app-src/src
     popd > /dev/null
 
-    cp app/index.html release/ 
+    cp app/index.html release/
+    cp app/perf.html release/
     ;;
 
   "watch:app:ts")   $CMD_TSC -w -p app/ ;;
