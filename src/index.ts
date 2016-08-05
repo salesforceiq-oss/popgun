@@ -17,6 +17,7 @@ import PopOver from './PopOver';
 import schemaStore from './SchemaStore';
 import Trigger from './Trigger';
 import TriggerEventType from './TriggerEventType';
+let closest = require('closest');
 
 export class Popgun {
 
@@ -59,6 +60,13 @@ export class Popgun {
   // returns whether a pop is already open for any group
   public isPopAlreadyOpenForGroup(groupId: string): boolean {
     return popEngine.isPopAlreadyOpenForGroup(groupId);
+  }
+
+  // reposition a pop based on the groupId
+  public reposition(groupId: string): void {
+    let pop = popEngine.getPopFromGroupId(groupId);
+    let container = closest(pop.popOver.element, 'div[pop=""]');
+    popEngine.setPosition(pop, container);
   }
 
   // Show the popover for a particular target element

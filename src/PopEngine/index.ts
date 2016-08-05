@@ -113,6 +113,18 @@ export class PopEngine {
     document.addEventListener('scroll', this._scrollListener, true);
   }
 
+  public setPosition(pop: Pop, container: Element): void {
+    let nose = <Element>container.getElementsByClassName('nose-triangle')[0];
+    let positionOpts = {
+      cushion: pop.opts.cushion,
+      containerCushion: pop.opts.containerCushion,
+      alignmentOffset: pop.opts.alignmentOffset,
+      arrowElement: nose
+    };
+    positioner(container, pop.targetEl, positionOpts)
+              .at(pop.opts.placement, pop.opts.optimizePlacement, pop.opts.alignment);
+  }
+
   public createPopElement(targetElement: Element, isDark: boolean): Element {
     let container: Element = document.createElement('div');
     let nose: Element = document.createElement('div');
@@ -197,7 +209,7 @@ export class PopEngine {
       this._maybeClearTimeout(this._timeouts.position, null);
       this._timeouts.position = setTimeout(function(): void {
 
-        this._setPosition(pop, container);
+        this.setPosition(pop, container);
 
         // PRE SHOW
         this.setState(pop, PopStateType.PRE_SHOW, pop.opts, null, false);
@@ -322,21 +334,9 @@ export class PopEngine {
       let groupId = popOver.getAttribute('pop-id');
       this._maybeClearTimeout(this._timeouts.scrollTimer, groupId);
       this._timeouts.scrollTimer[groupId] = setTimeout(function(): void {
-        this._setPosition(this.getPopFromGroupId(groupId), popOver);
+        this.setPosition(this.getPopFromGroupId(groupId), popOver);
       }.bind(this), 100);
     }, this);
-  }
-
-  private _setPosition(pop: Pop, container: Element): void {
-    let nose = <Element>container.getElementsByClassName('nose-triangle')[0];
-    let positionOpts = {
-      cushion: pop.opts.cushion,
-      containerCushion: pop.opts.containerCushion,
-      alignmentOffset: pop.opts.alignmentOffset,
-      arrowElement: nose
-    };
-    positioner(container, pop.targetEl, positionOpts)
-              .at(pop.opts.placement, pop.opts.optimizePlacement, pop.opts.alignment);
   }
 
   private _maybeSetParentChildRelationship(pop: Pop): void {
