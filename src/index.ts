@@ -21,7 +21,7 @@ let closest = require('closest');
 
 export class Popgun {
 
-  // registers mutation observer and sets up eventListeners
+  // registers mutation observer and sets up event listeners
   public init(): void {
     if (!document.body.hasAttribute('popgun-exists')) {
       mutationHandler.registerObserver();
@@ -48,8 +48,13 @@ export class Popgun {
   }
 
   // hidden, content_setup, pre_position, pre_show, showing, pre_hide
-  public getPopState(pop: Pop): string {
-    return pop.state;
+  public getPopState(groupId: string): string {
+    let pop = popEngine.getPopFromGroupId(groupId);
+    if (!!pop) {
+      return pop.state;
+    } else {
+      throw new Error('No open pop for this groupId.');
+    }
   }
 
   // returns whether a pop for a specific target is alrady open
@@ -69,7 +74,7 @@ export class Popgun {
       let container = closest(pop.popOver.element, 'div[pop=""]');
       popEngine.setPosition(pop, container);
     } else {
-      throw new Error('No pop open for this groupId.');
+      throw new Error('No open pop for this groupId.');
     }
   }
 
