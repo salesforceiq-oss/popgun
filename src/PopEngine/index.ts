@@ -7,6 +7,7 @@ import PopStateType from '../PopStateType';
 import Pop from '../Pop';
 import popChainManager from '../PopChainManager';
 import UserAgentUtil from '../UserAgentUtil';
+import timeoutManager from '../TimeoutManager';
 let camelize = require('camelize');
 let closest = require('closest');
 let positioner = require('positioner');
@@ -14,22 +15,6 @@ let zIndexManager = require('z-index-manager').default;
 const createEscapeStack = require('escape-stack').default;
 
 export class PopEngine {
-
-  _timeouts: {
-    hoverdelay: any
-    popHover: any
-    scrollTimer: { [key: string]: number }
-    timeToHoverOnPop: { [key: string]: number }
-  } = {
-    hoverdelay: null,
-    popHover: null,
-    scrollTimer: {},
-    timeToHoverOnPop: {}
-  };
-
-  _handlers: {
-    [groupId: string]: any
-  } = {};
 
   _transitionendCallbacks: {
     [groupId: string]: any
@@ -104,11 +89,6 @@ export class PopEngine {
     }
   }
 
-  public clearTimeout(targetElement: Element): void {
-    let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
-    this._clearTimeoutByGroupId(groupId);
-  }
-
   public listenForScroll(): void {
     document.addEventListener('scroll', this._scrollListener, true);
   }
@@ -147,8 +127,9 @@ export class PopEngine {
     let isAlreadyShowing = this.isPopAlreadyOpenForGroup(groupId);
 
     // clear any timeouts and do a timeout and show pop
-    this.clearTimeout(targetElement);
-    this._timeouts.hoverdelay = setTimeout(function(): void {
+    timeoutManager._maybeClearTimeout(timeoutManager._timeouts.timeToHoverOnPop, groupId);
+    timeoutManager._maybeClearTimeout(timeoutManager._timeouts.hoverdelay, null);
+    timeoutManager._timeouts.hoverdelay = setTimeout(function(): void {
       let animationEndStates = {};
 
       // this is gross and should be refactored
@@ -176,7 +157,7 @@ export class PopEngine {
       if (isAlreadyShowing && !!container) {
         // if pop is already showing for group, reuse
         container.removeChild(container.getElementsByClassName('pop-content')[0]);
-        this._maybeClearHandler(this._handlers[groupId]);
+        timeoutManager._maybeClearHandler(timeoutManager._handlers[groupId]);
       } else {
         container = this.createPopElement(targetElement, pop.opts.darkStyle);
         if (!!pop.opts.tipClass) {
@@ -197,7 +178,7 @@ export class PopEngine {
         popChainManager.maybePinOrUnpinPopAndParentPops(targetElement, true);
       }
 
-      this._maybeClearTimeout(this._timeouts.popHover, null);
+      timeoutManager._maybeClearTimeout(timeoutManager._timeouts.popHover, null);
 
       // CONTENT SETUP
       this.setState(pop, PopStateType.CONTENT_SETUP, pop.opts, null, false);
@@ -206,17 +187,17 @@ export class PopEngine {
       // PRE POSITION
       this.setState(pop, PopStateType.PRE_POSITION, pop.opts, null, false);
 
-      this._maybeClearTimeout(this._timeouts.position, null);
-      this._timeouts.position = setTimeout(function(): void {
+      timeoutManager._maybeClearTimeout(timeoutManager._timeouts.position, null);
+      timeoutManager._timeouts.position = setTimeout(function(): void {
 
         this.setPosition(pop, container);
 
         // PRE SHOW
         this.setState(pop, PopStateType.PRE_SHOW, pop.opts, null, false);
 
-        this._maybeClearTimeout(this._timeouts.hoverdelay, null);
+        timeoutManager._maybeClearTimeout(timeoutManager._timeouts.hoverdelay, null);
         if (!pop.opts.disableClickOff) {
-          this._handlers[groupId] = this._escapeStack.add(function(): boolean {
+          timeoutManager._handlers[groupId] = this._escapeStack.add(function(): boolean {
             this.synchronousHidePop(pop.targetEl, false);
             return true;
           }.bind(this));
@@ -239,7 +220,7 @@ export class PopEngine {
     if (pop) {
       this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
 
-      this._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
+      timeoutManager._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
         this.synchronousHidePop(targetElement, hideFullChain);
       }.bind(this), pop.opts.timeToHoverOnPop);
     }
@@ -261,7 +242,7 @@ export class PopEngine {
           let g = popOver.getAttribute('pop-id');
           p.targetEl.removeAttribute('pinned-pop');
 
-          this._maybeClearHandler(this._handlers[g]);
+          timeoutManager._maybeClearHandler(timeoutManager._handlers[g]);
 
           this.setState(p, PopStateType.HIDDEN, p.opts, null, false);
 
@@ -281,45 +262,6 @@ export class PopEngine {
     pop.targetEl.dispatchEvent(event);
   }
 
-  private _maybeClear(timeoutOrHandler: any, isTimeout: boolean, groupId: string): void {
-    if (timeoutOrHandler) {
-      let obj = isTimeout ? this._timeouts : this._handlers;
-      let key: string = null;
-      for (let k in obj) {
-        if (obj.hasOwnProperty(k) && ((<any>obj)[k] === timeoutOrHandler)) {
-          key = k;
-        }
-      }
-      if (isTimeout) {
-        if (key === 'timeToHoverOnPop' || key === 'scrollTimer') {
-          clearTimeout((<any>obj)[key][groupId]);
-        } else {
-          clearTimeout((<any>obj)[key]);
-        }
-      } else {
-        timeoutOrHandler();
-      }
-      if (key === 'timeToHoverOnPop' || key === 'scrollTimer') {
-        (<any>obj)[key][groupId] = undefined;
-      } else {
-        (<any>obj)[key] = undefined;
-      }
-    }
-  }
-
-  private _clearTimeoutByGroupId(groupId: string): void {
-    this._maybeClearTimeout(this._timeouts.timeToHoverOnPop, groupId);
-    this._maybeClearTimeout(this._timeouts.hoverdelay, null);
-  }
-
-  private _maybeClearTimeout(timeout: any, groupId: string): void {
-    return this._maybeClear(timeout, true, groupId);
-  }
-
-  private _maybeClearHandler(watch: any): void {
-    return this._maybeClear(watch, false, null);
-  }
-
   private _getParentPop(pop: Pop): Pop {
     let parentEl = closest(pop.targetEl, 'div[pop=""]');
     if (parentEl) {
@@ -332,8 +274,8 @@ export class PopEngine {
     let popElementsList = Array.prototype.slice.call(document.body.getElementsByClassName('popover'));
     popElementsList.forEach(function(popOver: Element): void {
       let groupId = popOver.getAttribute('pop-id');
-      this._maybeClearTimeout(this._timeouts.scrollTimer, groupId);
-      this._timeouts.scrollTimer[groupId] = setTimeout(function(): void {
+      timeoutManager._maybeClearTimeout(timeoutManager._timeouts.scrollTimer, groupId);
+      timeoutManager._timeouts.scrollTimer[groupId] = setTimeout(function(): void {
         this.setPosition(this.getPopFromGroupId(groupId), popOver);
       }.bind(this), 100);
     }, this);
