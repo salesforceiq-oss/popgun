@@ -18,11 +18,19 @@ export class TimeoutManager {
     [groupId: string]: any
   } = {};
 
-  public _maybeClearTimeout(timeout: any, groupId: string): void {
+  public getTimeouts(): any {
+    return this._timeouts;
+  }
+
+  public getHandlers(): any {
+    return this._handlers;
+  }
+
+  public maybeClearTimeout(timeout: any, groupId: string): void {
     return this._maybeClear(timeout, true, groupId);
   }
 
-  public _maybeClearHandler(watch: any): void {
+  public maybeClearHandler(watch: any): void {
     return this._maybeClear(watch, false, null);
   }
 

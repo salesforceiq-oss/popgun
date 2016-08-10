@@ -49,7 +49,7 @@ export class EventDelegate {
     if (popEngine.isPopForTrigger(target, trigger)) {
       if (popEngine.isPopAlreadyOpenForTarget(target)) {
         let groupId = target.getAttribute('popgun-group');
-        timeoutManager._maybeClearTimeout(timeoutManager._timeouts.timeToHoverOnPop, groupId);
+        timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().timeToHoverOnPop, groupId);
       } else {
         if (!target.hasAttribute('unpinned-pop')) {
           this._showPop(target, trigger);
@@ -59,7 +59,7 @@ export class EventDelegate {
       target = <Element>closest(e.target, '[pop]', true);
       let groupId = target.getAttribute('pop-id');
       let pop = popEngine.getPopFromGroupId(groupId);
-      timeoutManager._maybeClearTimeout(timeoutManager._timeouts.timeToHoverOnPop, groupId);
+      timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().timeToHoverOnPop, groupId);
       this._clearParentPops(pop);
     }
   }
@@ -110,7 +110,7 @@ export class EventDelegate {
         }
       } else {
         let groupId = target.getAttribute('pop-id');
-        timeoutManager._maybeClearTimeout(timeoutManager._timeouts.timeToHoverOnPop, groupId);
+        timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().timeToHoverOnPop, groupId);
         return;
       }
     }
@@ -131,7 +131,7 @@ export class EventDelegate {
         return;
       } else {
         let groupId = target.getAttribute('pop-id');
-        timeoutManager._maybeClearTimeout(timeoutManager._timeouts.timeToHoverOnPop, groupId);
+        timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().timeToHoverOnPop, groupId);
         return;
       }
     }
@@ -141,7 +141,7 @@ export class EventDelegate {
     if (pop) {
       while (!!pop.parentPop) {
         let groupId = pop.parentPop.targetEl.getAttribute('pop-id');
-        timeoutManager._maybeClearTimeout(timeoutManager._timeouts.timeToHoverOnPop, groupId);
+        timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().timeToHoverOnPop, groupId);
         pop = pop.parentPop;
       }
     }
