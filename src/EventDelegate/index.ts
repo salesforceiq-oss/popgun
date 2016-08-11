@@ -5,6 +5,7 @@ import EnumUtil from '../EnumUtil';
 import Pop from '../Pop';
 import popEngine from '../PopEngine';
 import popChainManager from '../PopChainManager';
+import timeoutManager from '../TimeoutManager';
 let closest = require('closest');
 
 export class EventDelegate {
@@ -47,7 +48,8 @@ export class EventDelegate {
 
     if (popEngine.isPopForTrigger(target, trigger)) {
       if (popEngine.isPopAlreadyOpenForTarget(target)) {
-        popEngine.clearTimeout(target);
+        let groupId = target.getAttribute('popgun-group');
+        timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().timeToHoverOnPop, groupId);
       } else {
         if (!target.hasAttribute('unpinned-pop')) {
           this._showPop(target, trigger);
@@ -55,8 +57,9 @@ export class EventDelegate {
       }
     } else if (popEngine.isPop(target)) {
       target = <Element>closest(e.target, '[pop]', true);
-      let pop = popEngine.getPopFromGroupId(target.getAttribute('pop-id'));
-      popEngine.clearTimeout(pop.targetEl);
+      let groupId = target.getAttribute('pop-id');
+      let pop = popEngine.getPopFromGroupId(groupId);
+      timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().timeToHoverOnPop, groupId);
       this._clearParentPops(pop);
     }
   }
@@ -68,8 +71,6 @@ export class EventDelegate {
 
     if (popEngine.isPopForTrigger(target, trigger)) {
       this._showPop(target, trigger);
-    } else if (popEngine.isPop(target)) {
-      popEngine.clearTimeout(target);
     }
   }
 
@@ -87,7 +88,7 @@ export class EventDelegate {
     let target: Element = <Element>closest(e.target, '[pop]', true);
     if (!!target) {
       let relatedTarget: Element = <Element>closest(e.relatedTarget, '[pop]', true);
-      if (!!relatedTarget && target !== relatedTarget) {
+      if (!!relatedTarget && relatedTarget !== target) {
         // hovering into another pop
         // ensure its not the same closest pop
         // see if they are in the same chain..
@@ -108,8 +109,8 @@ export class EventDelegate {
           return;
         }
       } else {
-        let pop = popEngine.getPopFromGroupId(target.getAttribute('pop-id'));
-        popEngine.clearTimeout(pop.targetEl);
+        let groupId = target.getAttribute('pop-id');
+        timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().timeToHoverOnPop, groupId);
         return;
       }
     }
@@ -129,7 +130,8 @@ export class EventDelegate {
         popEngine.hidePop(target, false);
         return;
       } else {
-        popEngine.clearTimeout(target);
+        let groupId = target.getAttribute('pop-id');
+        timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().timeToHoverOnPop, groupId);
         return;
       }
     }
@@ -138,7 +140,8 @@ export class EventDelegate {
   private _clearParentPops(pop: Pop): void {
     if (pop) {
       while (!!pop.parentPop) {
-        popEngine.clearTimeout(pop.parentPop.targetEl);
+        let groupId = pop.parentPop.targetEl.getAttribute('pop-id');
+        timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().timeToHoverOnPop, groupId);
         pop = pop.parentPop;
       }
     }
