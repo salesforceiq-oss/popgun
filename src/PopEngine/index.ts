@@ -156,7 +156,7 @@ export class PopEngine {
 
       if (isAlreadyShowing && !!container) {
         // if pop is already showing for group, reuse
-        this._fireEvent('Content_Swap', pop);
+        this._fireEvent('Content_Swap', oldPop);
         container.removeChild(container.getElementsByClassName('pop-content')[0]);
         timeoutManager.maybeClearHandler(timeoutManager.getHandlers()[groupId]);
       } else {
