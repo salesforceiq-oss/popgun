@@ -19,6 +19,7 @@ interface IOptions {
     disableClickOff?: boolean;
     tipClass?: string;
     darkStyle?: boolean;
+    disable?: boolean;
 }
 
 export default IOptions;

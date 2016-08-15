@@ -84,6 +84,10 @@ describe('Options - ', () => {
       expect((new Options()).darkStyle).toBe(false);
     });
 
+    it('should default disable to false', () => {
+      expect((new Options()).disable).toBe(false);
+    });
+
   });
 
   describe('extend - ', () => {
