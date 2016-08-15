@@ -19,7 +19,8 @@ let defaultOptions: IOptions = {
     containerCushion: 10,
     disableClickOff: false,
     tipClass: '',
-    darkStyle: false
+    darkStyle: false,
+    disable: false
 };
 
 export default defaultOptions;
