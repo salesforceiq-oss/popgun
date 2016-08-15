@@ -10,6 +10,10 @@ describe('PopStateType - ', () => {
       expect(PopStateType.HIDDEN).toBe('hidden');
     });
 
+    it('should set CONTENT_SWAP event type to `content_swap`', () => {
+      expect(PopStateType.CONTENT_SWAP).toBe('content_swap');
+    });
+
     it('should set CONTENT_SETUP event type to `content_setup`', () => {
       expect(PopStateType.CONTENT_SETUP).toBe('content_setup');
     });
@@ -24,6 +28,10 @@ describe('PopStateType - ', () => {
 
     it('should set SHOWING event type to `showing`', () => {
       expect(PopStateType.SHOWING).toBe('showing');
+    });
+
+    it('should set CONTENT_REMOVE event type to `content_remove`', () => {
+      expect(PopStateType.CONTENT_REMOVE).toBe('content_remove');
     });
 
     it('should set PRE_HIDE event type to `pre_hide`', () => {

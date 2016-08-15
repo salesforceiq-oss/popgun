@@ -157,6 +157,7 @@ export class PopEngine {
       if (isAlreadyShowing && !!container) {
         // if pop is already showing for group, reuse
         container.removeChild(container.getElementsByClassName('pop-content')[0]);
+        this._fireEvent(PopStateType.CONTENT_SWAP, oldPop);
         timeoutManager.maybeClearHandler(timeoutManager.getHandlers()[groupId]);
       } else {
         container = this.createPopElement(targetElement, pop.opts.darkStyle);
@@ -248,6 +249,7 @@ export class PopEngine {
 
           if (!!popOver) {
             document.body.removeChild(popOver);
+            this._fireEvent(PopStateType.CONTENT_REMOVE, p);
           }
           this.addPopToPopStore(g, null);
         }
