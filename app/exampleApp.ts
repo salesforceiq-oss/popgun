@@ -37,8 +37,9 @@ declare var require: NodeRequire;
     el.setAttribute('class', 'target');
     el.setAttribute('popgun-group', 'test1');
     el.setAttribute('popgun-trigger', 'hover');
+    el.setAttribute('popgun-dark-style', 'true');
     el.setAttribute('popgun-html', 'Pirates are way cooler than ninjas.');
-    el.innerText = 'Hover Me!!';
+    el.innerText = 'Hover Me I am dark styled!!';
     exampleContainerEl.appendChild(el);
 
     let inp = document.createElement('input');
