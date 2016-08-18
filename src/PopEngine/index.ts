@@ -105,11 +105,14 @@ export class PopEngine {
               .at(pop.opts.placement, pop.opts.optimizePlacement, pop.opts.alignment);
   }
 
-  public createPopElement(targetElement: Element): Element {
+  public createPopElement(targetElement: Element, isDark: boolean): Element {
     let container: Element = document.createElement('div');
     let nose: Element = document.createElement('div');
     container.classList.add('popover');
     container.classList.add('hidden');
+    if (isDark) {
+      container.classList.add('dark-style');
+    }
     container.setAttribute('pop-id', targetElement.getAttribute('popgun-group'));
     container.setAttribute('pop', '');
     nose.setAttribute('class', 'nose-triangle');
@@ -181,11 +184,6 @@ export class PopEngine {
 
         // CONTENT SETUP
         this.setState(pop, PopStateType.CONTENT_SETUP, pop.opts, null, false);
-        if (pop.opts.darkStyle) {
-          container.classList.add('dark-style');
-        } else {
-          container.classList.remove('dark-style');
-        }
         container.appendChild(pop.popOver.element);
 
         // PRE POSITION
