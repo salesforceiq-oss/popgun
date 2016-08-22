@@ -127,20 +127,12 @@ export class EventDelegate {
         // same popgun target
         timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().timeToHoverOnPop, groupId);
         return;
-      } else {
-        relatedTarget = <Element>closest(e.relatedTarget, '[popgun]', true);
-        if (!!relatedTarget) {
-          // hovering into a popgun element
-          // ensure its not the same closest el
-          popEngine.hidePop(target, false);
-          return;
-        } else {
-          // hovering into nothing
-          // hide if pop isn't pinned
-          target.removeAttribute('unpinned-pop');
-          popEngine.hidePop(target, false);
-          return;
-        }
+      } else if (!target.hasAttribute('pinned-pop')) {
+        // hovering into nothing
+        // hide if pop isn't pinned
+        target.removeAttribute('unpinned-pop');
+        popEngine.hidePop(target, false);
+        return;
       }
     }
   }
