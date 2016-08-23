@@ -37,12 +37,19 @@ export class MutationHandler {
       popEngine.synchronousHidePop(<Element>mutation.target, true);
       this._addGroupIdToCache(<Element>mutation.target);
     } else if (mutation.type === 'childList' && mutation.removedNodes.length) {
-      Array.prototype.slice.call(mutation.removedNodes).forEach(function(removedNode: Node): void {
-        if (!!(removedNode instanceof Element) && popEngine.isPopTarget(<Element>removedNode)) {
-          popEngine.synchronousHidePop(removedNode, true);
-        }
-      });
+      this._maybeRemoveOpenPopovers(mutation.removedNodes);
     }
+  }
+
+  private _maybeRemoveOpenPopovers(removedNodes: any): void {
+    Array.prototype.slice.call(removedNodes).forEach(function(removedNode: Node): void {
+      if (!!(removedNode instanceof Element)) {
+        let targetList = removedNode.querySelectorAll('[popgun]');
+        Array.prototype.slice.call(targetList).forEach(function(target: Element): void {
+          popEngine.synchronousHidePop(target, true);
+        });
+      }
+    }.bind(this));
   }
 
   private _addGroupIdToCache(el: Element): void {
