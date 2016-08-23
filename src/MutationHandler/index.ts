@@ -43,13 +43,11 @@ export class MutationHandler {
 
   private _maybeRemoveOpenPopovers(removedNodes: any): void {
     Array.prototype.slice.call(removedNodes).forEach(function(removedNode: Node): void {
-      // call hide pop on popgun element
-      if (!!(removedNode instanceof Element) && popEngine.isPopTarget(<Element>removedNode)) {
-        popEngine.synchronousHidePop(removedNode, true);
-      }
-      // recursive call
-      if (!!removedNode.childNodes.length) {
-        this._maybeRemoveOpenPopovers(removedNode.childNodes);
+      if (!!(removedNode instanceof Element)) {
+        let targetList = removedNode.querySelectorAll('[popgun]');
+        targetList.forEach(function(target: Element): void {
+          popEngine.synchronousHidePop(target, true);
+        });
       }
     }.bind(this));
   }
