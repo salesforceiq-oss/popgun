@@ -221,6 +221,7 @@ export class PopEngine {
   public hidePop(targetElement: Element, hideFullChain: boolean): void {
     let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
     let pop = this.getPopFromGroupId(groupId);
+    timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().hoverdelay, null);
 
     if (pop) {
       this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
