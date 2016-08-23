@@ -45,7 +45,7 @@ export class MutationHandler {
     Array.prototype.slice.call(removedNodes).forEach(function(removedNode: Node): void {
       if (!!(removedNode instanceof Element)) {
         let targetList = removedNode.querySelectorAll('[popgun]');
-        targetList.forEach(function(target: Element): void {
+        Array.prototype.slice.call(targetList).forEach(function(target: Element): void {
           popEngine.synchronousHidePop(target, true);
         });
       }
