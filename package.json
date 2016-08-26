@@ -72,6 +72,6 @@
     "positioner": "~0.2.0"
   },
   "peerDependencies": {
-    "z-index-manager": "0.1.0"
+    "z-index-manager": "0.x"
   }
 }
