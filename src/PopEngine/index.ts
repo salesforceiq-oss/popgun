@@ -11,7 +11,7 @@ import timeoutManager from '../TimeoutManager';
 let camelize = require('camelize');
 let closest = require('closest');
 let positioner = require('positioner');
-let zIndexManager = require('z-index-manager').default;
+let createZIndexManager = require('z-index-manager').default;
 const createEscapeStack = require('escape-stack').default;
 
 export class PopEngine {
@@ -22,8 +22,10 @@ export class PopEngine {
 
   _escapeStack: any = null;
   _scrollListener: any = null;
+  _zIndexManager: any = null;
 
   constructor() {
+    this._zIndexManager = createZIndexManager();
     this._escapeStack = createEscapeStack();
     this._scrollListener = this._positionOpenPops.bind(this);
   }
@@ -113,7 +115,7 @@ export class PopEngine {
     container.setAttribute('pop-id', targetElement.getAttribute('popgun-group'));
     container.setAttribute('pop', '');
     nose.setAttribute('class', 'nose-triangle');
-    container.setAttribute('style', 'z-index: ' + zIndexManager.getHighest().toString() + ';');
+    container.setAttribute('style', 'z-index: ' + this._zIndexManager.getHighest().toString() + ';');
     container.appendChild(nose);
     return container;
   }
