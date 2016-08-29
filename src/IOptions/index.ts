@@ -20,6 +20,7 @@ interface IOptions {
     tipClass?: string;
     darkStyle?: boolean;
     disable?: boolean;
+    reusePopover?: boolean;
 }
 
 export default IOptions;

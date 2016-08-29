@@ -35,6 +35,7 @@ export default class OptionsParser {
           case 'disableClickOff':
           case 'darkStyle':
           case 'disable':
+          case 'reusePopover':
             value = typeof value === 'string' ? value === 'true' : !!value;
             break;
         }
