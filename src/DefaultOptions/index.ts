@@ -20,7 +20,8 @@ let defaultOptions: IOptions = {
     disableClickOff: false,
     tipClass: '',
     darkStyle: false,
-    disable: false
+    disable: false,
+    reusePopover: true
 };
 
 export default defaultOptions;

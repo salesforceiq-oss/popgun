@@ -131,44 +131,9 @@ export class PopEngine {
       timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().hoverdelay, null);
       timeoutManager.getTimeouts().hoverdelay = setTimeout(function(): void {
         let animationEndStates = {};
+        let container = this._maybeCreateOrReusePopover(isAlreadyShowing, targetElement, pop, groupId);
 
-        // this is gross and should be refactored
-        // we store the old pop because it will be overwritten and we need it later
-        let container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
-        let oldPop = this.getPopFromGroupId(groupId);
         this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
-        this._maybeSetParentChildRelationship(pop);
-        if (isAlreadyShowing && !!container) {
-          oldPop.targetEl.removeAttribute('pinned-pop');
-          oldPop.targetEl.removeAttribute('unpinned-pop');
-          if (!!oldPop && !!oldPop.childPops.length) {
-            oldPop.childPops.forEach(function(child: Pop): void {
-              this.hidePop(child.targetEl, false);
-            }, this);
-          }
-          if (!!oldPop && !!oldPop.parentPop) {
-            let idx = oldPop.parentPop.childPops.indexOf(oldPop);
-            if (idx !== -1) {
-              oldPop.parentPop.childPops.splice(idx, 1);
-            }
-          }
-        }
-
-        if (isAlreadyShowing && !!container) {
-          // if pop is already showing for group, reuse
-          container.removeChild(container.getElementsByClassName('pop-content')[0]);
-          this._fireEvent(PopStateType.CONTENT_SWAP, oldPop);
-          timeoutManager.maybeClearHandler(timeoutManager.getHandlers()[groupId]);
-        } else {
-          container = this.createPopElement(targetElement);
-          if (!!pop.opts.tipClass) {
-            let classes = pop.opts.tipClass.split(' ');
-            classes.forEach(function (className: string): void {
-              container.classList.add(className);
-            });
-          }
-          document.body.appendChild(container);
-        }
 
         if (UserAgentUtil.isSafari() && !this._transitionendCallbacks[groupId]) {
           this._transitionendCallbacks[groupId] = this._removeHiddenClass.bind(this);
@@ -262,6 +227,50 @@ export class PopEngine {
         }
       }, this);
     }
+  }
+
+  private _maybeCreateOrReusePopover(isAlreadyShowing: boolean, targetElement: Element, pop: Pop, groupId: string): Element {
+    let container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
+    let oldPop = this.getPopFromGroupId(groupId);
+    if (oldPop && oldPop.targetEl && !pop.opts.reusePopover) {
+      this.synchronousHidePop(oldPop.targetEl, false);
+    }
+
+    // remove references to old popover
+    this._maybeSetParentChildRelationship(pop);
+    if (isAlreadyShowing && !!container) {
+      oldPop.targetEl.removeAttribute('pinned-pop');
+      oldPop.targetEl.removeAttribute('unpinned-pop');
+      if (!!oldPop && !!oldPop.childPops.length) {
+        oldPop.childPops.forEach(function(child: Pop): void {
+          this.synchronousHidePop(child.targetEl, false);
+        }, this);
+      }
+      if (!!oldPop && !!oldPop.parentPop) {
+        let idx = oldPop.parentPop.childPops.indexOf(oldPop);
+        if (idx !== -1) {
+          oldPop.parentPop.childPops.splice(idx, 1);
+        }
+      }
+    }
+
+    if (isAlreadyShowing && !!container && !!pop.opts.reusePopover) {
+      // if pop is already showing for group, reuse
+      container.removeChild(container.getElementsByClassName('pop-content')[0]);
+      this._fireEvent(PopStateType.CONTENT_SWAP, oldPop);
+      timeoutManager.maybeClearHandler(timeoutManager.getHandlers()[groupId]);
+    } else {
+      container = this.createPopElement(targetElement);
+      if (!!pop.opts.tipClass) {
+        let classes = pop.opts.tipClass.split(' ');
+        classes.forEach(function (className: string): void {
+          container.classList.add(className);
+        });
+      }
+      document.body.appendChild(container);
+    }
+
+    return container;
   }
 
   private _fireEvent(state: string, pop: Pop): void {

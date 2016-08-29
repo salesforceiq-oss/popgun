@@ -88,6 +88,10 @@ describe('Options - ', () => {
       expect((new Options()).disable).toBe(false);
     });
 
+    it('should default reusePopover to true', () => {
+      expect((new Options()).reusePopover).toBe(true);
+    });
+
   });
 
   describe('extend - ', () => {

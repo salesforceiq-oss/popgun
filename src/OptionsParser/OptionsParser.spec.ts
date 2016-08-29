@@ -121,13 +121,15 @@ describe('OptionsParser -', () => {
           transitionPlacement: 'false',
           disableClickOff: 'true',
           darkStyle: 'true',
-          disable: 'true'
+          disable: 'true',
+          reusePopover: 'false'
         })).toEqual({
           optimizePlacement: true,
           transitionPlacement: false,
           disableClickOff: true,
           darkStyle: true,
-          disable: true
+          disable: true,
+          reusePopover: false
         });
 
         expect(OptionsParser.fromLiteral({
@@ -135,13 +137,15 @@ describe('OptionsParser -', () => {
           transitionPlacement: false,
           disableClickOff: true,
           darkStyle: true,
-          disable: true
+          disable: true,
+          reusePopover: false
         })).toEqual({
           optimizePlacement: true,
           transitionPlacement: false,
           disableClickOff: true,
           darkStyle: true,
-          disable: true
+          disable: true,
+          reusePopover: false
         });
 
         expect(OptionsParser.fromLiteral({
@@ -149,13 +153,15 @@ describe('OptionsParser -', () => {
           transitionPlacement: 0,
           disableClickOff: 0,
           darkStyle: 0,
-          disable: 0
+          disable: 0,
+          reusePopover: 1
         })).toEqual({
           optimizePlacement: true,
           transitionPlacement: false,
           disableClickOff: false,
           darkStyle: false,
-          disable: false
+          disable: false,
+          reusePopover: true
         });
 
         expect(OptionsParser.fromLiteral({
@@ -163,13 +169,15 @@ describe('OptionsParser -', () => {
           transitionPlacement: '0',
           disableClickOff: '0',
           darkStyle: '0',
-          disable: '0'
+          disable: '0',
+          reusePopover: '0'
         })).toEqual({
           optimizePlacement: false,
           transitionPlacement: false,
           disableClickOff: false,
           darkStyle: false,
-          disable: false
+          disable: false,
+          reusePopover: false
         });
 
       });
@@ -270,6 +278,11 @@ describe('OptionsParser -', () => {
     it('should set disable from element attribute', () => {
       let opts = fromSingleAttribute('popgun-disable', 'true');
       expect(opts.disable).toEqual(true);
+    });
+
+    it('should set reusePopover from element attribute', () => {
+      let opts = fromSingleAttribute('popgun-reuse-popover', 'false');
+      expect(opts.reusePopover).toEqual(false);
     });
 
     it('should exclude popgun-schema', () => {
