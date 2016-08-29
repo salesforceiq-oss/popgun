@@ -229,6 +229,22 @@ export class PopEngine {
     }
   }
 
+  private _orphanPop(pop: Pop): void {
+    pop.targetEl.removeAttribute('pinned-pop');
+    pop.targetEl.removeAttribute('unpinned-pop');
+    if (!!pop && !!pop.childPops.length) {
+      pop.childPops.forEach(function(child: Pop): void {
+        this.synchronousHidePop(child.targetEl, false);
+      }, this);
+    }
+    if (!!pop && !!pop.parentPop) {
+      let idx = pop.parentPop.childPops.indexOf(pop);
+      if (idx !== -1) {
+        pop.parentPop.childPops.splice(idx, 1);
+      }
+    }
+  }
+
   private _maybeCreateOrReusePopover(isAlreadyShowing: boolean, targetElement: Element, pop: Pop, groupId: string): Element {
     let container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
     let oldPop = this.getPopFromGroupId(groupId);
@@ -236,22 +252,10 @@ export class PopEngine {
       this.synchronousHidePop(oldPop.targetEl, false);
     }
 
-    // remove references to old popover
     this._maybeSetParentChildRelationship(pop);
     if (isAlreadyShowing && !!container) {
-      oldPop.targetEl.removeAttribute('pinned-pop');
-      oldPop.targetEl.removeAttribute('unpinned-pop');
-      if (!!oldPop && !!oldPop.childPops.length) {
-        oldPop.childPops.forEach(function(child: Pop): void {
-          this.synchronousHidePop(child.targetEl, false);
-        }, this);
-      }
-      if (!!oldPop && !!oldPop.parentPop) {
-        let idx = oldPop.parentPop.childPops.indexOf(oldPop);
-        if (idx !== -1) {
-          oldPop.parentPop.childPops.splice(idx, 1);
-        }
-      }
+      // remove references to old popover
+      this._orphanPop(oldPop);
     }
 
     if (isAlreadyShowing && !!container && !!pop.opts.reusePopover) {
