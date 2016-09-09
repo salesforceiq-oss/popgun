@@ -60,7 +60,6 @@ export class MutationHandler {
       groupId = Math.random().toString(36).slice(2);
       el.setAttribute('popgun-group', groupId);
     }
-    popEngine.addPopToPopStore(groupId, null);
   }
 
 }
