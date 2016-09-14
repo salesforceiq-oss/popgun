@@ -10,9 +10,28 @@
     <link href='https://fonts.googleapis.com/css?family=Lato:400,400italic,700,700italic,900,900italic,300italic,300,100italic,100' rel='stylesheet' type='text/css'>
     <style type='text/css' href='app.css'></style>
     <style>
+    label, button {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .column {
+      float: left;
+      width: 50%;
+      padding: 10px;
+
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+
+    #left {
+      border-right: 1px solid #333;
+    }
+
     .target {
-        width: 75px;
-        height: 75px;
+        width: 100px;
+        height: 100px;
         padding: 10px;
         background: #cacac9;
         margin-bottom: 25px;
@@ -25,10 +44,6 @@
     .very-different-class {
         background: #f16b50;
     }
-
-    .one-final-different-class {
-        background: #1c4657;
-    }
     </style>
   </head>
 
@@ -36,7 +51,55 @@
     <h2>Popgun</h2>
     <h4>The highly customizable and efficient UI tip.</h4>
     <div id="popgunExampleSection">
-        <div class="target very-different-class" popgun popgun-group="test">Hover Me!</div>
+
+
+    <div id="left" class="column">
+      <!-- Trigger -->
+      <label>Trigger: <input id="popgun-trigger" type="text" name="trigger" placeholder="hover" value="hover"></label>
+
+      <!-- Group -->
+      <label>Group: <input id="popgun-group" type="text" name="group" placeholder="group1" value="group1"></label>
+
+      <!-- Placement -->
+      <label>Placement: <input id="popgun-placement" type="text" name="placement" placeholder="top bottom right left" value="top bottom right left"></label>
+
+      <!-- Alignment -->
+      <label>Alignment: <input id="popgun-alignment" type="text" name="alignment" placeholder="top bottom right left" value="bottom top left right"></label>
+
+      <!-- Time To Hover to Pop -->
+      <label>Time To Hover to Pop: <input id="popgun-time-to-hover-on-pop" type="text" name="time-to-hover-on-pop" placeholder="300" value="300"></label>
+
+      <!-- Show Delay -->
+      <label>Show Delay: <input id="popgun-show-delay" type="text" name="show-delay" placeholder="0" value="0"></label>
+
+      <!-- Tip Class -->
+      <label>Tip Class: <input id="popgun-tip-class" type="text" name="tip-class" placeholder="random-class" value="random-class"></label>
+
+      <!-- Text -->
+      <label>Text: <input id="popgun-text" type="text" name="text" placeholder="text" value="This is text!"></label>
+
+      <!-- HTML -->
+      <label>HTML: <input id="popgun-html" type="text" name="html" placeholder="html" value="<div>This is HTML!</div>"></label>
+
+      <!-- Dark Style -->
+      <label>Dark Style: <input id="popgun-dark-style" type="checkbox" name="dark-style"></label>
+
+      <!-- Optimize Placement -->
+      <label>Optimize Placement: <input id="popgun-optimize-placement" type="checkbox" name="optimize-placement" checked="true"></label>
+
+      <!-- Disable -->
+      <label>Disable: <input id="popgun-disable" type="checkbox" name="disable"></label>
+
+      <!-- Reuse Popover -->
+      <label>Reuse Popover: <input id="popgun-reuse-popover" type="checkbox" name="reuse-popover" checked></label>
+
+      <!-- Add Event Listeners -->
+      <label>Event Listeners: <input id="popgun-event-listeners" type="checkbox" name="event-listeners"></label>
+    </div>
+
+
+    <div id="right" class="column"></div>
+
     </div>
     <script src="app.js"></script>
   </body>
