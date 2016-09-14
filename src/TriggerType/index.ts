@@ -1,7 +1,8 @@
 enum TriggerType {
   CLICK,
-  HOVER,
+  BLUR,
   FOCUS,
+  HOVER,
   MANUAL,
   MOUSEOUT
 }
