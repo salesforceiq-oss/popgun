@@ -24,6 +24,10 @@ describe('Trigger - ', () => {
         expect((new Trigger('manual')).name).toBe(TriggerType.MANUAL);
     });
 
+    it('should set name to TriggerType.BLUR', () => {
+        expect((new Trigger('blur')).name).toBe(TriggerType.BLUR);
+    });
+
   });
 
   describe('TriggerEventType - ', () => {
@@ -44,6 +48,10 @@ describe('Trigger - ', () => {
           expect((new Trigger('manual')).eventType).toBe(TriggerEventType.MANUAL);
       });
 
+      it('should set focus event type to `focusout`', () => {
+          expect((new Trigger('blur')).eventType).toBe(TriggerEventType.BLUR);
+      });
+
   });
 
   describe('useCapture - ', () => {
@@ -62,6 +70,10 @@ describe('Trigger - ', () => {
 
       it('should be false for `manual`', () => {
           expect((new Trigger('manual')).useCapture).toBe(false);
+      });
+
+      it('should be false for `focusout`', () => {
+          expect((new Trigger('blur')).useCapture).toBe(false);
       });
 
   });

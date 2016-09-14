@@ -27,11 +27,14 @@ export default class Trigger {
       case TriggerType.CLICK:
         this.eventType = TriggerEventType.CLICK;
         break;
-      case TriggerType.HOVER:
-        this.eventType = TriggerEventType.HOVER;
+      case TriggerType.BLUR:
+        this.eventType = TriggerEventType.BLUR;
         break;
       case TriggerType.FOCUS:
         this.eventType = TriggerEventType.FOCUS;
+        break;
+      case TriggerType.HOVER:
+        this.eventType = TriggerEventType.HOVER;
         break;
       case TriggerType.MANUAL:
         this.eventType = TriggerEventType.MANUAL;

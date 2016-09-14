@@ -12,8 +12,9 @@ export class EventDelegate {
 
   public init(): void {
     this._setEventListener(new Trigger(TriggerType[TriggerType['CLICK']]), this.onClick);
-    this._setEventListener(new Trigger(TriggerType[TriggerType['HOVER']]), this.onHover);
+    this._setEventListener(new Trigger(TriggerType[TriggerType['BLUR']]), this.onBlur);
     this._setEventListener(new Trigger(TriggerType[TriggerType['FOCUS']]), this.onFocus);
+    this._setEventListener(new Trigger(TriggerType[TriggerType['HOVER']]), this.onHover);
     this._setEventListener(new Trigger(TriggerType[TriggerType['MANUAL']]), this.onManual);
     this._setEventListener(new Trigger(TriggerType[TriggerType['MOUSEOUT']]), this.onMouseOut);
     popEngine.listenForScroll();
@@ -61,6 +62,16 @@ export class EventDelegate {
       let pop = popEngine.getPopFromGroupId(groupId);
       timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().timeToHoverOnPop, groupId);
       this._clearParentPops(pop);
+    }
+  }
+
+  public onBlur(e: Event): void {
+    let t: string = TriggerEventType.triggerEventTypeToTriggerType('focusin');
+    let trigger: Trigger = new Trigger(t);
+    let target: Element = <Element>closest(e.target, '[popgun]', true);
+
+    if (popEngine.isPopForTrigger(target, trigger)) {
+      popEngine.hidePop(target, false);
     }
   }
 
@@ -131,7 +142,10 @@ export class EventDelegate {
         // hovering into nothing
         // hide if pop isn't pinned
         target.removeAttribute('unpinned-pop');
-        popEngine.hidePop(target, false);
+        let focusTrigger = new Trigger('focus');
+        if (!popEngine.isPopForTrigger(target, focusTrigger)) {
+          popEngine.hidePop(target, false);
+        }
         return;
       }
     }
