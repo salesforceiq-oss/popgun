@@ -105,6 +105,6 @@ el.addEventListener('PopgunPreShow', function(e) {
 
 
 ## Run Demo Popgun Application
-Run `bin/iqb install` in the root directory to install the npm and typings dependencies.
+Run `bin/iqb install` to install the npm and typings dependencies.
 
-Run `bin/iqb start` in the root directory to run a demo application with Popgun.
+Run `bin/iqb start` to run a demo application with Popgun.
