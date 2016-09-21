@@ -206,7 +206,7 @@ export class PopEngine {
     if (pop) {
       this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
 
-      let popChain = popChainManager.getFullPopChain(pop, hideFullChain);
+      let popChain = popChainManager.getPopChain(pop, hideFullChain);
 
       popChain.forEach(function(p: Pop): void {
         popChainManager.removeParentChildRelationship(p);
