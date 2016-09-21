@@ -69,13 +69,18 @@ popgun.registerGroup('sampleGroup2', anotherGroup);
 ### Popgun Attributes
 Some Popgun attributes that you can define are:
 * **containerCushion**: *(int - default 10)* the amount of padding between the popover border and the window.
+* **darkStyle**: *(boolean - default false)* Sets a dark theme to the popover.
+* **disable**: *(boolean - default false)* Clicking elsewhere on the page of a pinned popover will not hide the popm if this is set to true.
+* **disableClickOff**: *(boolean - default false)* When triggering a popgun target, the popover will not display if this attribute is set to true.
 * **fadeDuration**: *(int - default 100)* time for pop to fade in and out.
 * **html**: an html element for the content of the popover (will take precedence over the text attribute).
 * **optimzePlacement**: *(boolean - default true)* popgun will decide how to best position the popover.
 * **placement**: *(string - default 'top')* you can set placement of popover around target - 'top', 'bottom', 'left', 'right'.
+* **reusePopover**: *(boolean - default true)* boolean which sets whether popgun will reuse the same popover when moving between two Popgun targets of the same group.
 * **showDelay**: *(int - default 0)* the time it takes between the user triggering the target and the popover appearing.
 * **text**: text content for the popover.
 * **timeToHoverOnPop**: *(int - default 300)* the time a user has to hover back over the popover when they hover off the target.
+* **tipClass**: *(string - default '')* Adds css classes to the popover container (class names should be space separated).
 * **trigger**: *(string - default 'hover')* triggers for the target to show pop - 'hover', 'click', 'focus'.
 
 ### DOM Events
@@ -100,4 +105,6 @@ el.addEventListener('PopgunPreShow', function(e) {
 
 
 ## Run Demo Popgun Application
-Run `iqb start` in the root directory to run a demo application with Popgun.
+Run `bin/iqb install` to install the npm and typings dependencies.
+
+Run `bin/iqb start` to run a demo application with Popgun.

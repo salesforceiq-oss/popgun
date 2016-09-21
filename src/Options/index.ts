@@ -23,6 +23,8 @@ export default class Options implements IOptions {
   disableClickOff: boolean;
   tipClass: string;
   darkStyle: boolean;
+  disable: boolean;
+  reusePopover: boolean;
 
   static fromElement(el: Element): Options {
     return (new Options()).extend(OptionsParser.fromElement(el));

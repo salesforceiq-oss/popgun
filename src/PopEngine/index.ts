@@ -7,29 +7,14 @@ import PopStateType from '../PopStateType';
 import Pop from '../Pop';
 import popChainManager from '../PopChainManager';
 import UserAgentUtil from '../UserAgentUtil';
+import timeoutManager from '../TimeoutManager';
 let camelize = require('camelize');
 let closest = require('closest');
 let positioner = require('positioner');
-let zIndexManager = require('z-index-manager').default;
+let createZIndexManager = require('z-index-manager').default;
 const createEscapeStack = require('escape-stack').default;
 
 export class PopEngine {
-
-  _timeouts: {
-    hoverdelay: any
-    popHover: any
-    scrollTimer: { [key: string]: number }
-    timeToHoverOnPop: { [key: string]: number }
-  } = {
-    hoverdelay: null,
-    popHover: null,
-    scrollTimer: {},
-    timeToHoverOnPop: {}
-  };
-
-  _handlers: {
-    [groupId: string]: any
-  } = {};
 
   _transitionendCallbacks: {
     [groupId: string]: any
@@ -37,8 +22,10 @@ export class PopEngine {
 
   _escapeStack: any = null;
   _scrollListener: any = null;
+  _zIndexManager: any = null;
 
   constructor() {
+    this._zIndexManager = createZIndexManager();
     this._escapeStack = createEscapeStack();
     this._scrollListener = this._positionOpenPops.bind(this);
   }
@@ -104,11 +91,6 @@ export class PopEngine {
     }
   }
 
-  public clearTimeout(targetElement: Element): void {
-    let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
-    this._clearTimeoutByGroupId(groupId);
-  }
-
   public listenForScroll(): void {
     document.addEventListener('scroll', this._scrollListener, true);
   }
@@ -125,121 +107,93 @@ export class PopEngine {
               .at(pop.opts.placement, pop.opts.optimizePlacement, pop.opts.alignment);
   }
 
-  public createPopElement(targetElement: Element, isDark: boolean): Element {
+  public createPopElement(targetElement: Element): Element {
     let container: Element = document.createElement('div');
     let nose: Element = document.createElement('div');
     container.classList.add('popover');
     container.classList.add('hidden');
-    if (isDark) {
-      container.classList.add('dark-style');
-    }
     container.setAttribute('pop-id', targetElement.getAttribute('popgun-group'));
     container.setAttribute('pop', '');
     nose.setAttribute('class', 'nose-triangle');
-    container.setAttribute('style', 'z-index: ' + zIndexManager.getHighest().toString() + ';');
+    container.setAttribute('style', 'z-index: ' + this._zIndexManager.getHighest().toString() + ';');
     container.appendChild(nose);
     return container;
   }
 
   public showPop(targetElement: Element, isPinned: boolean, pop: Pop): void {
-    let delay = isPinned ? 0 : pop.opts.showDelay;
-    let groupId = targetElement.getAttribute('popgun-group');
-    let isAlreadyShowing = this.isPopAlreadyOpenForGroup(groupId);
+    if (!pop.opts.disable) {
+      let delay = isPinned ? 0 : pop.opts.showDelay;
+      let groupId = targetElement.getAttribute('popgun-group');
+      let isAlreadyShowing = this.isPopAlreadyOpenForGroup(groupId);
 
-    // clear any timeouts and do a timeout and show pop
-    this.clearTimeout(targetElement);
-    this._timeouts.hoverdelay = setTimeout(function(): void {
-      let animationEndStates = {};
+      // clear any timeouts and do a timeout and show pop
+      timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().timeToHoverOnPop, groupId);
+      timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().hoverdelay, null);
+      timeoutManager.getTimeouts().hoverdelay = setTimeout(function(): void {
+        let animationEndStates = {};
+        let container = this._maybeCreateOrReusePopover(isAlreadyShowing, targetElement, pop, groupId);
 
-      // this is gross and should be refactored
-      // we store the old pop because it will be overwritten and we need it later
-      let container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
-      let oldPop = this.getPopFromGroupId(groupId);
-      this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
-      this._maybeSetParentChildRelationship(pop);
-      if (isAlreadyShowing && !!container) {
-        oldPop.targetEl.removeAttribute('pinned-pop');
-        oldPop.targetEl.removeAttribute('unpinned-pop');
-        if (!!oldPop && !!oldPop.childPops.length) {
-          oldPop.childPops.forEach(function(child: Pop): void {
-            this.hidePop(child.targetEl, false);
-          }, this);
+        this.addPopToPopStore(targetElement.getAttribute('popgun-group'), pop);
+
+        if (UserAgentUtil.isSafari() && !this._transitionendCallbacks[groupId]) {
+          this._transitionendCallbacks[groupId] = this._removeHiddenClass.bind(this);
+          document.querySelector('div[pop-id="' + groupId + '"]').addEventListener('transitionend', this._transitionendCallbacks[groupId], true);
         }
-        if (!!oldPop && !!oldPop.parentPop) {
-          let idx = oldPop.parentPop.childPops.indexOf(oldPop);
-          if (idx !== -1) {
-            oldPop.parentPop.childPops.splice(idx, 1);
+
+        if (isPinned) {
+          popChainManager.maybePinOrUnpinPopAndParentPops(targetElement, true);
+        }
+
+        timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().popHover, null);
+
+        // CONTENT SETUP
+        this.setState(pop, PopStateType.CONTENT_SETUP, pop.opts, null, false);
+        if (pop.opts.darkStyle) {
+          container.classList.add('dark-style');
+        } else {
+          container.classList.remove('dark-style');
+        }
+        container.appendChild(pop.popOver.element);
+
+        // PRE POSITION
+        this.setState(pop, PopStateType.PRE_POSITION, pop.opts, null, false);
+
+        timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().position, null);
+        timeoutManager.getTimeouts().position = setTimeout(function(): void {
+
+          this.setPosition(pop, container);
+
+          // PRE SHOW
+          this.setState(pop, PopStateType.PRE_SHOW, pop.opts, null, false);
+
+          timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().hoverdelay, null);
+          if (!pop.opts.disableClickOff) {
+            timeoutManager.getHandlers()[groupId] = this._escapeStack.add(function(): boolean {
+              this.synchronousHidePop(pop.targetEl, false);
+              return true;
+            }.bind(this));
           }
-        }
-      }
 
-      if (isAlreadyShowing && !!container) {
-        // if pop is already showing for group, reuse
-        container.removeChild(container.getElementsByClassName('pop-content')[0]);
-        this._maybeClearHandler(this._handlers[groupId]);
-      } else {
-        container = this.createPopElement(targetElement, pop.opts.darkStyle);
-        if (!!pop.opts.tipClass) {
-          let classes = pop.opts.tipClass.split(' ');
-          classes.forEach(function (className: string): void {
-            container.classList.add(className);
-          });
-        }
-        document.body.appendChild(container);
-      }
+          // SHOWING
+          this.setState(pop, PopStateType.SHOWING, pop.opts, null, false);
+          if (!UserAgentUtil.isSafari()) {
+            container.classList.remove('hidden');
+          }
 
-      if (UserAgentUtil.isSafari() && !this._transitionendCallbacks[groupId]) {
-        this._transitionendCallbacks[groupId] = this._removeHiddenClass.bind(this);
-        document.querySelector('div[pop-id="' + groupId + '"]').addEventListener('transitionend', this._transitionendCallbacks[groupId], true);
-      }
-
-      if (isPinned) {
-        popChainManager.maybePinOrUnpinPopAndParentPops(targetElement, true);
-      }
-
-      this._maybeClearTimeout(this._timeouts.popHover, null);
-
-      // CONTENT SETUP
-      this.setState(pop, PopStateType.CONTENT_SETUP, pop.opts, null, false);
-      container.appendChild(pop.popOver.element);
-
-      // PRE POSITION
-      this.setState(pop, PopStateType.PRE_POSITION, pop.opts, null, false);
-
-      this._maybeClearTimeout(this._timeouts.position, null);
-      this._timeouts.position = setTimeout(function(): void {
-
-        this.setPosition(pop, container);
-
-        // PRE SHOW
-        this.setState(pop, PopStateType.PRE_SHOW, pop.opts, null, false);
-
-        this._maybeClearTimeout(this._timeouts.hoverdelay, null);
-        if (!pop.opts.disableClickOff) {
-          this._handlers[groupId] = this._escapeStack.add(function(): boolean {
-            this.synchronousHidePop(pop.targetEl, false);
-            return true;
-          }.bind(this));
-        }
-
-        // SHOWING
-        this.setState(pop, PopStateType.SHOWING, pop.opts, null, false);
-        if (!UserAgentUtil.isSafari()) {
-          container.classList.remove('hidden');
-        }
-
-      }.bind(this));
-    }.bind(this), delay);
+        }.bind(this));
+      }.bind(this), delay);
+    }
   }
 
   public hidePop(targetElement: Element, hideFullChain: boolean): void {
     let groupId = targetElement.getAttribute('popgun-group') || targetElement.getAttribute('pop-id');
     let pop = this.getPopFromGroupId(groupId);
+    timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().hoverdelay, null);
 
     if (pop) {
       this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
 
-      this._timeouts.timeToHoverOnPop[groupId] = setTimeout(function(): void {
+      timeoutManager.getTimeouts().timeToHoverOnPop[groupId] = setTimeout(function(): void {
         this.synchronousHidePop(targetElement, hideFullChain);
       }.bind(this), pop.opts.timeToHoverOnPop);
     }
@@ -252,7 +206,7 @@ export class PopEngine {
     if (pop) {
       this.setState(pop, PopStateType.PRE_HIDE, pop.opts, null, false);
 
-      let popChain = popChainManager.getFullPopChain(pop, hideFullChain);
+      let popChain = popChainManager.getPopChain(pop, hideFullChain);
 
       popChain.forEach(function(p: Pop): void {
         popChainManager.removeParentChildRelationship(p);
@@ -261,12 +215,13 @@ export class PopEngine {
           let g = popOver.getAttribute('pop-id');
           p.targetEl.removeAttribute('pinned-pop');
 
-          this._maybeClearHandler(this._handlers[g]);
+          timeoutManager.maybeClearHandler(timeoutManager.getHandlers()[g]);
 
           this.setState(p, PopStateType.HIDDEN, p.opts, null, false);
 
           if (!!popOver) {
             document.body.removeChild(popOver);
+            this._fireEvent(PopStateType.CONTENT_REMOVE, p);
           }
           this.addPopToPopStore(g, null);
         }
@@ -274,50 +229,59 @@ export class PopEngine {
     }
   }
 
+  private _orphanPop(pop: Pop): void {
+    pop.targetEl.removeAttribute('pinned-pop');
+    pop.targetEl.removeAttribute('unpinned-pop');
+    if (!!pop && !!pop.childPops.length) {
+      pop.childPops.forEach(function(child: Pop): void {
+        this.synchronousHidePop(child.targetEl, false);
+      }, this);
+    }
+    if (!!pop && !!pop.parentPop) {
+      let idx = pop.parentPop.childPops.indexOf(pop);
+      if (idx !== -1) {
+        pop.parentPop.childPops.splice(idx, 1);
+      }
+    }
+  }
+
+  private _maybeCreateOrReusePopover(isAlreadyShowing: boolean, targetElement: Element, pop: Pop, groupId: string): Element {
+    let container = <Element>document.querySelector('div[pop-id="' + groupId + '"]');
+    let oldPop = this.getPopFromGroupId(groupId);
+    if (oldPop && oldPop.targetEl && !pop.opts.reusePopover) {
+      this.synchronousHidePop(oldPop.targetEl, false);
+    }
+
+    this._maybeSetParentChildRelationship(pop);
+    if (isAlreadyShowing && !!container) {
+      // remove references to old popover
+      this._orphanPop(oldPop);
+    }
+
+    if (isAlreadyShowing && !!container && !!pop.opts.reusePopover) {
+      // if pop is already showing for group, reuse
+      container.removeChild(container.getElementsByClassName('pop-content')[0]);
+      this._fireEvent(PopStateType.CONTENT_SWAP, oldPop);
+      timeoutManager.maybeClearHandler(timeoutManager.getHandlers()[groupId]);
+    } else {
+      container = this.createPopElement(targetElement);
+      if (!!pop.opts.tipClass) {
+        let classes = pop.opts.tipClass.split(' ');
+        classes.forEach(function (className: string): void {
+          container.classList.add(className);
+        });
+      }
+      document.body.appendChild(container);
+    }
+
+    return container;
+  }
+
   private _fireEvent(state: string, pop: Pop): void {
     let event = document.createEvent('CustomEvent');
     event.initCustomEvent(camelize('Popgun_' + state), true, true, {'pop': pop});
 
     pop.targetEl.dispatchEvent(event);
-  }
-
-  private _maybeClear(timeoutOrHandler: any, isTimeout: boolean, groupId: string): void {
-    if (timeoutOrHandler) {
-      let obj = isTimeout ? this._timeouts : this._handlers;
-      let key: string = null;
-      for (let k in obj) {
-        if (obj.hasOwnProperty(k) && ((<any>obj)[k] === timeoutOrHandler)) {
-          key = k;
-        }
-      }
-      if (isTimeout) {
-        if (key === 'timeToHoverOnPop' || key === 'scrollTimer') {
-          clearTimeout((<any>obj)[key][groupId]);
-        } else {
-          clearTimeout((<any>obj)[key]);
-        }
-      } else {
-        timeoutOrHandler();
-      }
-      if (key === 'timeToHoverOnPop' || key === 'scrollTimer') {
-        (<any>obj)[key][groupId] = undefined;
-      } else {
-        (<any>obj)[key] = undefined;
-      }
-    }
-  }
-
-  private _clearTimeoutByGroupId(groupId: string): void {
-    this._maybeClearTimeout(this._timeouts.timeToHoverOnPop, groupId);
-    this._maybeClearTimeout(this._timeouts.hoverdelay, null);
-  }
-
-  private _maybeClearTimeout(timeout: any, groupId: string): void {
-    return this._maybeClear(timeout, true, groupId);
-  }
-
-  private _maybeClearHandler(watch: any): void {
-    return this._maybeClear(watch, false, null);
   }
 
   private _getParentPop(pop: Pop): Pop {
@@ -332,8 +296,8 @@ export class PopEngine {
     let popElementsList = Array.prototype.slice.call(document.body.getElementsByClassName('popover'));
     popElementsList.forEach(function(popOver: Element): void {
       let groupId = popOver.getAttribute('pop-id');
-      this._maybeClearTimeout(this._timeouts.scrollTimer, groupId);
-      this._timeouts.scrollTimer[groupId] = setTimeout(function(): void {
+      timeoutManager.maybeClearTimeout(timeoutManager.getTimeouts().scrollTimer, groupId);
+      timeoutManager.getTimeouts().scrollTimer[groupId] = setTimeout(function(): void {
         this.setPosition(this.getPopFromGroupId(groupId), popOver);
       }.bind(this), 100);
     }, this);

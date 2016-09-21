@@ -22,6 +22,10 @@ describe('TriggerEventType - ', () => {
       expect(TriggerEventType.MANUAL).toBe('popgun-manual');
     });
 
+    it('should set blur event type to `focusout`', () => {
+      expect(TriggerEventType.BLUR).toBe('focusout');
+    });
+
   });
 
   describe('triggerEventTypeToTriggerType - ', () => {
@@ -40,6 +44,10 @@ describe('TriggerEventType - ', () => {
 
     it('should return `manual` for `popgun-manual`', () => {
       expect(TriggerEventType.triggerEventTypeToTriggerType('popgun-manual')).toBe('manual');
+    });
+
+    it('should return `blur` for `focusout`', () => {
+      expect(TriggerEventType.triggerEventTypeToTriggerType('focusout')).toBe('blur');
     });
 
   });

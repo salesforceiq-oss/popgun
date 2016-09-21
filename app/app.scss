@@ -1,8 +1,6 @@
 @import '../src/popgun';
 
 html, body, #popgun-examples-container {
-	height: 100%;
-	width: 100%;
 }
 
 #popgunPerfSection {
@@ -18,4 +16,39 @@ html, body, #popgun-examples-container {
 .pop-example-block {
 	width: 200px;
 	height: 200px;
+}
+
+label, button {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.column {
+  float: left;
+  width: 50%;
+  padding: 10px;
+
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+#left {
+  border-right: 1px solid #333;
+}
+
+.target {
+    width: 100px;
+    height: 100px;
+    padding: 10px;
+    background: #cacac9;
+    margin-bottom: 50px;
+}
+
+.different-class {
+    background: #67bbaa;
+}
+
+.very-different-class {
+    background: #f16b50;
 }
