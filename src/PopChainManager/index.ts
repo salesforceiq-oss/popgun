@@ -8,13 +8,11 @@ export class PopChainManager {
     return closest(pop.targetEl, '[pop]', true);
   }
 
-  public getFullPopChain(pop: Pop, hideFullChain: boolean): Pop[] {
+  public getPopChain(pop: Pop, hideFullChain: boolean): Pop[] {
     let popChain: Pop[] = [];
 
     if (hideFullChain) {
       pop = this._getRootPop(pop);
-    } else {
-      pop = this._getFirstUnpinnedParentPop(pop);
     }
 
     let stack: Pop[] = [];
