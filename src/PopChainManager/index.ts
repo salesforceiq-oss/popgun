@@ -13,6 +13,8 @@ export class PopChainManager {
 
     if (hideFullChain) {
       pop = this._getRootPop(pop);
+    } else {
+      pop = this._getFirstUnpinnedUnhoveredParentPop(pop);
     }
 
     let stack: Pop[] = [];
@@ -73,8 +75,8 @@ export class PopChainManager {
     }
   }
 
-  private _getFirstUnpinnedParentPop(pop: Pop): Pop {
-    while (!!pop.parentPop && !pop.parentPop.isPinned) {
+  private _getFirstUnpinnedUnhoveredParentPop(pop: Pop): Pop {
+    while (!!pop.parentPop && !pop.parentPop.isPinned && !pop.parentPop.popOver.element.querySelector(':hover')) {
       pop = pop.parentPop;
     }
     return pop;
