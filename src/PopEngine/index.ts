@@ -222,6 +222,7 @@ export class PopEngine {
           this.setState(p, PopStateType.HIDDEN, p.opts, null, false);
 
           if (!!popOver) {
+            document.body.removeChild(popOver);
             this._fireEvent(PopStateType.CONTENT_REMOVE, p);
           }
           this.addPopToPopStore(g, null);
