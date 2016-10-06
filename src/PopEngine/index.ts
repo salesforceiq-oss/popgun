@@ -96,6 +96,7 @@ export class PopEngine {
   }
 
   public setPosition(pop: Pop, container: Element): void {
+    if (!pop) { return; }
     let nose = <Element>container.getElementsByClassName('nose-triangle')[0];
     let positionOpts = {
       cushion: pop.opts.cushion,
@@ -121,6 +122,7 @@ export class PopEngine {
   }
 
   public showPop(targetElement: Element, isPinned: boolean, pop: Pop): void {
+    if (!pop) { return; }
     if (!pop.opts.disable) {
       let delay = isPinned ? 0 : pop.opts.showDelay;
       let groupId = targetElement.getAttribute('popgun-group');
@@ -260,7 +262,11 @@ export class PopEngine {
 
     if (isAlreadyShowing && !!container && !!pop.opts.reusePopover) {
       // if pop is already showing for group, reuse
-      container.removeChild(container.getElementsByClassName('pop-content')[0]);
+      let contentEl : Element = <Element>container.getElementsByClassName('pop-content')[0];
+      // race condition guard
+      if (contentEl) {
+        container.removeChild(contentEl);
+      }
       this._fireEvent(PopStateType.CONTENT_SWAP, oldPop);
       timeoutManager.maybeClearHandler(timeoutManager.getHandlers()[groupId]);
     } else {
