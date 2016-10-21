@@ -68,8 +68,6 @@ export class Popgun {
     if (!!pop) {
       let container = closest(pop.popOver.element, 'div[pop=""]');
       popEngine.setPosition(pop, container);
-    } else {
-      throw new Error('No pop open for this groupId.');
     }
   }
 
