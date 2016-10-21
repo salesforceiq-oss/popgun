@@ -75,10 +75,11 @@ export class PopEngine {
 
   public isPopAlreadyOpenForTarget(targetElement: Element): boolean {
     let groupId = targetElement.getAttribute('popgun-group');
-    if (this.getPopFromGroupId(groupId)) {
-      return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING ||
-                this.getPopFromGroupId(groupId).state === PopStateType.PRE_HIDE) &&
-        (this.getPopFromGroupId(groupId).targetEl === targetElement));
+    let pop = this.getPopFromGroupId(groupId);
+    if (pop) {
+      return ((pop.state === PopStateType.SHOWING ||
+                pop.state === PopStateType.PRE_HIDE) &&
+        (pop.targetEl === targetElement));
     }
     return false;
   }
@@ -96,6 +97,7 @@ export class PopEngine {
   }
 
   public setPosition(pop: Pop, container: Element): void {
+    if (!pop) { return; }
     let nose = <Element>container.getElementsByClassName('nose-triangle')[0];
     let positionOpts = {
       cushion: pop.opts.cushion,
@@ -121,6 +123,7 @@ export class PopEngine {
   }
 
   public showPop(targetElement: Element, isPinned: boolean, pop: Pop): void {
+    if (!pop) { return; }
     if (!pop.opts.disable) {
       let delay = isPinned ? 0 : pop.opts.showDelay;
       let groupId = targetElement.getAttribute('popgun-group');
@@ -260,7 +263,11 @@ export class PopEngine {
 
     if (isAlreadyShowing && !!container && !!pop.opts.reusePopover) {
       // if pop is already showing for group, reuse
-      container.removeChild(container.getElementsByClassName('pop-content')[0]);
+      let contentEl : Element = <Element>container.getElementsByClassName('pop-content')[0];
+      // race condition guard
+      if (contentEl) {
+        container.removeChild(contentEl);
+      }
       this._fireEvent(PopStateType.CONTENT_SWAP, oldPop);
       timeoutManager.maybeClearHandler(timeoutManager.getHandlers()[groupId]);
     } else {

@@ -132,6 +132,8 @@ export class EventDelegate {
     target = <Element>closest(e.target, '[popgun]', true);
     if (!!target) {
       let groupId = target.getAttribute('popgun-group');
+      // error guard
+      if (!e.relatedTarget || !groupId) { return; }
       let relatedTarget: Element = <Element>closest(e.relatedTarget, '[popgun-group="' + groupId + '"]', true);
 
       if (!!relatedTarget) {
