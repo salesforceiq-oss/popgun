@@ -75,10 +75,11 @@ export class PopEngine {
 
   public isPopAlreadyOpenForTarget(targetElement: Element): boolean {
     let groupId = targetElement.getAttribute('popgun-group');
-    if (this.getPopFromGroupId(groupId)) {
-      return ((this.getPopFromGroupId(groupId).state === PopStateType.SHOWING ||
-                this.getPopFromGroupId(groupId).state === PopStateType.PRE_HIDE) &&
-        (this.getPopFromGroupId(groupId).targetEl === targetElement));
+    let pop = this.getPopFromGroupId(groupId);
+    if (pop) {
+      return ((pop.state === PopStateType.SHOWING ||
+                pop.state === PopStateType.PRE_HIDE) &&
+        (pop.targetEl === targetElement));
     }
     return false;
   }
