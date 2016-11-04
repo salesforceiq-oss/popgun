@@ -16,13 +16,13 @@ const createEscapeStack = require('escape-stack').default;
 
 export class PopEngine {
 
-  _transitionendCallbacks: {
+  private _transitionendCallbacks: {
     [groupId: string]: any
   } = {};
 
-  _escapeStack: any = null;
-  _scrollListener: any = null;
-  _zIndexManager: any = null;
+  private _escapeStack: any = null;
+  private _scrollListener: any = null;
+  private _zIndexManager: any = null;
 
   constructor() {
     this._zIndexManager = createZIndexManager();
