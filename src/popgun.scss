@@ -195,6 +195,12 @@ $darkColorBackground: rgba(#133340, 0.88);
   -webkit-transition: top .25s ease-out, left .25s ease-out;
   transition: top .25s ease-out, left .25s ease-out;
 
+  /* Safari transitions act funky */
+  &.safari {
+    -webkit-transition: none;
+    transition: none;
+  }
+
   &.dark-style {
     border: 1px solid transparent;
     color: #fff;
