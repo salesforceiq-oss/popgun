@@ -16,10 +16,6 @@ const createEscapeStack = require('escape-stack').default;
 
 export class PopEngine {
 
-  private _transitionendCallbacks: {
-    [groupId: string]: any
-  } = {};
-
   private _escapeStack: any = null;
   private _scrollListener: any = null;
   private _zIndexManager: any = null;
