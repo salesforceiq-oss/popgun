@@ -1,6 +1,6 @@
 {
   "name": "popgun",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A pure Javascript popover component for high performance and feature-rich web applications",
   "main": ".src/index.js",
   "scripts": {
