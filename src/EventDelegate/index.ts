@@ -119,7 +119,7 @@ export class EventDelegate {
           }
         } else {
           let pop = popEngine.getPopFromGroupId(groupId);
-          if (popEngine.isPopForTrigger(pop.targetEl, (new Trigger('hover'))) && !pop.targetEl.hasAttribute('pinned-pop')) {
+          if (pop && pop.targetEl && popEngine.isPopForTrigger(pop.targetEl, (new Trigger('hover'))) && !pop.targetEl.hasAttribute('pinned-pop')) {
             // hide pop is the target is not pinned
             pop.targetEl.removeAttribute('unpinned-pop');
             popEngine.hidePop(pop.targetEl, false);
