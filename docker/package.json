@@ -2,7 +2,7 @@
   "name": "packagename",
   "devDependencies": {
     "connect-livereload": "0.2.0",
-    "express": "3.4.8",
+    "express": "4.17.1",
     "fs": "0.0.2",
     "http-proxy": "~1.10.1",
     "tiny-lr": "0.0.5",
